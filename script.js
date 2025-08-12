@@ -1,68 +1,49 @@
+// This script loads the project list from projects.js to build the gallery.
 document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURATION ---
-    // These values MUST match your GitHub details exactly.
+    // These values are still needed to build the correct image URLs.
     const githubUsername = 'wuebmistireselassie'; 
-const repoName = 'real-portfolio'; 
-const folderPath = 'images';
+    const repoName = 'real-portfolio'; 
+    const folderPath = 'images'; // The folder where your images are stored.
     // ---------------------
 
     const portfolioGrid = document.getElementById('portfolio-grid');
-    const apiUrl = `https://api.github.com/repos/${githubUsername}/${repoName}/contents/${folderPath}`;
 
-    // Function to fetch and display portfolio items
-    async function loadPortfolio() {
-        try {
-            const response = await fetch(apiUrl);
+    // Check if the projectFiles array exists from projects.js
+    if (typeof projectFiles !== 'undefined' && projectFiles.length > 0) {
+        // Clear the "Loading..." message
+        portfolioGrid.innerHTML = ''; 
 
-            // Handle API errors like "Not Found"
-            if (!response.ok) {
-                throw new Error(`GitHub API Error: ${response.status} - ${response.statusText}. Check the 'apiUrl' in your script.`);
-            }
-
-            const files = await response.json();
+        // Create gallery items from the list
+        projectFiles.forEach(fileName => {
+            const item = document.createElement('div');
+            item.className = 'portfolio-item';
             
-            // Clear the "Loading..." message
-            portfolioGrid.innerHTML = ''; 
+            // Construct the full URL to the image file
+            const imageUrl = `https://raw.githubusercontent.com/${githubUsername}/${repoName}/main/${folderPath}/${encodeURIComponent(fileName)}`;
 
-            // Filter for files that are images
-            const imageFiles = files.filter(file => 
-                file.type === 'file' && /\.(jpe?g|png|gif|svg)$/i.test(file.name)
-            );
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
 
-            if (imageFiles.length === 0) {
-                portfolioGrid.innerHTML = '<p>No projects found. Make sure your images are in the correct folder on GitHub.</p>';
-                return;
-            }
+            const image = document.createElement('img');
+            image.src = imageUrl;
+            image.alt = fileName;
 
-            // Create gallery items for each image file
-            imageFiles.forEach(file => {
-                const item = document.createElement('div');
-                item.className = 'portfolio-item';
-                
-                const link = document.createElement('a');
-                link.href = file.download_url;
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
+            // Use the filename without extension as the caption
+            const caption = document.createElement('p');
+            caption.textContent = fileName.split('.').slice(0, -1).join('.');
 
-                const image = document.createElement('img');
-                image.src = file.download_url;
-                image.alt = file.name;
+            link.appendChild(image);
+            link.appendChild(caption);
+            item.appendChild(link);
+            portfolioGrid.appendChild(item);
+        });
 
-                const caption = document.createElement('p');
-                caption.textContent = file.name.split('.').slice(0, -1).join('.');
-
-                link.appendChild(image);
-                link.appendChild(caption);
-                item.appendChild(link);
-                portfolioGrid.appendChild(item);
-            });
-
-        } catch (error) {
-            console.error('Failed to load portfolio:', error);
-            portfolioGrid.innerHTML = `<p style="color: red;">Error: Could not load portfolio items. Please double-check that the GitHub username, repository name, and folder path are correct in the script.js file.</p>`;
-        }
+    } else {
+        // This message shows if projects.js is missing or empty
+        portfolioGrid.innerHTML = '<p>No projects found. Please check the projects.js file.</p>';
+        console.error("Error: 'projectFiles' array not found or is empty. Make sure projects.js is loaded correctly before this script.");
     }
-
-    // Run the function to load the portfolio
-    loadPortfolio();
 });
