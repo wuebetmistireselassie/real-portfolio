@@ -45,12 +45,12 @@ const portfolioItems = [
     url: 'https://docs.google.com/presentation/d/1fGQv90tWiE67GIt3YMXQHENtppNDjnAQ/edit?usp=drive_link&ouid=106245665520969369871&rtpof=true&sd=true'
   },
 
-  // --- VIDEO PROJECTS (Example Template) ---
-  /*
+  // --- VIDEO PROJECTS ---
   {
     type: 'video',
     title: 'My Animated Logo Showcase',
-    url: 'https://youtu.be/njgHOjvJKr0?si=6KcRaOb0K-AjOly-'
+    // This URL has been corrected to the proper embed format
+    url: 'https://www.youtube.com/embed/njgHOjvJKr0'
   },
-  */
+  
 ];
