@@ -136,6 +136,7 @@ auth.onAuthStateChanged(user => {
         if (guestCTA) guestCTA.classList.remove('hidden');
         protectedContent.forEach(element => element.classList.add('hidden'));
 
-        buildGuestPortfolio();
+        // Wait for projects.js to load, then build guest portfolio
+        setTimeout(buildGuestPortfolio, 200);
     }
 });
