@@ -1,5 +1,4 @@
 // --- FIREBASE CONFIGURATION ---
-// These are your unique project keys.
 const firebaseConfig = {
   apiKey: "AIzaSyBBChrO3wq3ax-cbSPZGEFEqePFWlubowg",
   authDomain: "mwcreatives-3fd8b.firebaseapp.com",
@@ -55,57 +54,47 @@ showLoginLink.addEventListener('click', (e) => {
 });
 
 // --- AUTHENTICATION LOGIC ---
-
-// Sign up new users
 signupSubmitButton.addEventListener('click', (e) => {
     e.preventDefault();
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
-
     auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            console.log('User signed up:', userCredential.user);
-            authModal.classList.add('hidden');
-        })
-        .catch((error) => {
-            authError.textContent = error.message;
-        });
+        .then(() => authModal.classList.add('hidden'))
+        .catch(error => authError.textContent = error.message);
 });
 
-// Sign in existing users
 loginSubmitButton.addEventListener('click', (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
-
     auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            console.log('User signed in:', userCredential.user);
-            authModal.classList.add('hidden');
-        })
-        .catch((error) => {
-            authError.textContent = error.message;
-        });
+        .then(() => authModal.classList.add('hidden'))
+        .catch(error => authError.textContent = error.message);
 });
 
-// Sign out
-logoutButton.addEventListener('click', () => {
-    auth.signOut().then(() => {
-        console.log('User signed out');
-    });
-});
+logoutButton.addEventListener('click', () => auth.signOut());
 
-// Listen for authentication state changes
-auth.onAuthStateChanged((user) => {
+auth.onAuthStateChanged(user => {
     if (user) {
-        // User is signed in
         loginButton.classList.add('hidden');
         userInfo.classList.remove('hidden');
         userEmailSpan.textContent = user.email;
     } else {
-        // User is signed out
         loginButton.classList.remove('hidden');
         userInfo.classList.add('hidden');
         userEmailSpan.textContent = '';
     }
+});
+
+// --- DROPLET ANIMATION RANDOMIZER ---
+document.querySelectorAll('.droplet').forEach(droplet => {
+    const size = Math.random() * 15 + 5;
+    const delay = Math.random() * -20;
+    const duration = Math.random() * 10 + 10;
+    const position = Math.random() * 98;
+    droplet.style.width = `${size}px`;
+    droplet.style.height = `${size}px`;
+    droplet.style.left = `${position}vw`;
+    droplet.style.animationDelay = `${delay}s`;
+    droplet.style.animationDuration = `${duration}s`;
 });
