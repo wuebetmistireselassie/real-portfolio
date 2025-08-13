@@ -50,7 +50,7 @@ const portfolioItems = [
   {
     type: 'video',
     title: 'My Animated Logo Showcase',
-    url: 'https://www.youtube.com/embed/your_video_id_here'
+    url: 'https://youtu.be/njgHOjvJKr0?si=6KcRaOb0K-AjOly-'
   },
   */
 ];
