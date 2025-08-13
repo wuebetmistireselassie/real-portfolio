@@ -1,11 +1,11 @@
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
-  apiKey: "AIzaSyBBChrO3wq3ax-cbSPZGEFEqePFWlubowg",
-  authDomain: "mwcreatives-3fd8b.firebaseapp.com",
-  projectId: "mwcreatives-3fd8b",
-  storageBucket: "mwcreatives-3fd8b.appspot.com",
-  messagingSenderId: "56482314427",
-  appId: "1:56482314427:web:3e4d5fc7d53dcf1045d19e"
+    apiKey: "AIzaSyBBChrO3wq3ax-cbSPZGEFEqePFWlubowg",
+    authDomain: "mwcreatives-3fd8b.firebaseapp.com",
+    projectId: "mwcreatives-3fd8b",
+    storageBucket: "mwcreatives-3fd8b.appspot.com",
+    messagingSenderId: "56482314427",
+    appId: "1:56482314427:web:3e4d5fc7d53dcf1045d19e"
 };
 
 // Initialize Firebase
@@ -20,16 +20,20 @@ const userEmailSpan = document.getElementById('user-email');
 const authModal = document.getElementById('auth-modal');
 const closeModalButton = document.querySelector('.close-button');
 const ctaLoginButton = document.getElementById('cta-login-button');
+
 const loginForm = document.getElementById('login-form');
 const signupForm = document.getElementById('signup-form');
 const forgotPasswordForm = document.getElementById('forgot-password-form');
+
 const showSignupLink = document.getElementById('show-signup');
 const showLoginLink = document.getElementById('show-login');
 const forgotPasswordLink = document.getElementById('forgot-password-link');
 const backToLoginLink = document.getElementById('back-to-login');
+
 const signupSubmitButton = document.getElementById('signup-submit-button');
 const loginSubmitButton = document.getElementById('login-submit-button');
 const resetPasswordButton = document.getElementById('reset-password-button');
+
 const authMessage = document.getElementById('auth-message');
 const protectedContent = document.querySelectorAll('.protected-content');
 const guestCTA = document.getElementById('guest-cta');
@@ -57,6 +61,7 @@ if (ctaLoginButton) {
     ctaLoginButton.addEventListener('click', openAuthModal);
 }
 closeModalButton.addEventListener('click', () => authModal.classList.add('hidden'));
+
 showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
 showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
 forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotPasswordForm); });
@@ -107,35 +112,30 @@ resetPasswordButton.addEventListener('click', (e) => {
 
 logoutButton.addEventListener('click', () => auth.signOut());
 
-// --- THIS IS THE KEY LOGIC FOR HIDING/SHOWING CONTENT ---
+// --- AUTH STATE LISTENER ---
 auth.onAuthStateChanged(user => {
     if (user) {
-        // User is LOGGED IN
+        // LOGGED IN
         loginButton.classList.add('hidden');
         userInfo.classList.remove('hidden');
         userEmailSpan.textContent = user.email;
 
-        if(guestCTA) guestCTA.classList.add('hidden');
-        protectedContent.forEach(element => {
-            element.classList.remove('hidden');
-        });
+        if (guestCTA) guestCTA.classList.add('hidden');
+        protectedContent.forEach(element => element.classList.remove('hidden'));
 
-        // *** THIS IS THE CRITICAL FIX ***
-        // Build the portfolio content only if it hasn't been built yet.
         if (!portfolioHasBeenBuilt) {
             buildPortfolio();
             portfolioHasBeenBuilt = true;
         }
-
     } else {
-        // User is LOGGED OUT
+        // LOGGED OUT
         loginButton.classList.remove('hidden');
         userInfo.classList.add('hidden');
         userEmailSpan.textContent = '';
 
-        if(guestCTA) guestCTA.classList.remove('hidden');
-        protectedContent.forEach(element => {
-            element.classList.add('hidden');
-        });
+        if (guestCTA) guestCTA.classList.remove('hidden');
+        protectedContent.forEach(element => element.classList.add('hidden'));
+
+        buildGuestPortfolio();
     }
 });
