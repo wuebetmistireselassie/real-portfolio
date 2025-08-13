@@ -8,9 +8,9 @@ function buildPortfolio() {
         return;
     }
 
-    imageGrid.innerHTML = '';
-    videoGrid.innerHTML = '';
-    documentList.innerHTML = '';
+    if (imageGrid) imageGrid.innerHTML = '';
+    if (videoGrid) videoGrid.innerHTML = '';
+    if (documentList) documentList.innerHTML = '';
 
     let imageCount = 0, videoCount = 0, documentCount = 0;
 
@@ -61,42 +61,30 @@ function buildPortfolio() {
 // --- NEW FUNCTION: Guest Portfolio ---
 function buildGuestPortfolio() {
     const guestImageGrid = document.getElementById('guest-image-grid');
-    if (!guestImageGrid) return;
-
-    if (typeof portfolioItems === 'undefined' || portfolioItems.length === 0) {
-        guestImageGrid.innerHTML = '<p>No sample projects available.</p>';
-        return;
-    }
+    if (!guestImageGrid || typeof portfolioItems === 'undefined') return;
 
     guestImageGrid.innerHTML = '';
 
-    // Take first 2 portfolio items
-    const sampleItems = portfolioItems.slice(0, 2);
+    // Pick first 2 image projects
+    const sampleItems = portfolioItems.filter(item => item.type === 'image').slice(0, 2);
 
     sampleItems.forEach(item => {
-        if (item.type === 'image') {
-            const imageItem = document.createElement('div');
-            imageItem.className = 'portfolio-item';
-            imageItem.innerHTML = `
-                <a href="${item.url}" class="gallery-link" title="${item.title}">
-                    <img src="${item.url}" alt="${item.title}">
-                    <p>${item.title}</p>
-                </a>`;
-            guestImageGrid.appendChild(imageItem);
-        } else if (item.type === 'document') {
-            const docItem = document.createElement('div');
-            docItem.className = 'document-item';
-            docItem.innerHTML = `<a href="${item.url}" target="_blank">${item.title}</a>`;
-            guestImageGrid.appendChild(docItem);
-        }
+        const imageItem = document.createElement('div');
+        imageItem.className = 'portfolio-item';
+        imageItem.innerHTML = `
+            <a href="${item.url}" class="gallery-link" title="${item.title}">
+                <img src="${item.url}" alt="${item.title}">
+                <p>${item.title}</p>
+            </a>`;
+        guestImageGrid.appendChild(imageItem);
     });
 
-    if (sampleItems.some(item => item.type === 'image')) {
+    if (sampleItems.length > 0) {
         new SimpleLightbox('#guest-image-grid .gallery-link', { captionsData: 'title', captionDelay: 250 });
     }
 }
 
-// --- Background animation ---
+// Randomize droplets animation
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.droplet').forEach(droplet => {
         const size = Math.random() * 15 + 5;
