@@ -1,10 +1,14 @@
+// This script builds the portfolio from projects.js and initializes animations.
+
 document.addEventListener('DOMContentLoaded', () => {
     // Portfolio loading logic
     const imageGrid = document.getElementById('image-grid');
     const videoGrid = document.getElementById('video-grid');
     const documentList = document.getElementById('document-list');
 
+    // Check if portfolioItems is defined and has items
     if (typeof portfolioItems !== 'undefined' && portfolioItems.length > 0) {
+        // Clear loading messages
         imageGrid.innerHTML = '';
         videoGrid.innerHTML = '';
         documentList.innerHTML = '';
@@ -25,10 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     imageCount++;
                     break;
                 case 'video':
-                    // This section remains for future use if you add videos
                     const videoItem = document.createElement('div');
                     videoItem.className = 'video-item';
-                    videoItem.innerHTML = `<h4>${item.title}</h4><div class="video-embed-container"><iframe src="${item.url}" title="${item.title}" frameborder="0" allowfullscreen></iframe></div>`;
+                    videoItem.innerHTML = `
+                        <h4>${item.title}</h4>
+                        <div class="video-embed-container">
+                            <iframe src="${item.url}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>`;
                     videoGrid.appendChild(videoItem);
                     videoCount++;
                     break;
@@ -46,14 +53,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (videoCount === 0) videoGrid.innerHTML = '<p>No videos to display yet.</p>';
         if (documentCount === 0) documentList.innerHTML = '<p>No documents to display yet.</p>';
         
+        // Initialize Lightbox only if images were added
         if (imageCount > 0) {
-            new SimpleLightbox('.gallery-link', { captionsData: 'title', captionDelay: 250 });
+            new SimpleLightbox('.gallery-link', {
+                captionsData: 'title',
+                captionDelay: 250,
+            });
         }
+
     } else {
+        // Handle case where portfolioItems might be empty
         imageGrid.innerHTML = '<p>No projects have been added yet.</p>';
     }
     
-    // Droplet Animation Randomizer
+    // --- Droplet Animation Randomizer ---
     document.querySelectorAll('.droplet').forEach(droplet => {
         const size = Math.random() * 15 + 5;
         const delay = Math.random() * -20;
