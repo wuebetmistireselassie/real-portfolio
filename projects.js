@@ -32,6 +32,16 @@ const portfolioItems = [
     title: 'Leafinity Concept 3',
     url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_3_w7h7zh.png'
   },
+  {
+    type: 'image',
+    title: 'SkyPulse Logo (PNG)',
+    url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082554/SkyPulse_uapeed.png'
+  },
+  {
+    type: 'image',
+    title: 'SkyPulse Logo (SVG)',
+    url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_z1vkr9.svg'
+  },
 
 
   // --- VIDEO PROJECTS (Example Template) ---
@@ -45,14 +55,17 @@ const portfolioItems = [
   */
 
 
-  // --- DOCUMENT PROJECTS (Example Template) ---
+  // --- DOCUMENT PROJECTS ---
   // To add a document, uncomment the lines below and add your Cloudinary document URL.
-  /*
   {
     type: 'document',
-    title: 'My Professional Resume (PDF)',
-    url: 'YOUR_CLOUDINARY_DOCUMENT_URL_HERE/your_resume.pdf'
+    title: 'Interactive Dashboard Sample (Excel)',
+    url: 'https://res.cloudinary.com/dreresany/raw/upload/v1755082552/Interactive_Dashboard_bzwcms.xlsx'
   },
-  */
+  {
+    type: 'document',
+    title: 'SkyPulse Logo Source File (AI)',
+    url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082553/SkyPulse_c7q8iz.ai'
+  },
 
 ];
