@@ -20,29 +20,22 @@ const userEmailSpan = document.getElementById('user-email');
 const authModal = document.getElementById('auth-modal');
 const closeModalButton = document.querySelector('.close-button');
 const ctaLoginButton = document.getElementById('cta-login-button');
-
-// Form References
 const loginForm = document.getElementById('login-form');
 const signupForm = document.getElementById('signup-form');
 const forgotPasswordForm = document.getElementById('forgot-password-form');
-
-// Link References
 const showSignupLink = document.getElementById('show-signup');
 const showLoginLink = document.getElementById('show-login');
 const forgotPasswordLink = document.getElementById('forgot-password-link');
 const backToLoginLink = document.getElementById('back-to-login');
-
-// Button References
 const signupSubmitButton = document.getElementById('signup-submit-button');
 const loginSubmitButton = document.getElementById('login-submit-button');
 const resetPasswordButton = document.getElementById('reset-password-button');
-
-// Message/Error Display
 const authMessage = document.getElementById('auth-message');
-
-// Content Sections
 const protectedContent = document.querySelectorAll('.protected-content');
 const guestCTA = document.getElementById('guest-cta');
+
+// --- STATE VARIABLE ---
+let portfolioHasBeenBuilt = false;
 
 // --- MODAL & FORM VISIBILITY ---
 function showForm(formToShow) {
@@ -60,8 +53,9 @@ function openAuthModal() {
 }
 
 loginButton.addEventListener('click', openAuthModal);
-ctaLoginButton.addEventListener('click', openAuthModal); // Make the CTA button open the modal too
-
+if (ctaLoginButton) {
+    ctaLoginButton.addEventListener('click', openAuthModal);
+}
 closeModalButton.addEventListener('click', () => authModal.classList.add('hidden'));
 showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
 showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
@@ -89,7 +83,7 @@ loginSubmitButton.addEventListener('click', (e) => {
         .then(() => authModal.classList.add('hidden'))
         .catch(error => {
             authMessage.className = 'message error';
-            if (error.code === 'auth/invalid-credential') {
+            if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
                 authMessage.textContent = 'Wrong credentials. Please try again.';
             } else {
                 authMessage.textContent = error.message;
@@ -121,11 +115,17 @@ auth.onAuthStateChanged(user => {
         userInfo.classList.remove('hidden');
         userEmailSpan.textContent = user.email;
 
-        // Show protected content
-        guestCTA.classList.add('hidden');
+        if(guestCTA) guestCTA.classList.add('hidden');
         protectedContent.forEach(element => {
             element.classList.remove('hidden');
         });
+
+        // *** THIS IS THE CRITICAL FIX ***
+        // Build the portfolio content only if it hasn't been built yet.
+        if (!portfolioHasBeenBuilt) {
+            buildPortfolio();
+            portfolioHasBeenBuilt = true;
+        }
 
     } else {
         // User is LOGGED OUT
@@ -133,8 +133,7 @@ auth.onAuthStateChanged(user => {
         userInfo.classList.add('hidden');
         userEmailSpan.textContent = '';
 
-        // Hide protected content
-        guestCTA.classList.remove('hidden');
+        if(guestCTA) guestCTA.classList.remove('hidden');
         protectedContent.forEach(element => {
             element.classList.add('hidden');
         });
