@@ -1,10 +1,12 @@
+// This script builds the portfolio from projects.js and initializes animations.
+
 document.addEventListener('DOMContentLoaded', () => {
     const imageGrid = document.getElementById('image-grid');
     const videoGrid = document.getElementById('video-grid');
     const documentList = document.getElementById('document-list');
 
     if (typeof portfolioItems === 'undefined' || portfolioItems.length === 0) {
-        imageGrid.innerHTML = '<p>No projects found. Please check the projects.js file.</p>';
+        imageGrid.innerHTML = '<p>No projects found. Please check projects.js</p>';
         videoGrid.innerHTML = '';
         documentList.innerHTML = '';
         return;
@@ -27,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const imageLink = document.createElement('a');
                 imageLink.href = item.url;
                 imageLink.className = 'gallery-link'; // Class for lightbox
+                imageLink.setAttribute('data-title', item.title); // For lightbox caption
 
                 const image = document.createElement('img');
                 image.src = item.url;
@@ -46,12 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const videoItem = document.createElement('div');
                 videoItem.className = 'video-item';
                 videoItem.innerHTML = `
+                    <h4>${item.title}</h4>
                     <div class="video-embed-container">
-                        <iframe 
-                            src="${item.url}" 
-                            title="${item.title}" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        <iframe
+                            src="${item.url}"
+                            title="${item.title}"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen>
                         </iframe>
                     </div>`;
@@ -74,21 +78,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    if (imageCount === 0) {
-        imageGrid.innerHTML = '<p>No designs to display yet.</p>';
-    }
-    if (videoCount === 0) {
-        videoGrid.innerHTML = '<p>No videos to display yet.</p>';
-    }
-    if (documentCount === 0) {
-        documentList.innerHTML = '<p>No documents to display yet.</p>';
-    }
+    if (imageCount === 0) imageGrid.innerHTML = '<p>No designs to display yet.</p>';
+    if (videoCount === 0) videoGrid.innerHTML = '<p>No videos to display yet.</p>';
+    if (documentCount === 0) documentList.innerHTML = '<p>No documents to display yet.</p>';
 
-    // Initialize the lightbox on all images
+    // Initialize Lightbox
     if (imageCount > 0) {
         new SimpleLightbox('.gallery-link', {
             captionsData: 'alt',
             captionDelay: 250,
         });
     }
+
+    // Droplet Animation Randomizer
+    document.querySelectorAll('.droplet').forEach(droplet => {
+        const size = Math.random() * 15 + 5;
+        const delay = Math.random() * -20;
+        const duration = Math.random() * 10 + 15;
+        const position = Math.random() * 98;
+        droplet.style.width = `${size}px`;
+        droplet.style.height = `${size}px`;
+        droplet.style.left = `${position}vw`;
+        droplet.style.animationDelay = `${delay}s`;
+        droplet.style.animationDuration = `${duration}s`;
+    });
 });
