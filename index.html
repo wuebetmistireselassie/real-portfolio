@@ -12,6 +12,11 @@
 </head>
 <body>
 
+    <div class="droplet-container">
+        <span class="droplet"></span><span class="droplet"></span><span class="droplet"></span><span class="droplet"></span><span class="droplet"></span>
+        <span class="droplet"></span><span class="droplet"></span><span class="droplet"></span><span class="droplet"></span><span class="droplet"></span>
+    </div>
+
     <header>
         <div class="header-container">
             <h1 class="logo-name">Mistireselassie W.</h1>
@@ -23,6 +28,13 @@
                     <li><a href="#contact">Contact</a></li>
                 </ul>
             </nav>
+            <div id="auth-container">
+                <button id="login-button" class="auth-button">Sign In</button>
+                <div id="user-info" class="hidden">
+                    <span id="user-email"></span>
+                    <button id="logout-button" class="auth-button">Sign Out</button>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -53,18 +65,15 @@
         <section id="portfolio">
             <div class="section-container">
                 <h2>My Work</h2>
-
                 <h3 class="portfolio-subheader">Logo Designs & Graphics</h3>
                 <p class="portfolio-intro">Here are some of my recent designs. Click any image to view it in the gallery.</p>
                 <div id="image-grid" class="portfolio-grid">
                     <p>Loading designs...</p>
                 </div>
-
                 <h3 class="portfolio-subheader">Video Presentations</h3>
                 <div id="video-grid" class="video-grid">
                      <p>Loading videos...</p>
                 </div>
-
                 <h3 class="portfolio-subheader">Document Samples & Downloads</h3>
                 <div id="document-list" class="document-list">
                     <p>Loading documents...</p>
@@ -89,8 +98,34 @@
         <p>&copy; 2025 Mistireselassie W. All rights reserved.</p>
     </footer>
 
+    <div id="auth-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div id="login-form">
+                <h3>Sign In</h3>
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button id="login-submit-button" class="modal-button">Login</button>
+                <p class="form-text">Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
+            </div>
+            <div id="signup-form" class="hidden">
+                <h3>Create Account</h3>
+                <input type="email" id="signup-email" placeholder="Email" required>
+                <input type="password" id="signup-password" placeholder="Password (min. 6 characters)" required>
+                <button id="signup-submit-button" class="modal-button">Sign Up</button>
+                <p class="form-text">Already have an account? <a href="#" id="show-login">Log in</a></p>
+            </div>
+             <p id="auth-error" class="error-message"></p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
     <script src="projects.js"></script>
     <script src="script.js"></script>
+    <script src="auth.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.js"></script>
 </body>
 </html>
