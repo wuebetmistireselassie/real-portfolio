@@ -15,7 +15,7 @@ const portfolioItems = [
   {
     type: 'image',
     title: 'Bean & Bloom',
-    url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Bean_and_Bloom_xijheh.jpg'
+    url: 'https://res.cloudinary.com/dreresany/image/upload/v1755098148/Bean_and_Bloom_xijheh.svg'
   },
   {
     type: 'image',
