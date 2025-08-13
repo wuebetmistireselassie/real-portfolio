@@ -24,8 +24,8 @@
                 <ul>
                     <li><a href="#about">About</a></li>
                     <li><a href="#skills">Skills</a></li>
-                    <li><a href="#portfolio">My Work</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li class="protected-content hidden"><a href="#portfolio">My Work</a></li>
+                    <li class="protected-content hidden"><a href="#contact">Contact</a></li>
                 </ul>
             </nav>
             <div id="auth-container">
@@ -58,7 +58,13 @@
             </ul>
         </section>
 
-        <section id="portfolio">
+        <section id="guest-cta" class="cta-section">
+            <h2>See My Work</h2>
+            <p>Please sign in or create a free account to view my full portfolio and get in touch.</p>
+            <button id="cta-login-button" class="auth-button">Sign In to Continue</button>
+        </section>
+        
+        <section id="portfolio" class="protected-content hidden">
             <h2>My Work</h2>
             <h3 class="portfolio-subheader">Logo Designs & Graphics</h3>
             <p class="portfolio-intro">Here are some of my recent designs. Click any image to view it in the gallery.</p>
@@ -75,7 +81,7 @@
             </div>
         </section>
 
-        <section id="contact">
+        <section id="contact" class="protected-content hidden">
             <h2>Contact Me</h2>
             <ul class="contact-list">
                 <li><strong>Email:</strong> <a href="mailto:changesat2021@gmail.com">changesat2021@gmail.com</a></li>
