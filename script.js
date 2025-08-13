@@ -1,5 +1,5 @@
-// This file now contains the functions to build the portfolio and handle animations.
-// It will be called by auth.js after a successful login.
+// This file defines the functions to build the portfolio and handle animations.
+// The buildPortfolio() function is now called by auth.js after a successful login.
 
 function buildPortfolio() {
     const imageGrid = document.getElementById('image-grid');
@@ -9,7 +9,7 @@ function buildPortfolio() {
     // Check if the portfolio data exists
     if (typeof portfolioItems === 'undefined' || portfolioItems.length === 0) {
         if (imageGrid) imageGrid.innerHTML = '<p>No projects have been added yet.</p>';
-        return; // Stop if there's no data
+        return;
     }
 
     // Clear any "Loading..." messages
@@ -17,11 +17,8 @@ function buildPortfolio() {
     if (videoGrid) videoGrid.innerHTML = '';
     if (documentList) documentList.innerHTML = '';
 
-    let imageCount = 0;
-    let videoCount = 0;
-    let documentCount = 0;
+    let imageCount = 0, videoCount = 0, documentCount = 0;
 
-    // Loop through the projects and build the HTML
     portfolioItems.forEach(item => {
         switch (item.type) {
             case 'image':
@@ -37,14 +34,9 @@ function buildPortfolio() {
                 break;
 
             case 'video':
-                // This section is ready for when you add videos
                 const videoItem = document.createElement('div');
                 videoItem.className = 'video-item';
-                videoItem.innerHTML = `
-                    <h4>${item.title}</h4>
-                    <div class="video-embed-container">
-                        <iframe src="${item.url}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                    </div>`;
+                videoItem.innerHTML = `<h4>${item.title}</h4><div class="video-embed-container"><iframe src="${item.url}" title="${item.title}" frameborder="0" allowfullscreen></iframe></div>`;
                 videoGrid.appendChild(videoItem);
                 videoCount++;
                 break;
@@ -59,23 +51,18 @@ function buildPortfolio() {
         }
     });
 
-    // Add placeholder text if a category is empty
     if (imageCount === 0) imageGrid.innerHTML = '<p>No designs to display yet.</p>';
     if (videoCount === 0) videoGrid.innerHTML = '<p>No videos to display yet.</p>';
     if (documentCount === 0) documentList.innerHTML = '<p>No documents to display yet.</p>';
-
-    // IMPORTANT: Initialize the lightbox AFTER the images have been added to the page
+    
+    // Initialize Lightbox AFTER images are on the page
     if (imageCount > 0) {
-        new SimpleLightbox('.gallery-link', {
-            captionsData: 'title',
-            captionDelay: 250,
-        });
+        new SimpleLightbox('.gallery-link', { captionsData: 'title', captionDelay: 250 });
     }
 }
 
-// This function can still run when the page loads to set up animations
+// Randomize droplets when the page first loads
 document.addEventListener('DOMContentLoaded', () => {
-    // Droplet Animation Randomizer
     document.querySelectorAll('.droplet').forEach(droplet => {
         const size = Math.random() * 15 + 5;
         const delay = Math.random() * -20;
