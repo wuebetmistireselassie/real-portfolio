@@ -112,15 +112,6 @@ resetPasswordButton.addEventListener('click', (e) => {
 
 logoutButton.addEventListener('click', () => auth.signOut());
 
-// --- SAFE GUEST PORTFOLIO LOADER ---
-function safeBuildGuestPortfolio() {
-    if (typeof portfolioItems !== 'undefined' && portfolioItems.length > 0) {
-        buildGuestPortfolio();
-    } else {
-        setTimeout(safeBuildGuestPortfolio, 100);
-    }
-}
-
 // --- AUTH STATE LISTENER ---
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -145,6 +136,6 @@ auth.onAuthStateChanged(user => {
         if (guestCTA) guestCTA.classList.remove('hidden');
         protectedContent.forEach(element => element.classList.add('hidden'));
 
-        safeBuildGuestPortfolio();
+        buildGuestPortfolio();
     }
 });
