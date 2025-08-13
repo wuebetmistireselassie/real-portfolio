@@ -1,3 +1,10 @@
+// ===================================================================================
+// YOUR PORTFOLIO DATABASE
+// ===================================================================================
+// This file controls all the content in your "My Work" section.
+// To add a new item, copy one of the templates below and fill in your details.
+// ===================================================================================
+
 const portfolioItems = [
   // --- IMAGE PROJECTS ---
   {
@@ -39,7 +46,7 @@ const portfolioItems = [
   // --- DOCUMENT PROJECTS ---
   {
     type: 'document',
-    title: 'SkyPulse_Project Interactive Dashboard Sample (Excel)',
+    title: 'SkyPuls Interactive Dashboard Sample (Excel)',
     url: 'https://res.cloudinary.com/dreresany/raw/upload/v1755082552/Interactive_Dashboard_bzwcms.xlsx'
   },
   {
@@ -49,8 +56,16 @@ const portfolioItems = [
   },
   {
     type: 'document',
-    title: 'SkyPulse_ProjectNightjar_Briefing_2025-08-11 (PPTX)',
+    title: 'SkyPulse (PPTX)',
     url: 'https://docs.google.com/presentation/d/1fGQv90tWiE67GIt3YMXQHENtppNDjnAQ/edit?usp=drive_link&ouid=106245665520969369871&rtpof=true&sd=true'
   },
 
+  // --- VIDEO PROJECTS (Example Template) ---
+  /*
+  {
+    type: 'video',
+    title: 'My Animated Logo Showcase',
+    url: 'https://www.youtube.com/embed/your_video_id_here'
+  },
+  */
 ];
