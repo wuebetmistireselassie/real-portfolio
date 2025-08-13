@@ -13,9 +13,7 @@
 <body>
 
     <div class="droplet-container">
-        <span class="droplet"></span><span class="droplet"></span><span class="droplet"></span><span class="droplet"></span><span class="droplet"></span>
-        <span class="droplet"></span><span class="droplet"></span><span class="droplet"></span><span class="droplet"></span><span class="droplet"></span>
-    </div>
+        </div>
 
     <header>
         <div class="header-container">
@@ -39,60 +37,7 @@
     </header>
 
     <main>
-        <section id="about" class="hero">
-            <div class="section-container">
-                <h1>Creative Designer & Office Expert</h1>
-                <p>
-                    Hello! I’m <strong>Mistireselassie W.</strong>, a creative logo designer and Microsoft Office expert. I specialize in crafting original logo concepts and providing top-tier administrative support with professional document formatting, presentation design, and data entry.
-                </p>
-            </div>
-        </section>
-
-        <section id="skills">
-            <div class="section-container">
-                <h2>My Skills</h2>
-                <ul class="skills-list">
-                    <li>🎨 Logo Design (Original, Handcrafted Concepts)</li>
-                    <li>✅ PowerPoint Presentation Design</li>
-                    <li>✅ Microsoft Word Document Formatting</li>
-                    <li>✅ Microsoft Excel Tasks (Data Entry, Formulas, Formatting)</li>
-                    <li>✅ File Conversion (PDF, SVG, PNG, etc.)</li>
-                    <li>💻 Data Entry & Administrative Support</li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="portfolio">
-            <div class="section-container">
-                <h2>My Work</h2>
-                <h3 class="portfolio-subheader">Logo Designs & Graphics</h3>
-                <p class="portfolio-intro">Here are some of my recent designs. Click any image to view it in the gallery.</p>
-                <div id="image-grid" class="portfolio-grid">
-                    <p>Loading designs...</p>
-                </div>
-                <h3 class="portfolio-subheader">Video Presentations</h3>
-                <div id="video-grid" class="video-grid">
-                     <p>Loading videos...</p>
-                </div>
-                <h3 class="portfolio-subheader">Document Samples & Downloads</h3>
-                <div id="document-list" class="document-list">
-                    <p>Loading documents...</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact">
-            <div class="section-container">
-                <h2>Contact Me</h2>
-                <ul class="contact-list">
-                    <li><strong>Email:</strong> <a href="mailto:changesat2021@gmail.com">changesat2021@gmail.com</a></li>
-                    <li><strong>WhatsApp:</strong> <a href="https://wa.me/251919981116">+251 919 981 116</a></li>
-                    <li><strong>Telegram:</strong> <a href="https://t.me/google4to" target="_blank">@google4to</a></li>
-                    <li><strong>Location:</strong> Addis Ababa, Ethiopia</li>
-                </ul>
-            </div>
-        </section>
-    </main>
+        </main>
 
     <footer>
         <p>&copy; 2025 Mistireselassie W. All rights reserved.</p>
@@ -101,13 +46,18 @@
     <div id="auth-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <span class="close-button">&times;</span>
+
             <div id="login-form">
                 <h3>Sign In</h3>
                 <input type="email" id="login-email" placeholder="Email" required>
                 <input type="password" id="login-password" placeholder="Password" required>
                 <button id="login-submit-button" class="modal-button">Login</button>
+                <p class="form-links">
+                    <a href="#" id="forgot-password-link">Forgot Password?</a>
+                </p>
                 <p class="form-text">Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
             </div>
+
             <div id="signup-form" class="hidden">
                 <h3>Create Account</h3>
                 <input type="email" id="signup-email" placeholder="Email" required>
@@ -115,17 +65,24 @@
                 <button id="signup-submit-button" class="modal-button">Sign Up</button>
                 <p class="form-text">Already have an account? <a href="#" id="show-login">Log in</a></p>
             </div>
-             <p id="auth-error" class="error-message"></p>
+
+            <div id="forgot-password-form" class="hidden">
+                <h3>Reset Password</h3>
+                <p class="form-text">Enter your email and we'll send you a reset link.</p>
+                <input type="email" id="reset-email" placeholder="Email" required>
+                <button id="reset-password-button" class="modal-button">Send Reset Link</button>
+                <p class="form-text"><a href="#" id="back-to-login">Back to Login</a></p>
+            </div>
+
+            <p id="auth-message" class="message"></p>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-
     <script src="projects.js"></script>
-    <script src="script.js"></script>
     <script src="auth.js"></script>
-
+    <script src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.js"></script>
 </body>
 </html>
