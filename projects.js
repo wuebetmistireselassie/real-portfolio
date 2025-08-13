@@ -59,7 +59,7 @@ const portfolioItems = [
   // To add a document, uncomment the lines below and add your Cloudinary document URL.
   {
     type: 'document',
-    title: 'Interactive Dashboard Sample (Excel)',
+    title: 'SkyPulse Drones Interactive Dashboard Sample (Excel)',
     url: 'https://res.cloudinary.com/dreresany/raw/upload/v1755082552/Interactive_Dashboard_bzwcms.xlsx'
   },
   {
@@ -69,7 +69,7 @@ const portfolioItems = [
   },
   {
     type: 'document',
-    title: 'Company Profile Presentation (PPTX)',
+    title: 'SkyPulse_ProjectNightjar_Briefing_2025-08-11',
     url: 'https://docs.google.com/presentation/d/1fGQv90tWiE67GIt3YMXQHENtppNDjnAQ/edit?usp=drive_link&ouid=106245665520969369871&rtpof=true&sd=true'
   },
 
