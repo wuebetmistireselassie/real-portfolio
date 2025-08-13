@@ -9,7 +9,7 @@ const portfolioItems = [
   // --- IMAGE PROJECTS ---
   {
     type: 'image',
-    title: 'A&R Star Logo',
+    title: 'ARStar Logo',
     url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png'
   },
   {
@@ -24,22 +24,7 @@ const portfolioItems = [
   },
   {
     type: 'image',
-    title: 'Leafinity Concept 2',
-    url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_2_fqoxgy.png'
-  },
-  {
-    type: 'image',
-    title: 'Leafinity Concept 3',
-    url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_3_w7h7zh.png'
-  },
-  {
-    type: 'image',
-    title: 'SkyPulse Logo (PNG)',
-    url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082554/SkyPulse_uapeed.png'
-  },
-  {
-    type: 'image',
-    title: 'SkyPulse Logo (SVG)',
+    title: 'SkyPulse Logo ',
     url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_z1vkr9.svg'
   },
 
