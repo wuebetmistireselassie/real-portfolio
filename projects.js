@@ -1,10 +1,3 @@
-// ===================================================================================
-// YOUR PORTFOLIO DATABASE
-// ===================================================================================
-// This file controls all the content in your "My Work" section.
-// To add a new item, copy one of the templates below and fill in your details.
-// ===================================================================================
-
 const portfolioItems = [
   // --- IMAGE PROJECTS ---
   {
@@ -43,23 +36,10 @@ const portfolioItems = [
     url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_z1vkr9.svg'
   },
 
-
-  // --- VIDEO PROJECTS (Example Template) ---
-  // To add a video, uncomment the lines below and add your YouTube embed URL.
-  /*
-  {
-    type: 'video',
-    title: 'My Animated Logo Showcase',
-    url: 'https://www.youtube.com/embed/your_video_id_here'
-  },
-  */
-
-
   // --- DOCUMENT PROJECTS ---
-  // To add a document, uncomment the lines below and add your Cloudinary document URL.
   {
     type: 'document',
-    title: 'SkyPulse Drones Interactive Dashboard Sample (Excel)',
+    title: 'Interactive Dashboard Sample (Excel)',
     url: 'https://res.cloudinary.com/dreresany/raw/upload/v1755082552/Interactive_Dashboard_bzwcms.xlsx'
   },
   {
@@ -69,7 +49,7 @@ const portfolioItems = [
   },
   {
     type: 'document',
-    title: 'SkyPulse_ProjectNightjar_Briefing_2025-08-11',
+    title: 'Company Profile Presentation (PPTX)',
     url: 'https://docs.google.com/presentation/d/1fGQv90tWiE67GIt3YMXQHENtppNDjnAQ/edit?usp=drive_link&ouid=106245665520969369871&rtpof=true&sd=true'
   },
 
