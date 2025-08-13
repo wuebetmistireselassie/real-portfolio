@@ -70,7 +70,7 @@ function buildGuestPortfolio() {
 
     guestImageGrid.innerHTML = '';
 
-    // Take first 2 portfolio items from the data (prefer images first)
+    // Take first 2 portfolio items
     const sampleItems = portfolioItems.slice(0, 2);
 
     sampleItems.forEach(item => {
