@@ -1,241 +1,365 @@
+/* ==========================================================================
+   High-End Portfolio Style by Gemini
+   ========================================================================== */
+
 /* --- Global Styles & Variables --- */
 :root {
-    --primary-color: #007BFF; /* A nice, professional blue */
-    --secondary-color: #343a40; /* Dark grey for text and headers */
-    --background-color: #f8f9fa; /* Light grey background */
-    --surface-color: #ffffff; /* White for cards and sections */
-    --text-color: #495057;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --primary-gradient: linear-gradient(90deg, #8a2be2, #007BFF);
+  --primary-color: #007BFF; /* Fallback and for single-color elements */
+  --primary-glow: 0 0 25px rgba(0, 123, 255, 0.5);
+  --secondary-color: #212529; /* Darker grey for high contrast text */
+  --background-color: #f4f7f9; /* A slightly cooler light grey */
+  --surface-color: #ffffff;
+  --text-color: #495057;
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+  --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.1);
+  --border-radius: 8px;
+  --transition-speed: 0.3s;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.7;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.7;
 }
 
 .section-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 4rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 5rem 2rem;
 }
 
-h1, h2 {
-    color: var(--secondary-color);
-    font-weight: 700;
+h1, h2, h3, h4 {
+  color: var(--secondary-color);
+  font-weight: 700;
 }
 
 h2 {
-    font-size: 2.5rem;
-    text-align: center;
-    margin-bottom: 2rem;
-    position: relative;
-    padding-bottom: 1rem;
+  font-size: 2.8rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  position: relative;
+  padding-bottom: 1rem;
 }
 
-/* Underline effect for section titles */
 h2::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 4px;
-    background-color: var(--primary-color);
-    border-radius: 2px;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 5px;
+  background: var(--primary-gradient);
+  border-radius: 3px;
 }
 
-/* --- Header & Navigation --- */
+/* Sub-header for portfolio sections */
+.portfolio-subheader, .video-item h4 {
+    font-size: 1.8rem;
+    margin-top: 4rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* --- Entrance Animation --- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+section > .section-container > * {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* --- Header & Navigation (Glassmorphism) --- */
 header {
-    background-color: var(--surface-color);
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    width: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* For Safari */
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
 }
 
 .header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
 }
 
 .logo-name {
-    font-size: 1.5rem;
-    color: var(--primary-color);
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 nav ul {
-    list-style: none;
-    display: flex;
-    gap: 1.5rem;
+  list-style: none;
+  display: flex;
+  gap: 2rem;
 }
 
 nav a {
-    text-decoration: none;
-    color: var(--secondary-color);
-    font-weight: 600;
-    font-size: 1rem;
-    transition: color 0.3s ease;
+  text-decoration: none;
+  color: var(--secondary-color);
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color var(--transition-speed) ease;
+  position: relative;
+  padding-bottom: 5px;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-gradient);
+    transition: width var(--transition-speed) ease-out;
 }
 
 nav a:hover {
-    color: var(--primary-color);
+  color: var(--primary-color);
 }
+
+nav a:hover::after {
+    width: 100%;
+}
+
 
 /* --- Sections --- */
-section {
-    background-color: var(--surface-color);
-}
-
 section:nth-child(even) {
-    background-color: var(--background-color);
+  background-color: var(--surface-color);
 }
 
 .hero {
-    min-height: 60vh;
-    display: flex;
-    align-items: center;
-    text-align: center;
+  background-color: var(--surface-color);
+  text-align: center;
 }
 
 .hero p {
-    font-size: 1.2rem;
-    max-width: 800px;
-    margin: 0 auto;
+  font-size: 1.2rem;
+  max-width: 800px;
+  margin: 1rem auto 0;
 }
 
 /* --- Skills List --- */
 .skills-list {
-    list-style: none;
-    font-size: 1.1rem;
-    max-width: 700px;
-    margin: 0 auto;
-    text-align: left;
+  list-style: none;
+  font-size: 1.1rem;
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: left;
 }
 
 .skills-list li {
-    background-color: var(--surface-color);
-    padding: 1rem;
-    margin-bottom: 0.75rem;
-    border-left: 5px solid var(--primary-color);
-    border-radius: 5px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: var(--surface-color);
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  border-left: 5px solid;
+  border-image: var(--primary-gradient) 1;
+  border-radius: var(--border-radius);
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
 .skills-list li:hover {
-    transform: translateX(10px);
-    box-shadow: var(--shadow);
+  transform: translateX(10px);
+  box-shadow: var(--shadow-hover);
 }
 
-/* --- Portfolio Grid --- */
+/* --- Portfolio Grids (Image, Video, Document) --- */
 .portfolio-intro {
-    text-align: center;
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  font-size: 1.1rem;
 }
 
-.portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
+.portfolio-grid, .video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
 }
 
+/* Image Item Styling */
 .portfolio-item {
-    background: var(--surface-color);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: var(--surface-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
 .portfolio-item:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-hover);
 }
 
 .portfolio-item a {
-    text-decoration: none;
-    color: inherit;
-    display: block;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+/* Image Zoom Effect on Hover */
+.portfolio-item .image-container {
+    overflow: hidden; /* This is crucial for the zoom effect */
 }
 
 .portfolio-item img {
-    width: 100%;
-    height: 220px;
-    object-fit: cover; /* Ensures images are not distorted */
-    display: block;
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease-out;
+}
+
+.portfolio-item:hover img {
+  transform: scale(1.05);
 }
 
 .portfolio-item p {
-    padding: 1rem;
-    font-weight: 600;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  padding: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* --- Contact List --- */
-.contact-list {
-    list-style: none;
-    font-size: 1.2rem;
+/* Video Item Styling */
+.video-item {
     text-align: center;
+}
+
+.video-item h4 {
+    border: none;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.video-embed-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    width: 100%;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.video-embed-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
+/* Document List Styling */
+.document-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.document-item a {
+    display: block;
+    background-color: var(--surface-color);
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    color: var(--secondary-color);
+    font-weight: 600;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
+.document-item a:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    color: var(--primary-color);
+}
+
+/* --- Contact & Footer --- */
+.contact-list {
+  list-style: none;
+  font-size: 1.2rem;
+  text-align: center;
 }
 
 .contact-list li {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .contact-list a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 600;
-    transition: text-decoration 0.3s ease;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all var(--transition-speed) ease;
 }
 
 .contact-list a:hover {
-    text-decoration: underline;
+  text-shadow: var(--primary-glow);
 }
 
-/* --- Footer --- */
 footer {
-    background-color: var(--secondary-color);
-    color: var(--background-color);
-    text-align: center;
-    padding: 1.5rem;
+  background-color: var(--secondary-color);
+  color: #dee2e6;
+  text-align: center;
+  padding: 2rem;
 }
 
 /* --- Responsive Design --- */
 @media (max-width: 768px) {
-    .header-container {
-        flex-direction: column;
-        gap: 1rem;
-    }
+  h2 {
+    font-size: 2.2rem;
+  }
 
-    nav ul {
-        gap: 1rem;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
+  .header-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 
-    h2 {
-        font-size: 2rem;
-    }
+  nav ul {
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .portfolio-grid, .video-grid {
+    grid-template-columns: 1fr;
+  }
 }
