@@ -19,6 +19,7 @@ const userInfo = document.getElementById('user-info');
 const userEmailSpan = document.getElementById('user-email');
 const authModal = document.getElementById('auth-modal');
 const closeModalButton = document.querySelector('.close-button');
+const ctaLoginButton = document.getElementById('cta-login-button');
 
 // Form References
 const loginForm = document.getElementById('login-form');
@@ -39,20 +40,27 @@ const resetPasswordButton = document.getElementById('reset-password-button');
 // Message/Error Display
 const authMessage = document.getElementById('auth-message');
 
+// Content Sections
+const protectedContent = document.querySelectorAll('.protected-content');
+const guestCTA = document.getElementById('guest-cta');
+
 // --- MODAL & FORM VISIBILITY ---
 function showForm(formToShow) {
     loginForm.classList.add('hidden');
     signupForm.classList.add('hidden');
     forgotPasswordForm.classList.add('hidden');
     formToShow.classList.remove('hidden');
-    authMessage.textContent = ''; // Clear any previous messages
-    authMessage.className = 'message'; // Reset message style
+    authMessage.textContent = '';
+    authMessage.className = 'message';
 }
 
-loginButton.addEventListener('click', () => {
+function openAuthModal() {
     authModal.classList.remove('hidden');
     showForm(loginForm);
-});
+}
+
+loginButton.addEventListener('click', openAuthModal);
+ctaLoginButton.addEventListener('click', openAuthModal); // Make the CTA button open the modal too
 
 closeModalButton.addEventListener('click', () => authModal.classList.add('hidden'));
 showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
@@ -61,13 +69,10 @@ forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showFo
 backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
 
 // --- AUTHENTICATION LOGIC ---
-
-// Sign up new users
 signupSubmitButton.addEventListener('click', (e) => {
     e.preventDefault();
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
-
     auth.createUserWithEmailAndPassword(email, password)
         .then(() => authModal.classList.add('hidden'))
         .catch(error => {
@@ -76,18 +81,15 @@ signupSubmitButton.addEventListener('click', (e) => {
         });
 });
 
-// Sign in existing users
 loginSubmitButton.addEventListener('click', (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
-
     auth.signInWithEmailAndPassword(email, password)
         .then(() => authModal.classList.add('hidden'))
         .catch(error => {
             authMessage.className = 'message error';
-            // Custom error message as requested
-            if (error.code === 'auth/invalid-login-credentials' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+            if (error.code === 'auth/invalid-credential') {
                 authMessage.textContent = 'Wrong credentials. Please try again.';
             } else {
                 authMessage.textContent = error.message;
@@ -95,11 +97,9 @@ loginSubmitButton.addEventListener('click', (e) => {
         });
 });
 
-// Password Reset
 resetPasswordButton.addEventListener('click', (e) => {
     e.preventDefault();
     const email = document.getElementById('reset-email').value;
-
     auth.sendPasswordResetEmail(email)
         .then(() => {
             authMessage.className = 'message success';
@@ -111,19 +111,32 @@ resetPasswordButton.addEventListener('click', (e) => {
         });
 });
 
-
-// Sign out
 logoutButton.addEventListener('click', () => auth.signOut());
 
-// Listen for authentication state changes
+// --- THIS IS THE KEY LOGIC FOR HIDING/SHOWING CONTENT ---
 auth.onAuthStateChanged(user => {
     if (user) {
+        // User is LOGGED IN
         loginButton.classList.add('hidden');
         userInfo.classList.remove('hidden');
         userEmailSpan.textContent = user.email;
+
+        // Show protected content
+        guestCTA.classList.add('hidden');
+        protectedContent.forEach(element => {
+            element.classList.remove('hidden');
+        });
+
     } else {
+        // User is LOGGED OUT
         loginButton.classList.remove('hidden');
         userInfo.classList.add('hidden');
         userEmailSpan.textContent = '';
+
+        // Hide protected content
+        guestCTA.classList.remove('hidden');
+        protectedContent.forEach(element => {
+            element.classList.add('hidden');
+        });
     }
 });
