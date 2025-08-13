@@ -19,7 +19,7 @@ const portfolioItems = [
   },
   {
     type: 'image',
-    title: 'Leafinity Concept 1',
+    title: 'Leafinity ',
     url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_1_ya5std.png'
   },
   {
