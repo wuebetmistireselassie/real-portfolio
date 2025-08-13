@@ -1,162 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mistireselassie W. | Portfolio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.css" />
-</head>
-<body>
-
-    <div class="background-effects"></div>
-
-    <header>
-        <div class="header-container">
-            <a href="#" class="logo-name">Mistireselassie W.</a>
-            <nav>
-                <ul>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#skills">Skills</a></li>
-                    <li class="protected-content hidden"><a href="#portfolio">My Work</a></li>
-                    <li class="protected-content hidden"><a href="#contact">Contact</a></li>
-                </ul>
-            </nav>
-            <div id="auth-container">
-                <button id="login-button" class="auth-button">Sign In</button>
-                <div id="user-info" class="hidden">
-                    <span id="user-email"></span>
-                    <button id="logout-button" class="auth-button">Sign Out</button>
-                </div>
+<main>
+    <section id="about" class="hero">
+        <h1>Creative Designer & Office Expert</h1>
+        <div class="mission-vision-container">
+            <div class="mission-item">
+                <h3>Mission</h3>
+                <p>To provide businesses and individuals with clear, compelling, and professional visual identities by merging creative design with technical precision.</p>
+            </div>
+            <div class="mission-item">
+                <h3>Vision</h3>
+                <p>To be the go-to resource for clients seeking seamless, high-quality design and document solutions, empowering them to present their best work.</p>
+            </div>
+            <div class="mission-item">
+                <h3>Goal</h3>
+                <p>To build lasting partnerships by consistently delivering exceptional results with reliability and clear communication on every single project.</p>
             </div>
         </div>
-    </header>
+    </section>
 
-    <main>
-        <section id="about" class="hero">
-            <h1>Creative Designer & Office Expert</h1>
-            <div class="mission-vision-container">
-                <div class="mission-item">
-                    <h3>Mission</h3>
-                    <p>To provide businesses and individuals with clear, compelling, and professional visual identities by merging creative design with technical precision.</p>
-                </div>
-                <div class="mission-item">
-                    <h3>Vision</h3>
-                    <p>To be the go-to resource for clients seeking seamless, high-quality design and document solutions, empowering them to present their best work.</p>
-                </div>
-                <div class="mission-item">
-                    <h3>Goal</h3>
-                    <p>To build lasting partnerships by consistently delivering exceptional results with reliability and clear communication on every single project.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="skills">
-            <div class="section-container">
-                <h2>My Skills</h2>
-                <ul class="skills-list">
-                    <li>🎨 Logo Design (Original, Handcrafted Concepts)</li>
-                    <li>✅ PowerPoint Presentation Design</li>
-                    <li>✅ Microsoft Word Document Formatting</li>
-                    <li>✅ Microsoft Excel Tasks (Data Entry, Formulas, Formatting)</li>
-                    <li>✅ File Conversion (PDF, SVG, PNG, etc.)</li>
-                    <li>💻 Data Entry & Administrative Support</li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="guest-cta" class="cta-section hidden">
-             <div class="section-container">
-                <h2>See My Work</h2>
-                <p>Please sign in or create a free account to view my full portfolio and get in touch.</p>
-                <button id="cta-login-button" class="auth-button cta-button">Sign In to Continue</button>
-            </div>
-        </section>
-<section id="guest-portfolio">
-  <div class="section-container">
-    <h2>Sample Work</h2>
-    <p>Here are a couple of my projects. <strong>Sign in</strong> to see the full portfolio!</p>
-    <div id="guest-image-grid" class="portfolio-grid"></div>
-  </div>
-</section>
-
-
-        <section id="portfolio" class="protected-content hidden">
-            <div class="section-container">
-                <h2>My Work</h2>
-                <h3 class="portfolio-subheader">Logo Designs & Graphics</h3>
-                <p class="portfolio-intro">Here are some of my recent designs. Click any image to view it in the gallery.</p>
-                <div id="image-grid" class="portfolio-grid">
-                    <p>Loading designs...</p>
-                </div>
-                
-                <h3 class="portfolio-subheader">Video Presentations</h3>
-                <div id="video-grid" class="video-grid">
-                     <p>Loading videos...</p>
-                </div>
-
-                <h3 class="portfolio-subheader">Document Samples & Downloads</h3>
-                <div id="document-list" class="document-list">
-                    <p>Loading documents...</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact" class="protected-content hidden">
-            <div class="section-container">
-                <h2>Contact Me</h2>
-                <ul class="contact-list">
-                    <li><strong>Email:</strong> <a href="mailto:changesat2021@gmail.com">changesat2021@gmail.com</a></li>
-                    <li><strong>WhatsApp:</strong> <a href="https://wa.me/251919981116">+251 919 981 116</a></li>
-                    <li><strong>Telegram:</strong> <a href="https://t.me/google4to" target="_blank">@google4to</a></li>
-                    <li><strong>Location:</strong> Addis Ababa, Ethiopia</li>
-                </ul>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 Mistireselassie W. All rights reserved.</p>
-    </footer>
-
-    <div id="auth-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <div id="login-form">
-                <h3>Sign In</h3>
-                <input type="email" id="login-email" placeholder="Email" required>
-                <input type="password" id="login-password" placeholder="Password" required>
-                <button id="login-submit-button" class="modal-button">Login</button>
-                <p class="form-links"><a href="#" id="forgot-password-link">Forgot Password?</a></p>
-                <p class="form-text">Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
-            </div>
-            <div id="signup-form" class="hidden">
-                <h3>Create Account</h3>
-                <input type="email" id="signup-email" placeholder="Email" required>
-                <input type="password" id="signup-password" placeholder="Password (min. 6 characters)" required>
-                <button id="signup-submit-button" class="modal-button">Sign Up</button>
-                <p class="form-text">Already have an account? <a href="#" id="show-login">Log in</a></p>
-            </div>
-            <div id="forgot-password-form" class="hidden">
-                <h3>Reset Password</h3>
-                <p class="form-text">Enter your email and we'll send you a reset link.</p>
-                <input type="email" id="reset-email" placeholder="Email" required>
-                <button id="reset-password-button" class="modal-button">Send Reset Link</button>
-                <p class="form-text"><a href="#" id="back-to-login">Back to Login</a></p>
-            </div>
-             <p id="auth-message" class="message"></p>
+    <section id="skills">
+        <div class="section-container">
+            <h2>My Skills</h2>
+            <ul class="skills-list">
+                <li>🎨 Logo Design (Original, Handcrafted Concepts)</li>
+                <li>✅ PowerPoint Presentation Design</li>
+                <li>✅ Microsoft Word Document Formatting</li>
+                <li>✅ Microsoft Excel Tasks (Data Entry, Formulas, Formatting)</li>
+                <li>✅ File Conversion (PDF, SVG, PNG, etc.)</li>
+                <li>💻 Data Entry & Administrative Support</li>
+            </ul>
         </div>
-    </div>
+    </section>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="projects.js"></script>
-    <script src="script.js"></script>
-    <script src="auth.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.js"></script>
-</body>
-</html>
+    <!-- CTA for guests -->
+    <section id="guest-cta" class="cta-section hidden">
+        <div class="section-container">
+            <h2>See My Work</h2>
+            <p>Please sign in or create a free account to view my full portfolio and get in touch.</p>
+            <button id="cta-login-button" class="auth-button cta-button">Sign In to Continue</button>
+        </div>
+    </section>
 
+    <!-- SAMPLE WORK for guests -->
+    <section id="guest-portfolio">
+        <div class="section-container">
+            <h2>Sample Work</h2>
+            <p>Here are a couple of my projects. <strong>Sign in</strong> to see the full portfolio!</p>
+            <div id="guest-image-grid" class="portfolio-grid"></div>
+        </div>
+    </section>
+
+    <!-- FULL portfolio for logged-in users -->
+    <section id="portfolio" class="protected-content hidden">
+        <div class="section-container">
+            <h2>My Work</h2>
+            <h3 class="portfolio-subheader">Logo Designs & Graphics</h3>
+            <p class="portfolio-intro">Here are some of my recent designs. Click any image to view it in the gallery.</p>
+            <div id="image-grid" class="portfolio-grid">
+                <p>Loading designs...</p>
+            </div>
+            
+            <h3 class="portfolio-subheader">Video Presentations</h3>
+            <div id="video-grid" class="video-grid">
+                <p>Loading videos...</p>
+            </div>
+
+            <h3 class="portfolio-subheader">Document Samples & Downloads</h3>
+            <div id="document-list" class="document-list">
+                <p>Loading documents...</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="protected-content hidden">
+        <div class="section-container">
+            <h2>Contact Me</h2>
+            <ul class="contact-list">
+                <li><strong>Email:</strong> <a href="mailto:changesat2021@gmail.com">changesat2021@gmail.com</a></li>
+                <li><strong>WhatsApp:</strong> <a href="https://wa.me/251919981116">+251 919 981 116</a></li>
+                <li><strong>Telegram:</strong> <a href="https://t.me/google4to" target="_blank">@google4to</a></li>
+                <li><strong>Location:</strong> Addis Ababa, Ethiopia</li>
+            </ul>
+        </div>
+    </section>
+</main>
