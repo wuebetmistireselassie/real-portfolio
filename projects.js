@@ -44,6 +44,11 @@ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082553/SkyPulse_c7q
 },
 {
 type: 'document',
+title: 'TechWave Electronics Source File (AI)',
+url: 'https://res.cloudinary.com/dreresany/image/upload/v1755165393/TechWave_Electronics_c6lf2v.ai'
+},
+{
+type: 'document',
 title: 'SkyPulse (PPTX)',
 url: 'https://docs.google.com/presentation/d/1fGQv90tWiE67GIt3YMXQHENtppNDjnAQ/edit?usp=drive_link&ouid=106245665520969369871&rtpof=true&sd=true'
 },
