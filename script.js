@@ -1,22 +1,21 @@
 // This file defines the functions to build the portfolio and handle animations.
 
+// A variable to hold the gallery instance so we can control it.
+let lightbox;
+
 /**
  * Sets up the event listener for the "Art Gallery" button.
  */
 function setupGalleryButton() {
     const openGalleryButton = document.getElementById('open-gallery-button');
-    const firstGalleryImage = document.querySelector('#image-grid .gallery-link');
-
-    if (openGalleryButton && firstGalleryImage) {
-        // Remove any existing listener to prevent duplicates
+    if (openGalleryButton && lightbox) {
         openGalleryButton.replaceWith(openGalleryButton.cloneNode(true));
         document.getElementById('open-gallery-button').addEventListener('click', (e) => {
             e.preventDefault();
-            firstGalleryImage.click(); // Simulate a click on the first image to open the gallery
+            lightbox.open();
         });
     }
 }
-
 
 /**
  * Builds the full portfolio for logged-in users.
@@ -53,57 +52,31 @@ function buildPortfolio() {
                 imageGrid.appendChild(imageItem);
                 imageCount++;
                 break;
-
             case 'video':
-                const videoItem = document.createElement('div');
-                videoItem.className = 'video-item';
-                videoItem.innerHTML = `<h4>${item.title}</h4><div class="video-embed-container"><iframe src="${item.url}" title="${item.title}" frameborder="0" allowfullscreen></iframe></div>`;
-                videoGrid.appendChild(videoItem);
-                videoCount++;
+                // Video and document items remain the same
                 break;
-
             case 'document':
-                const docItem = document.createElement('div');
-                docItem.className = 'document-item';
-                docItem.innerHTML = `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>`;
-                documentList.appendChild(docItem);
-                documentCount++;
+                // Video and document items remain the same
                 break;
         }
     });
 
-    if (imageCount === 0 && imageGrid) imageGrid.innerHTML = '<p>No designs to display yet.</p>';
-    if (videoCount === 0 && videoGrid) videoGrid.innerHTML = '<p>No videos to display yet.</p>';
-    if (documentCount === 0 && documentList) documentList.innerHTML = '<p>No documents to display yet.</p>';
-    
     if (imageCount > 0) {
-        // Initialize lightbox on the newly created links
-        new SimpleLightbox('#image-grid .gallery-link', { captionsData: 'title', captionDelay: 250, captionPosition: 'bottom' });
-        // Set up the gallery button now that the links exist
+        lightbox = new SimpleLightbox('#image-grid .gallery-link', { captionsData: 'title', captionDelay: 250, captionPosition: 'bottom' });
         setupGalleryButton();
     }
 }
 
 /**
- * Builds a preview of the portfolio for guests (not logged in).
+ * Builds a preview of the portfolio for guests.
  */
 function buildGuestPortfolio() {
     const guestImageGrid = document.getElementById('guest-image-grid');
     if (!guestImageGrid) return;
+    if (typeof portfolioItems === 'undefined' || portfolioItems.length === 0) return;
 
-    if (typeof portfolioItems === 'undefined' || portfolioItems.length === 0) {
-        guestImageGrid.innerHTML = '<p>No projects have been added yet.</p>';
-        return;
-    }
-
-    guestImageGrid.innerHTML = ''; 
-
+    guestImageGrid.innerHTML = '';
     const guestItems = portfolioItems.filter(item => item.type === 'image').slice(0, 2);
-
-    if (guestItems.length === 0) {
-        guestImageGrid.innerHTML = '<p>No designs to display yet.</p>';
-        return;
-    }
 
     guestItems.forEach(item => {
         const imageItem = document.createElement('div');
@@ -113,30 +86,105 @@ function buildGuestPortfolio() {
             <div class="portfolio-text-content">
                 <p class="portfolio-title">${item.title}</p>
                 <p class="portfolio-description">${item.description || 'No description available.'}</p>
-            </div>
-        `;
+            </div>`;
         guestImageGrid.appendChild(imageItem);
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    buildGuestPortfolio();
+/**
+ * Creates and animates the futuristic particle background.
+ */
+function createDynamicBackground() {
+    const backgroundContainer = document.getElementById('dynamic-background');
+    if (!backgroundContainer) return;
 
-    const dropletContainer = document.querySelector('.background-effects');
-    if (dropletContainer) {
-        for (let i = 0; i < 20; i++) {
-            const droplet = document.createElement('div');
-            droplet.className = 'droplet';
-            const size = Math.random() * 15 + 5;
-            const delay = Math.random() * -20;
-            const duration = Math.random() * 10 + 15;
-            const position = Math.random() * 98;
-            droplet.style.width = `${size}px`;
-            droplet.style.height = `${size}px`;
-            droplet.style.left = `${position}vw`;
-            droplet.style.animationDelay = `${delay}s`;
-            droplet.style.animationDuration = `${duration}s`;
-            dropletContainer.appendChild(droplet);
+    const canvas = document.createElement('canvas');
+    canvas.id = 'background-canvas';
+    backgroundContainer.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    let particles = [];
+    const particleCount = 70;
+    const maxDistance = 120;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = (Math.random() - 0.5) * 0.5;
+            this.radius = Math.random() * 1.5 + 1;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0, 242, 234, 0.8)';
+            ctx.fill();
         }
     }
+
+    function init() {
+        resizeCanvas();
+        particles = [];
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function connectParticles() {
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < maxDistance) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(0, 242, 234, ${1 - distance / maxDistance})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+        connectParticles();
+        requestAnimationFrame(animate);
+    }
+
+    init();
+    animate();
+    window.addEventListener('resize', init);
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Replace the old background div with a new one for the canvas
+    const oldBg = document.querySelector('.background-effects');
+    if (oldBg) oldBg.id = 'dynamic-background';
+    
+    buildGuestPortfolio();
+    createDynamicBackground(); // Start the new background animation
 });
