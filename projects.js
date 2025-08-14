@@ -12,12 +12,6 @@ const portfolioItems = [
     // --- IMAGE PROJECTS ---
     {
         type: 'image',
-        title: 'Bean & Bloom',
-        url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167293/Bean_and_Bloom_xijheh.png',
-        description: 'A warm and inviting logo for a fictional café, blending the ideas of coffee ("Bean") and freshness ("Bloom").'
-    },
-    {
-        type: 'image',
         title: 'Leafinity',
         url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_1_ya5std.png',
         description: 'Represents a fictional company focused on nature and sustainability. The name combines "Leaf" and "Infinity" to suggest endless nature.'
