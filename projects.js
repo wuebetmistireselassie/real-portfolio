@@ -8,6 +8,11 @@ const portfolioItems = [
 // --- IMAGE PROJECTS ---
 {
 type: 'image',
+title: 'TechWave Electronics',
+url: 'https://res.cloudinary.com/dreresany/image/upload/v1755165098/TechWave_Electronics_nq7ful.svg'
+},
+{
+type: 'image',
 title: 'ARStar Logo',
 url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png'
 },
