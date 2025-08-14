@@ -53,10 +53,18 @@ function buildPortfolio() {
                 imageCount++;
                 break;
             case 'video':
-                // Video and document items remain the same
+                const videoItem = document.createElement('div');
+                videoItem.className = 'video-item';
+                videoItem.innerHTML = `<h4>${item.title}</h4><div class="video-embed-container"><iframe src="${item.url}" title="${item.title}" frameborder="0" allowfullscreen></iframe></div>`;
+                videoGrid.appendChild(videoItem);
+                videoCount++;
                 break;
             case 'document':
-                // Video and document items remain the same
+                const docItem = document.createElement('div');
+                docItem.className = 'document-item';
+                docItem.innerHTML = `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>`;
+                documentList.appendChild(docItem);
+                documentCount++;
                 break;
         }
     });
@@ -92,7 +100,7 @@ function buildGuestPortfolio() {
 }
 
 /**
- * Creates and animates the futuristic particle background.
+ * Creates and animates the particle background for the light theme.
  */
 function createDynamicBackground() {
     const backgroundContainer = document.getElementById('dynamic-background');
@@ -132,7 +140,8 @@ function createDynamicBackground() {
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(0, 242, 234, 0.8)';
+            // Changed to a dark color for the light theme
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.fill();
         }
     }
@@ -154,7 +163,8 @@ function createDynamicBackground() {
 
                 if (distance < maxDistance) {
                     ctx.beginPath();
-                    ctx.strokeStyle = `rgba(0, 242, 234, ${1 - distance / maxDistance})`;
+                    // Changed to a dark, subtle color for the lines
+                    ctx.strokeStyle = `rgba(0, 0, 0, ${0.4 * (1 - distance / maxDistance)})`;
                     ctx.lineWidth = 0.5;
                     ctx.moveTo(particles[i].x, particles[i].y);
                     ctx.lineTo(particles[j].x, particles[j].y);
@@ -181,10 +191,9 @@ function createDynamicBackground() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Replace the old background div with a new one for the canvas
     const oldBg = document.querySelector('.background-effects');
     if (oldBg) oldBg.id = 'dynamic-background';
     
     buildGuestPortfolio();
-    createDynamicBackground(); // Start the new background animation
+    createDynamicBackground();
 });
