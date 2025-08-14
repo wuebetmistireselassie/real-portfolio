@@ -55,11 +55,7 @@ const portfolioItems = [
         title: 'SkyPulse (PPTX)',
         url: 'https://docs.google.com/presentation/d/1fGQv90tWiE67GIt3YMXQHENtppNDjnAQ/edit?usp=drive_link&ouid=106245665520969369871&rtpof=true&sd=true'
     },
-    {
-        type: 'document',
-        title: 'Bean and Bloom source file (SVG)',
-        url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167320/Bean_and_Bloom_hfoasb.svg'
-    },
+
     {
         type: 'document',
         title: 'Fillable HTML that is converted to the below fillable PDF',
