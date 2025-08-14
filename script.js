@@ -4,6 +4,17 @@
 let lightbox;
 
 /**
+ * Sets the profile picture in the header.
+ */
+function setProfilePicture() {
+    const profilePicElement = document.getElementById('profile-picture');
+    // Check if the profile picture element and the profileInfo object exist
+    if (profilePicElement && typeof profileInfo !== 'undefined' && profileInfo.imageUrl) {
+        profilePicElement.src = profileInfo.imageUrl;
+    }
+}
+
+/**
  * Sets up the event listener for the "Art Gallery" button.
  */
 function setupGalleryButton() {
@@ -191,9 +202,8 @@ function createDynamicBackground() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const oldBg = document.querySelector('.background-effects');
-    if (oldBg) oldBg.id = 'dynamic-background';
-    
+    // This function runs when the page is ready
+    setProfilePicture();
     buildGuestPortfolio();
     createDynamicBackground();
 });
