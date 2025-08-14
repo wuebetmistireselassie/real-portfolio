@@ -69,11 +69,11 @@ const portfolioItems = [
     {
         type: 'document',
         title: 'Fillable HTML that is converted to the below fillable PDF',
-        url: 'https://drive.google.com/file/d/12x099Fmuer6LVN5WAsCs7NVoqQzQs7Lc/view?usp=drive_link'
+        url: 'https://res.cloudinary.com/dreresany/raw/upload/v1755192268/Fillable_HTML_that_is_converted_to_the_below_fillable_PDF_kpdbzp.html'
     },
  {
         type: 'document',
         title: 'Sample by Mistireselassie',
-        url: 'https://drive.google.com/file/d/1E--vfTh7rwOjc-mIPusFzmKkwGJs5aBz/view?usp=drive_link'
+        url: 'https://collection.cloudinary.com/dreresany/3cf2a77fcdd50c53a14ec4445856a116'
     },
 ];
