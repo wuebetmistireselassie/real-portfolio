@@ -11,11 +11,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.css" />
 </head>
 <body>
-    <div class="background-effects"></div>
+    <div id="dynamic-background"></div>
 
     <header>
         <div class="header-container">
-            <a href="#" class="logo-name">Mistireselassie W.</a>
+            <div class="logo-container">
+                <img id="profile-picture" src="" alt="Profile Picture">
+                <a href="#" class="logo-name">Mistireselassie W.</a>
+            </div>
             <nav>
                 <ul>
                     <li><a href="#about">About</a></li>
@@ -67,13 +70,11 @@
             </div>
         </section>
 
-        <!-- This section will show a preview to guests -->
         <section id="guest-portfolio" class="hidden">
             <div class="section-container">
                 <h2>Sample of My Work</h2>
                  <p class="portfolio-intro">Here is a sample of my recent designs. Please sign in to see my full portfolio.</p>
                 <div id="guest-image-grid" class="portfolio-grid">
-                    <!-- Guest portfolio items will be loaded here by script.js -->
                 </div>
                  <div class="cta-section">
                     <button id="cta-login-button" class="auth-button cta-button">Sign In to See More</button>
@@ -81,8 +82,6 @@
             </div>
         </section>
 
-
-        <!-- This is the full portfolio for logged-in users -->
         <section id="portfolio" class="protected-content hidden">
             <div class="section-container">
                 <h2>My Work</h2>
