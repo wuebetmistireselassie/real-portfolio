@@ -1,17 +1,16 @@
-
-
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
-apiKey: "AIzaSyBBChrO3wq3ax-cbSPZGEFEqePFWlubowg",
-authDomain: "mwcreatives-3fd8b.firebaseapp.com",
-projectId: "mwcreatives-3fd8b",
-storageBucket: "mwcreatives-3fd8b.appspot.com",
-messagingSenderId: "56482314427",
-appId: "1:56482314427:web:3e4d5fc7d53dcf1045d19e"
+    apiKey: "AIzaSyBBChrO3wq3ax-cbSPZGEFEqePFWlubowg",
+    authDomain: "mwcreatives-3fd8b.firebaseapp.com",
+    projectId: "mwcreatives-3fd8b",
+    storageBucket: "mwcreatives-3fd8b.appspot.com",
+    messagingSenderId: "56482314427",
+    appId: "1:56482314427:web:3e4d5fc7d53dcf1045d19e"
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+
 // --- DOM ELEMENT REFERENCES ---
 const loginButton = document.getElementById('login-button');
 const logoutButton = document.getElementById('logout-button');
@@ -31,87 +30,99 @@ const signupSubmitButton = document.getElementById('signup-submit-button');
 const loginSubmitButton = document.getElementById('login-submit-button');
 const resetPasswordButton = document.getElementById('reset-password-button');
 const authMessage = document.getElementById('auth-message');
+
+// --- CONTENT SECTIONS ---
 const protectedContent = document.querySelectorAll('.protected-content');
-const guestCTA = document.getElementById('guest-cta');
+const guestPortfolio = document.getElementById('guest-portfolio');
+
 // --- STATE VARIABLE ---
 let portfolioHasBeenBuilt = false;
+
 // --- MODAL & FORM VISIBILITY ---
 function showForm(formToShow) {
-loginForm.classList.add('hidden');
-signupForm.classList.add('hidden');
-forgotPasswordForm.classList.add('hidden');
-formToShow.classList.remove('hidden');
-authMessage.textContent = '';
-authMessage.className = 'message';
+    loginForm.classList.add('hidden');
+    signupForm.classList.add('hidden');
+    forgotPasswordForm.classList.add('hidden');
+    formToShow.classList.remove('hidden');
+    authMessage.textContent = '';
+    authMessage.className = 'message';
 }
+
 function openAuthModal() {
-authModal.classList.remove('hidden');
-showForm(loginForm);
+    authModal.classList.remove('hidden');
+    showForm(loginForm);
 }
+
 loginButton.addEventListener('click', openAuthModal);
 if (ctaLoginButton) {
-ctaLoginButton.addEventListener('click', openAuthModal);
+    ctaLoginButton.addEventListener('click', openAuthModal);
 }
 closeModalButton.addEventListener('click', () => authModal.classList.add('hidden'));
 showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
 showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
 forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotPasswordForm); });
 backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+
 // --- AUTHENTICATION LOGIC ---
 signupSubmitButton.addEventListener('click', (e) => {
-e.preventDefault();
-const email = document.getElementById('signup-email').value;
-const password = document.getElementById('signup-password').value;
-auth.createUserWithEmailAndPassword(email, password)
-.then(() => authModal.classList.add('hidden'))
-.catch(error => {
-authMessage.className = 'message error';
-authMessage.textContent = error.message;
+    e.preventDefault();
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    auth.createUserWithEmailAndPassword(email, password)
+        .then(() => authModal.classList.add('hidden'))
+        .catch(error => {
+            authMessage.className = 'message error';
+            authMessage.textContent = error.message;
+        });
 });
-});
+
 loginSubmitButton.addEventListener('click', (e) => {
-e.preventDefault();
-const email = document.getElementById('login-email').value;
-const password = document.getElementById('login-password').value;
-auth.signInWithEmailAndPassword(email, password)
-.then(() => authModal.classList.add('hidden'))
-.catch(error => {
-authMessage.className = 'message error';
-if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-authMessage.textContent = 'Wrong credentials. Please try again.';
-} else {
-authMessage.textContent = error.message;
-}
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    auth.signInWithEmailAndPassword(email, password)
+        .then(() => authModal.classList.add('hidden'))
+        .catch(error => {
+            authMessage.className = 'message error';
+            if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                authMessage.textContent = 'Wrong credentials. Please try again.';
+            } else {
+                authMessage.textContent = error.message;
+            }
+        });
 });
-});
+
 resetPasswordButton.addEventListener('click', (e) => {
-e.preventDefault();
-const email = document.getElementById('reset-email').value;
-auth.sendPasswordResetEmail(email)
-.then(() => {
-authMessage.className = 'message success';
-authMessage.textContent = 'Password reset email sent! Please check your inbox.';
-})
-.catch((error) => {
-authMessage.className = 'message error';
-authMessage.textContent = error.message;
+    e.preventDefault();
+    const email = document.getElementById('reset-email').value;
+    auth.sendPasswordResetEmail(email)
+        .then(() => {
+            authMessage.className = 'message success';
+            authMessage.textContent = 'Password reset email sent! Please check your inbox.';
+        })
+        .catch((error) => {
+            authMessage.className = 'message error';
+            authMessage.textContent = error.message;
+        });
 });
-});
+
 logoutButton.addEventListener('click', () => auth.signOut());
+
 // --- THIS IS THE KEY LOGIC FOR HIDING/SHOWING CONTENT ---
 auth.onAuthStateChanged(user => {
-if (user) {
-// User is LOGGED IN
-loginButton.classList.add('hidden');
-userInfo.classList.remove('hidden');
-userEmailSpan.textContent = user.email;
-        if(guestCTA) guestCTA.classList.add('hidden');
+    if (user) {
+        // User is LOGGED IN
+        loginButton.classList.add('hidden');
+        userInfo.classList.remove('hidden');
+        userEmailSpan.textContent = user.email;
+        
+        // Hide guest preview and show all protected content
+        if (guestPortfolio) guestPortfolio.classList.add('hidden');
         protectedContent.forEach(element => {
             element.classList.remove('hidden');
         });
 
-        // *** THIS IS THE CRITICAL FIX ***
-        // Build the portfolio content only if it hasn't been built yet.
+        // Build the full portfolio only if it hasn't been built yet.
         if (!portfolioHasBeenBuilt) {
             buildPortfolio();
             portfolioHasBeenBuilt = true;
@@ -123,13 +134,13 @@ userEmailSpan.textContent = user.email;
         userInfo.classList.add('hidden');
         userEmailSpan.textContent = '';
 
-        if(guestCTA) guestCTA.classList.remove('hidden');
+        // Show guest preview and hide all protected content
+        if (guestPortfolio) guestPortfolio.classList.remove('hidden');
         protectedContent.forEach(element => {
             element.classList.add('hidden');
         });
+        
+        // Reset the flag so the portfolio can be built again on next login
+        portfolioHasBeenBuilt = false;
     }
 });
-
-
-
-
