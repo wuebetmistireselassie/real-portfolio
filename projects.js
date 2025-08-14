@@ -66,4 +66,14 @@ const portfolioItems = [
         title: 'Bean and Bloom source file (SVG)',
         url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167320/Bean_and_Bloom_hfoasb.svg'
     },
+    {
+        type: 'document',
+        title: 'Fillable HTML that is converted to the below fillable PDF',
+        url: 'https://drive.google.com/file/d/12x099Fmuer6LVN5WAsCs7NVoqQzQs7Lc/view?usp=drive_link'
+    },
+ {
+        type: 'document',
+        title: 'Sample by Mistireselassie',
+        url: 'https://drive.google.com/file/d/1E--vfTh7rwOjc-mIPusFzmKkwGJs5aBz/view?usp=drive_link'
+    },
 ];
