@@ -2,67 +2,72 @@
 // YOUR PORTFOLIO DATABASE
 // ===================================================================================
 // This file controls all the content in your "My Work" section.
-// To add a new item, copy one of the templates below and fill in your details.
+// Each 'image' item now has a 'description' field.
 // ===================================================================================
 const portfolioItems = [
-// --- IMAGE PROJECTS ---
-{
-type: 'image',
-title: 'Bean & Bloom',
-url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167293/Bean_and_Bloom_xijheh.png'
-},
-{
-type: 'image',
-title: 'Leafinity ',
-url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_1_ya5std.png'
-},
-{
-type: 'image',
-title: 'SkyPulse Logo ',
-url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_z1vkr9.svg'
-},
-{
-type: 'image',
-title: 'TechWave Electronics',
-url: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_Electronics_nq7ful.png'
-},
-{
-type: 'image',
-title: 'ARStar Logo',
-url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png'
-},
-// --- DOCUMENT PROJECTS ---
-{
-type: 'document',
-title: 'SkyPuls Interactive Dashboard Sample (Excel)',
-url: 'https://res.cloudinary.com/dreresany/raw/upload/v1755082552/Interactive_Dashboard_bzwcms.xlsx'
-},
-{
-type: 'document',
-title: 'SkyPulse Logo Source File (AI)',
-url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082553/SkyPulse_c7q8iz.ai'
-},
-{
-type: 'document',
-title: 'TechWave Electronics Source File (AI)',
-url: 'https://res.cloudinary.com/dreresany/image/upload/v1755165393/TechWave_Electronics_c6lf2v.ai'
-},
-{
-type: 'document',
-title: 'SkyPulse (PPTX)',
-url: 'https://docs.google.com/presentation/d/1fGQv90tWiE67GIt3YMXQHENtppNDjnAQ/edit?usp=drive_link&ouid=106245665520969369871&rtpof=true&sd=true'
-},
-{
-type: 'document',
-title: 'Bean and Bloom source file (SVG)',
-url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167320/Bean_and_Bloom_hfoasb.svg'
-},
-// --- VIDEO PROJECTS (Example Template) ---
-/*
-{
-type: 'video',
-title: 'My Animated Logo Showcase',
-url: 'https://www.youtube.com/embed/your_video_id_here'
-},
-*/
+    // --- IMAGE PROJECTS ---
+    {
+        type: 'image',
+        title: 'Bean & Bloom',
+        url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167293/Bean_and_Bloom_xijheh.png',
+        description: 'A warm and inviting logo for a fictional café, blending the ideas of coffee ("Bean") and freshness ("Bloom").'
+    },
+    {
+        type: 'image',
+        title: 'Leafinity',
+        url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_1_ya5std.png',
+        description: 'Represents a fictional company focused on nature and sustainability. The name combines "Leaf" and "Infinity" to suggest endless nature.'
+    },
+    {
+        type: 'image',
+        title: 'SkyPulse Logo',
+        url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_z1vkr9.svg',
+        description: 'A modern logo for a fictional tech or aviation company. The name implies data signals ("Pulse") and cloud computing ("Sky").'
+    },
+    {
+        type: 'image',
+        title: 'TechWave Electronics',
+        url: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_Electronics_nq7ful.png',
+        description: 'This logo for a fictional electronics brand uses "TechWave" to suggest modern technology and a flow of innovation.'
+    },
+    {
+        type: 'image',
+        title: 'ARStar Logo',
+        url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png',
+        description: 'Designed for a fictional company in the Augmented Reality (AR) or entertainment space, suggesting a leading, high-quality brand.'
+    },
+    // --- DOCUMENT PROJECTS ---
+    {
+        type: 'document',
+        title: 'SkyPulse Interactive Dashboard Sample (Excel)',
+        url: 'https://res.cloudinary.com/dreresany/raw/upload/v1755082552/Interactive_Dashboard_bzwcms.xlsx'
+    },
+    {
+        type: 'document',
+        title: 'SkyPulse Logo Source File (AI)',
+        url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082553/SkyPulse_c7q8iz.ai'
+    },
+    {
+        type: 'document',
+        title: 'TechWave Electronics Source File (AI)',
+        url: 'https://res.cloudinary.com/dreresany/image/upload/v1755165393/TechWave_Electronics_c6lf2v.ai'
+    },
+    {
+        type: 'document',
+        title: 'SkyPulse (PPTX)',
+        url: 'https://docs.google.com/presentation/d/1fGQv90tWiE67GIt3YMXQHENtppNDjnAQ/edit?usp=drive_link&ouid=106245665520969369871&rtpof=true&sd=true'
+    },
+    {
+        type: 'document',
+        title: 'Bean and Bloom source file (SVG)',
+        url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167320/Bean_and_Bloom_hfoasb.svg'
+    },
+    // --- VIDEO PROJECTS (Example Template) ---
+    /*
+    {
+        type: 'video',
+        title: 'My Animated Logo Showcase',
+        url: 'https://www.youtube.com/embed/your_video_id_here'
+    },
+    */
 ];
