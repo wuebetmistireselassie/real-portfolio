@@ -1,21 +1,36 @@
 // This file defines the functions to build the portfolio and handle animations.
 
 /**
- * Builds the portfolio for logged-in users.
- * This function is called by auth.js after a successful login.
+ * Sets up the event listener for the "Art Gallery" button.
+ */
+function setupGalleryButton() {
+    const openGalleryButton = document.getElementById('open-gallery-button');
+    const firstGalleryImage = document.querySelector('#image-grid .gallery-link');
+
+    if (openGalleryButton && firstGalleryImage) {
+        // Remove any existing listener to prevent duplicates
+        openGalleryButton.replaceWith(openGalleryButton.cloneNode(true));
+        document.getElementById('open-gallery-button').addEventListener('click', (e) => {
+            e.preventDefault();
+            firstGalleryImage.click(); // Simulate a click on the first image to open the gallery
+        });
+    }
+}
+
+
+/**
+ * Builds the full portfolio for logged-in users.
  */
 function buildPortfolio() {
     const imageGrid = document.getElementById('image-grid');
     const documentList = document.getElementById('document-list');
     const videoGrid = document.getElementById('video-grid');
 
-    // Check if the portfolio data exists
     if (typeof portfolioItems === 'undefined' || portfolioItems.length === 0) {
         if (imageGrid) imageGrid.innerHTML = '<p>No projects have been added yet.</p>';
         return;
     }
 
-    // Clear any "Loading..." messages
     if (imageGrid) imageGrid.innerHTML = '';
     if (videoGrid) videoGrid.innerHTML = '';
     if (documentList) documentList.innerHTML = '';
@@ -28,9 +43,12 @@ function buildPortfolio() {
                 const imageItem = document.createElement('div');
                 imageItem.className = 'portfolio-item';
                 imageItem.innerHTML = `
-                    <a href="${item.url}" class="gallery-link" title="${item.title}">
+                    <a href="${item.url}" class="gallery-link" title="${item.title}: ${item.description || ''}">
                         <img src="${item.url}" alt="${item.title}">
-                        <p>${item.title}</p>
+                        <div class="portfolio-text-content">
+                            <p class="portfolio-title">${item.title}</p>
+                            <p class="portfolio-description">${item.description || 'No description available.'}</p>
+                        </div>
                     </a>`;
                 imageGrid.appendChild(imageItem);
                 imageCount++;
@@ -54,33 +72,32 @@ function buildPortfolio() {
         }
     });
 
-    if (imageCount === 0) imageGrid.innerHTML = '<p>No designs to display yet.</p>';
-    if (videoCount === 0) videoGrid.innerHTML = '<p>No videos to display yet.</p>';
-    if (documentCount === 0) documentList.innerHTML = '<p>No documents to display yet.</p>';
+    if (imageCount === 0 && imageGrid) imageGrid.innerHTML = '<p>No designs to display yet.</p>';
+    if (videoCount === 0 && videoGrid) videoGrid.innerHTML = '<p>No videos to display yet.</p>';
+    if (documentCount === 0 && documentList) documentList.innerHTML = '<p>No documents to display yet.</p>';
     
-    // Initialize Lightbox AFTER images are on the page
     if (imageCount > 0) {
-        new SimpleLightbox('.gallery-link', { captionsData: 'title', captionDelay: 250 });
+        // Initialize lightbox on the newly created links
+        new SimpleLightbox('#image-grid .gallery-link', { captionsData: 'title', captionDelay: 250, captionPosition: 'bottom' });
+        // Set up the gallery button now that the links exist
+        setupGalleryButton();
     }
 }
 
 /**
  * Builds a preview of the portfolio for guests (not logged in).
- * Shows the first 2 items.
  */
 function buildGuestPortfolio() {
     const guestImageGrid = document.getElementById('guest-image-grid');
-    if (!guestImageGrid) return; // Exit if the element doesn't exist
+    if (!guestImageGrid) return;
 
-    // Check if the portfolio data exists
     if (typeof portfolioItems === 'undefined' || portfolioItems.length === 0) {
         guestImageGrid.innerHTML = '<p>No projects have been added yet.</p>';
         return;
     }
 
-    guestImageGrid.innerHTML = ''; // Clear existing content
+    guestImageGrid.innerHTML = ''; 
 
-    // Get only the first 2 image items for the preview
     const guestItems = portfolioItems.filter(item => item.type === 'image').slice(0, 2);
 
     if (guestItems.length === 0) {
@@ -91,22 +108,20 @@ function buildGuestPortfolio() {
     guestItems.forEach(item => {
         const imageItem = document.createElement('div');
         imageItem.className = 'portfolio-item';
-        // Note: We don't initialize a lightbox here, it's a simple preview
         imageItem.innerHTML = `
             <img src="${item.url}" alt="${item.title}">
-            <p>${item.title}</p>
+            <div class="portfolio-text-content">
+                <p class="portfolio-title">${item.title}</p>
+                <p class="portfolio-description">${item.description || 'No description available.'}</p>
+            </div>
         `;
         guestImageGrid.appendChild(imageItem);
     });
 }
 
-
-// This runs when the page content is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Build the guest portfolio immediately so visitors see it
     buildGuestPortfolio();
 
-    // Randomize droplets for the background animation
     const dropletContainer = document.querySelector('.background-effects');
     if (dropletContainer) {
         for (let i = 0; i < 20; i++) {
