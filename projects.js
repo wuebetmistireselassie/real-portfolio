@@ -8,18 +8,8 @@ const portfolioItems = [
 // --- IMAGE PROJECTS ---
 {
 type: 'image',
-title: 'TechWave Electronics',
-url: 'https://res.cloudinary.com/dreresany/image/upload/v1755165098/TechWave_Electronics_nq7ful.svg'
-},
-{
-type: 'image',
-title: 'ARStar Logo',
-url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png'
-},
-{
-type: 'image',
 title: 'Bean & Bloom',
-url: 'https://res.cloudinary.com/dreresany/image/upload/v1755098148/Bean_and_Bloom_xijheh.svg'
+url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167293/Bean_and_Bloom_xijheh.png'
 },
 {
 type: 'image',
@@ -30,6 +20,16 @@ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_1_
 type: 'image',
 title: 'SkyPulse Logo ',
 url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_z1vkr9.svg'
+},
+{
+type: 'image',
+title: 'TechWave Electronics',
+url: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_Electronics_nq7ful.png'
+},
+{
+type: 'image',
+title: 'ARStar Logo',
+url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png'
 },
 // --- DOCUMENT PROJECTS ---
 {
