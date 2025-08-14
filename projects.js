@@ -1,9 +1,13 @@
 // ===================================================================================
 // YOUR PORTFOLIO DATABASE
 // ===================================================================================
-// This file controls all the content in your "My Work" section.
-// Each 'image' item now has a 'description' field.
-// ===================================================================================
+
+// Add your professional image URL here
+const profileInfo = {
+    imageUrl: 'https://res.cloudinary.com/dreresany/image/upload/v1755173247/My_Reality_wiyus6.png' // Placeholder - Replace with your image link
+};
+
+
 const portfolioItems = [
     // --- IMAGE PROJECTS ---
     {
@@ -62,12 +66,4 @@ const portfolioItems = [
         title: 'Bean and Bloom source file (SVG)',
         url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167320/Bean_and_Bloom_hfoasb.svg'
     },
-    // --- VIDEO PROJECTS (Example Template) ---
-    /*
-    {
-        type: 'video',
-        title: 'My Animated Logo Showcase',
-        url: 'https://www.youtube.com/embed/your_video_id_here'
-    },
-    */
 ];
