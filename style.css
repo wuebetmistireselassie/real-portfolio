@@ -41,7 +41,7 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    background: transparent; /* Removed dark gradient */
+    background: transparent;
 }
 
 #background-canvas {
@@ -75,7 +75,7 @@ h2 {
     text-align: center;
     margin-bottom: 3rem;
     color: var(--heading-color);
-    text-shadow: none; /* Removed glow */
+    text-shadow: none;
 }
 
 h3.portfolio-subheader {
@@ -108,12 +108,26 @@ header {
     padding: 0 2rem;
 }
 
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between image and name */
+    text-decoration: none;
+}
+
+#profile-picture {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+}
+
 .logo-name {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--heading-color);
     text-decoration: none;
-    text-shadow: none;
 }
 
 nav ul { list-style: none; display: flex; gap: 2.5rem; }
