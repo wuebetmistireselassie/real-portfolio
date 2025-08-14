@@ -111,16 +111,16 @@ header {
 .logo-container {
     display: flex;
     align-items: center;
-    gap: 15px; /* Space between image and name */
+    gap: 20px; /* Increased gap for better spacing */
     text-decoration: none;
 }
 
 #profile-picture {
-    width: 50px;
-    height: 50px;
+    width: 60px;  /* Increased from 50px */
+    height: 60px; /* Increased from 50px */
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--primary-color);
+    border: 3px solid var(--primary-color); /* Made border slightly thicker */
 }
 
 .logo-name {
