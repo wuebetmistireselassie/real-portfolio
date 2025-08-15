@@ -34,6 +34,13 @@ const portfolioItems = [
         url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png',
         description: 'Designed for a fictional company in the Augmented Reality (AR) or entertainment space, suggesting a leading, high-quality brand.'
     }, // <--- THIS COMMA WAS MISSING
+//Mock up import
+{
+    type: 'mockup', // New type
+    title: 'Bean & Bloom | Business Card Mockup',
+    url: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg', // Path to your new image
+    description: 'A professional mockup demonstrating the Bean & Bloom logo on a business card, showcasing its application in a real-world branding scenario.'
+},
 
     // --- DOCUMENT PROJECTS ---
     {
