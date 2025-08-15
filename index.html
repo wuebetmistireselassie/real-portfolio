@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.css" />
 </head>
 <body>
     <div id="dynamic-background"></div>
@@ -16,24 +15,16 @@
     <header>
         <div class="header-container">
             <div class="logo-container">
-                <img id="profile-picture" src="" alt="Profile Picture">
-                <a href="#" class="logo-name">Mistireselassie W.</a>
+                <img id="profile-picture" src="" alt="Profile Picture"> <a href="#" class="logo-name">Mistireselassie W.</a>
             </div>
             <nav>
                 <ul>
                     <li><a href="#about">About</a></li>
                     <li><a href="#skills">Skills</a></li>
                     <li><a href="#portfolio">My Work</a></li>
-                    <li class="protected-content hidden"><a href="#contact">Contact</a></li>
+                    <li><a href="#contact">Contact</a></li>
                 </ul>
             </nav>
-            <div id="auth-container">
-                <button id="login-button" class="auth-button">Sign In</button>
-                <div id="user-info" class="hidden">
-                    <span id="user-email"></span>
-                    <button id="logout-button" class="auth-button">Sign Out</button>
-                </div>
-            </div>
         </div>
     </header>
 
@@ -70,26 +61,12 @@
             </div>
         </section>
 
-        <section id="guest-portfolio" class="hidden">
-            <div class="section-container">
-                <h2>Sample of My Work</h2>
-                 <p class="portfolio-intro">Here is a sample of my recent designs. Please sign in to see my full portfolio.</p>
-                <div id="guest-image-grid" class="portfolio-grid">
-                </div>
-                 <div class="cta-section">
-                    <button id="cta-login-button" class="auth-button cta-button">Sign In to See More</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="portfolio" class="protected-content hidden">
+        <section id="portfolio">
             <div class="section-container">
                 <h2>My Work</h2>
-                <div class="gallery-button-container">
-                    <button id="open-gallery-button" class="cta-button">View Art Gallery</button>
-                </div>
+                
                 <h3 class="portfolio-subheader">Logo Designs & Graphics</h3>
-                <p class="portfolio-intro">Here are my recent designs. Click any image to view it in the gallery with a full description.</p>
+                <p class="portfolio-intro">Here are my recent designs. Click any image to view it with a full description.</p>
                 <div id="image-grid" class="portfolio-grid">
                     <p>Loading designs...</p>
                 </div>
@@ -106,7 +83,7 @@
             </div>
         </section>
 
-        <section id="contact" class="protected-content hidden">
+        <section id="contact">
             <div class="section-container">
                 <h2>Contact Me</h2>
                 <ul class="contact-list">
@@ -123,40 +100,7 @@
         <p>&copy; 2025 Mistireselassie W. All rights reserved.</p>
     </footer>
 
-    <div id="auth-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <div id="login-form">
-                <h3>Sign In</h3>
-                <input type="email" id="login-email" placeholder="Email" required>
-                <input type="password" id="login-password" placeholder="Password" required>
-                <button id="login-submit-button" class="modal-button">Login</button>
-                <p class="form-links"><a href="#" id="forgot-password-link">Forgot Password?</a></p>
-                <p class="form-text">Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
-            </div>
-            <div id="signup-form" class="hidden">
-                <h3>Create Account</h3>
-                <input type="email" id="signup-email" placeholder="Email" required>
-                <input type="password" id="signup-password" placeholder="Password (min. 6 characters)" required>
-                <button id="signup-submit-button" class="modal-button">Sign Up</button>
-                <p class="form-text">Already have an account? <a href="#" id="show-login">Log in</a></p>
-            </div>
-            <div id="forgot-password-form" class="hidden">
-                <h3>Reset Password</h3>
-                <p class="form-text">Enter your email and we'll send you a reset link.</p>
-                <input type="email" id="reset-email" placeholder="Email" required>
-                <button id="reset-password-button" class="modal-button">Send Reset Link</button>
-                <p class="form-text"><a href="#" id="back-to-login">Back to Login</a></p>
-            </div>
-             <p id="auth-message" class="message"></p>
-        </div>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="projects.js"></script>
     <script src="script.js"></script>
-    <script src="auth.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.js"></script>
 </body>
 </html>
