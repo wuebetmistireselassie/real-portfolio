@@ -1,46 +1,36 @@
 // This file defines the functions to build the portfolio and handle animations.
 
-// A variable to hold the gallery instance so we can control it.
-let lightbox;
-
 /**
- * Sets the profile picture in the header.
+ * Sets the profile picture in the header from a profileInfo object.
+ * NOTE: You will need to define profileInfo in projects.js or here.
+ * Example: const profileInfo = { imageUrl: './images/my-photo.jpg' };
  */
 function setProfilePicture() {
     const profilePicElement = document.getElementById('profile-picture');
     // Check if the profile picture element and the profileInfo object exist
     if (profilePicElement && typeof profileInfo !== 'undefined' && profileInfo.imageUrl) {
         profilePicElement.src = profileInfo.imageUrl;
+    } else {
+        // Optional: Hide the image element if no picture is set
+        if(profilePicElement) profilePicElement.style.display = 'none';
     }
 }
 
 /**
- * Sets up the event listener for the "Art Gallery" button.
- */
-function setupGalleryButton() {
-    const openGalleryButton = document.getElementById('open-gallery-button');
-    if (openGalleryButton && lightbox) {
-        openGalleryButton.replaceWith(openGalleryButton.cloneNode(true));
-        document.getElementById('open-gallery-button').addEventListener('click', (e) => {
-            e.preventDefault();
-            lightbox.open();
-        });
-    }
-}
-
-/**
- * Builds the full portfolio for logged-in users.
+ * Builds the full portfolio, now visible to all visitors.
  */
 function buildPortfolio() {
     const imageGrid = document.getElementById('image-grid');
     const documentList = document.getElementById('document-list');
     const videoGrid = document.getElementById('video-grid');
 
+    // Check if the portfolio items array exists and has content
     if (typeof portfolioItems === 'undefined' || portfolioItems.length === 0) {
         if (imageGrid) imageGrid.innerHTML = '<p>No projects have been added yet.</p>';
         return;
     }
 
+    // Clear any "Loading..." messages
     if (imageGrid) imageGrid.innerHTML = '';
     if (videoGrid) videoGrid.innerHTML = '';
     if (documentList) documentList.innerHTML = '';
@@ -52,6 +42,7 @@ function buildPortfolio() {
             case 'image':
                 const imageItem = document.createElement('div');
                 imageItem.className = 'portfolio-item';
+                // Note: SimpleLightbox uses the 'title' attribute for the caption.
                 imageItem.innerHTML = `
                     <a href="${item.url}" class="gallery-link" title="${item.title}: ${item.description || ''}">
                         <img src="${item.url}" alt="${item.title}">
@@ -80,38 +71,19 @@ function buildPortfolio() {
         }
     });
 
+    // If any images were added, initialize the SimpleLightbox gallery
     if (imageCount > 0) {
-        lightbox = new SimpleLightbox('#image-grid .gallery-link', { captionsData: 'title', captionDelay: 250, captionPosition: 'bottom' });
-        setupGalleryButton();
+        new SimpleLightbox('#image-grid .gallery-link', { 
+            captionsData: 'title', 
+            captionDelay: 250, 
+            captionPosition: 'bottom' 
+        });
     }
 }
 
-/**
- * Builds a preview of the portfolio for guests.
- */
-function buildGuestPortfolio() {
-    const guestImageGrid = document.getElementById('guest-image-grid');
-    if (!guestImageGrid) return;
-    if (typeof portfolioItems === 'undefined' || portfolioItems.length === 0) return;
-
-    guestImageGrid.innerHTML = '';
-    const guestItems = portfolioItems.filter(item => item.type === 'image').slice(0, 2);
-
-    guestItems.forEach(item => {
-        const imageItem = document.createElement('div');
-        imageItem.className = 'portfolio-item';
-        imageItem.innerHTML = `
-            <img src="${item.url}" alt="${item.title}">
-            <div class="portfolio-text-content">
-                <p class="portfolio-title">${item.title}</p>
-                <p class="portfolio-description">${item.description || 'No description available.'}</p>
-            </div>`;
-        guestImageGrid.appendChild(imageItem);
-    });
-}
 
 /**
- * Creates and animates the particle background for the light theme.
+ * Creates and animates the particle background.
  */
 function createDynamicBackground() {
     const backgroundContainer = document.getElementById('dynamic-background');
@@ -151,7 +123,6 @@ function createDynamicBackground() {
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            // Changed to a dark color for the light theme
             ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.fill();
         }
@@ -174,7 +145,6 @@ function createDynamicBackground() {
 
                 if (distance < maxDistance) {
                     ctx.beginPath();
-                    // Changed to a dark, subtle color for the lines
                     ctx.strokeStyle = `rgba(0, 0, 0, ${0.4 * (1 - distance / maxDistance)})`;
                     ctx.lineWidth = 0.5;
                     ctx.moveTo(particles[i].x, particles[i].y);
@@ -201,9 +171,9 @@ function createDynamicBackground() {
 }
 
 
+// This function runs when the page is ready
 document.addEventListener('DOMContentLoaded', () => {
-    // This function runs when the page is ready
     setProfilePicture();
-    buildGuestPortfolio();
+    buildPortfolio(); // <-- This is the main change. We now build the full portfolio for everyone.
     createDynamicBackground();
 });
