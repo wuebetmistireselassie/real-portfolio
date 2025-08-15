@@ -33,7 +33,8 @@ const portfolioItems = [
         title: 'ARStar Logo',
         url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png',
         description: 'Designed for a fictional company in the Augmented Reality (AR) or entertainment space, suggesting a leading, high-quality brand.'
-    },
+    }, // <--- THIS COMMA WAS MISSING
+
     // --- DOCUMENT PROJECTS ---
     {
         type: 'document',
@@ -55,13 +56,12 @@ const portfolioItems = [
         title: 'SkyPulse (PPTX)',
         url: 'https://docs.google.com/presentation/d/1fGQv90tWiE67GIt3YMXQHENtppNDjnAQ/edit?usp=drive_link&ouid=106245665520969369871&rtpof=true&sd=true'
     },
-
     {
         type: 'document',
         title: 'Fillable HTML that is converted to the below fillable PDF',
         url: 'https://res.cloudinary.com/dreresany/raw/upload/v1755192268/Fillable_HTML_that_is_converted_to_the_below_fillable_PDF_kpdbzp.html'
     },
- {
+    {
         type: 'document',
         title: 'Sample by Mistireselassie',
         url: 'https://collection.cloudinary.com/dreresany/3cf2a77fcdd50c53a14ec4445856a116'
