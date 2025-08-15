@@ -2,16 +2,12 @@
 
 /**
  * Sets the profile picture in the header from a profileInfo object.
- * NOTE: You will need to define profileInfo in projects.js or here.
- * Example: const profileInfo = { imageUrl: './images/my-photo.jpg' };
  */
 function setProfilePicture() {
     const profilePicElement = document.getElementById('profile-picture');
-    // Check if the profile picture element and the profileInfo object exist
     if (profilePicElement && typeof profileInfo !== 'undefined' && profileInfo.imageUrl) {
         profilePicElement.src = profileInfo.imageUrl;
     } else {
-        // Optional: Hide the image element if no picture is set
         if(profilePicElement) profilePicElement.style.display = 'none';
     }
 }
@@ -21,28 +17,25 @@ function setProfilePicture() {
  */
 function buildPortfolio() {
     const imageGrid = document.getElementById('image-grid');
+    const mockupGrid = document.getElementById('mockup-grid'); // Added this line
     const documentList = document.getElementById('document-list');
     const videoGrid = document.getElementById('video-grid');
 
-    // Check if the portfolio items array exists and has content
     if (typeof portfolioItems === 'undefined' || portfolioItems.length === 0) {
         if (imageGrid) imageGrid.innerHTML = '<p>No projects have been added yet.</p>';
         return;
     }
 
-    // Clear any "Loading..." messages
     if (imageGrid) imageGrid.innerHTML = '';
+    if (mockupGrid) mockupGrid.innerHTML = ''; // Added this line
     if (videoGrid) videoGrid.innerHTML = '';
     if (documentList) documentList.innerHTML = '';
-
-    let imageCount = 0, videoCount = 0, documentCount = 0;
 
     portfolioItems.forEach(item => {
         switch (item.type) {
             case 'image':
                 const imageItem = document.createElement('div');
                 imageItem.className = 'portfolio-item';
-                // Note: SimpleLightbox uses the 'title' attribute for the caption.
                 imageItem.innerHTML = `
                     <a href="${item.url}" class="gallery-link" title="${item.title}: ${item.description || ''}">
                         <img src="${item.url}" alt="${item.title}">
@@ -52,33 +45,37 @@ function buildPortfolio() {
                         </div>
                     </a>`;
                 imageGrid.appendChild(imageItem);
-                imageCount++;
                 break;
+            
+            // New 'mockup' case added here
+            case 'mockup':
+                const mockupItem = document.createElement('div');
+                mockupItem.className = 'portfolio-item';
+                mockupItem.innerHTML = `
+                    <a href="${item.url}" class="gallery-link" title="${item.title}: ${item.description || ''}">
+                        <img src="${item.url}" alt="${item.title}">
+                        <div class="portfolio-text-content">
+                            <p class="portfolio-title">${item.title}</p>
+                            <p class="portfolio-description">${item.description || 'No description available.'}</p>
+                        </div>
+                    </a>`;
+                mockupGrid.appendChild(mockupItem);
+                break;
+
             case 'video':
                 const videoItem = document.createElement('div');
                 videoItem.className = 'video-item';
                 videoItem.innerHTML = `<h4>${item.title}</h4><div class="video-embed-container"><iframe src="${item.url}" title="${item.title}" frameborder="0" allowfullscreen></iframe></div>`;
                 videoGrid.appendChild(videoItem);
-                videoCount++;
                 break;
             case 'document':
                 const docItem = document.createElement('div');
                 docItem.className = 'document-item';
                 docItem.innerHTML = `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>`;
                 documentList.appendChild(docItem);
-                documentCount++;
                 break;
         }
     });
-
-    // If any images were added, initialize the SimpleLightbox gallery
-    if (imageCount > 0) {
-        new SimpleLightbox('#image-grid .gallery-link', { 
-            captionsData: 'title', 
-            captionDelay: 250, 
-            captionPosition: 'bottom' 
-        });
-    }
 }
 
 
@@ -174,6 +171,6 @@ function createDynamicBackground() {
 // This function runs when the page is ready
 document.addEventListener('DOMContentLoaded', () => {
     setProfilePicture();
-    buildPortfolio(); // <-- This is the main change. We now build the full portfolio for everyone.
+    buildPortfolio();
     createDynamicBackground();
 });
