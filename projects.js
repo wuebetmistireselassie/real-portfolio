@@ -27,9 +27,9 @@ const designs = [
         ],
         // NEW SECTION ADDED HERE - REPLACE WITH YOUR IMAGE URLS
         processGallery: [
-            { url: 'https://via.placeholder.com/800x600.png?text=1.+Rough+Digital+Sketches' },
-            { url: 'https://via.placeholder.com/800x600.png?text=2.+Vector+Outline+View' },
-            { url: 'https://via.placeholder.com/800x600.png?text=3.+Final+Grid+Construction' },
+            { url: 'x' },
+            { url: 'x' },
+            { url: 'x' },
         ]
     },
     {
@@ -53,7 +53,11 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336438/SkyPulse_Drones_Business_Card_Mockup_kqxcql.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336437/SkyPulse_Drones_MacBook_Mockup_yednal.jpg' }
         ],
-        processGallery: [] // Leave empty or add your process images
+        processGallery: [
+            { url: 'x' },
+            { url: 'x' },
+            { url: 'x' },
+] // Leave empty or add your process images
     },
     {
         id: 'techwave',
@@ -72,7 +76,11 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346107/TechWave_Smartphone_Clay_Mockup_qyv9tu.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346108/TechWave_Electronics_shop_Free_iMac_Mockup_fve7eh.jpg' }
         ],
-        processGallery: []
+        processGallery: [
+            { url: 'x' },
+            { url: 'x' },
+            { url: 'x' },
+]
     },
     {
         id: 'leafinity',
@@ -91,7 +99,11 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755353099/Leafinity_Eco-Goods_Wooden_Frame_Mockup_gaei5m.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755353099/Leafinity_Eco-Goods_Wooden_Stamp_Mockup_djfmts.jpg' }
         ],
-        processGallery: []
+        processGallery: [
+            { url: 'x' },
+            { url: 'x' },
+            { url: 'x' },
+]
     },
     {
         id: 'arstar',
@@ -111,7 +123,11 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351039/A_R_Star_Partners_Sign_Mockup_1_hidp3y.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351040/A_R_Star_Partners_Three_Banner_Flags_Mockup_a3f2p4.jpg' }
         ],
-        processGallery: []
+        processGallery: [
+            { url: 'x' },
+            { url: 'x' },
+            { url: 'x' },
+]
     },
 ];
 
