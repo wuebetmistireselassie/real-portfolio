@@ -256,7 +256,16 @@ nav a:hover {
     gap: 2rem;
     text-align: center;
 }
-.logo-system-grid img {
+.logo-system-item {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px var(--surface-shadow);
+}
+.logo-system-item.logo-display-dark-bg {
+    background: #000000;
+}
+.logo-system-item img {
     max-width: 100%;
     height: auto;
     display: block;
