@@ -128,7 +128,10 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351040/A_R_Star_Partners_Three_Banner_Flags_Mockup_a3f2p4.jpg' }
         ],
         processGallery: [
-            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=Replace+Me' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375260/A_R_Star_Partners_1_w2xvge.png' },
+{ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375261/A_R_Star_Partners_2_kmrolw.png' },
+{ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375260/A_R_Star_Partners_3_cci0wa.png' },
+{ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375260/A_R_Star_Partners_4_ihhhe5.png' },
         ]
     },
 ];
