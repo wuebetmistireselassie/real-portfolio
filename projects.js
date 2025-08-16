@@ -72,18 +72,18 @@ const designs = [
         id: 'leafinity Eco-Goods',
         title: 'Leafinity',
         category: 'logo',
-        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755348325/Leafinity_Eco-Goods_ufcvkm.png',
+        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755353099/Leafinity_Eco-Goods_Wooden_Frame_Mockup_gaei5m.jpg',
         brief: {
-            challenge: 'Represents a fictional company focused on nature and sustainability. The name combines "Leaf" and "Infinity" to suggest endless nature.',
-            solution: 'This logo merges a leaf with the infinity symbol to create a single, cohesive mark. The design is simple, elegant, and conveys a message of environmental longevity.'
+            challenge: 'To create a minimalist and elegant brand identity for a sustainable goods company that not only conveys a message of environmental consciousness, but also positions the brand as a premium and artistic lifestyle choice.',
+            solution: 'The logo skillfully merges a leaf with the infinity symbol to create a single, cohesive mark. The brand's visual identity successfully showcases this logo in a clean, artistic context, using a simple wooden frame and natural lighting to convey a message of authenticity and high quality. The chosen hero image positions the brand as an aspirational, eco-conscious statement, rather than just a product line.'
         },
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348325/Leafinity_Eco-Goods_ufcvkm.png' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348356/Leafinity_Eco-Goods_White_version_eietmr.png' }
         ],
         mockupGallery: [
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_mockup_1.jpg' },
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_mockup_2.jpg' }
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755353099/Leafinity_Eco-Goods_Wooden_Frame_Mockup_gaei5m.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755353099/Leafinity_Eco-Goods_Wooden_Stamp_Mockup_djfmts.jpg' }
         ]
     },
     {
