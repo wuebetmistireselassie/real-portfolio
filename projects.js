@@ -13,7 +13,7 @@ const designs = [
         category: 'logo',
         heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755343786/Bean_and_Bloom_Coffee_Brand_Mockup_jedwwq.jpg',
         brief: {
-            challenge: 'A professional mockup demonstrating the Bean & Bloom logo on a business card, showcasing its application in a real-world branding scenario.',
+            challenge: 'To create a complete and cohesive brand identity for a modern coffee shop, ensuring the logo and its elements are versatile enough to work seamlessly across a wide range of real-world applications.',
             solution: 'The design itself is a stylized "B" which also incorporates a coffee bean shape. The two "B"s from "Bean & Bloom" are cleverly intertwined.'
         },
         logoVariations: [
