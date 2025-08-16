@@ -48,6 +48,24 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336437/SkyPulse_Drones_MacBook_Mockup_yednal.jpg' }
         ]
     },
+  {
+        id: 'techwave',
+        title: 'TechWave Electronics',
+        category: 'logo',
+        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_Electronics_nq7ful.png',
+        brief: {
+            challenge: 'This logo for a fictional electronics brand uses "TechWave" to suggest modern technology and a flow of innovation.',
+            solution: 'The logo directly represents the brand name with a solid vertical bar for "Tech" and a wave for "Wave." It is simple, memorable, and visually interesting.'
+        },
+        logoVariations: [
+            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_Electronics_nq7ful.png' },
+            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_white.png' }
+        ],
+        mockupGallery: [
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_mockup_1.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_mockup_2.jpg' }
+        ]
+    },
     {
         id: 'leafinity',
         title: 'Leafinity',
@@ -64,24 +82,6 @@ const designs = [
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_mockup_1.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_mockup_2.jpg' }
-        ]
-    },
-    {
-        id: 'techwave',
-        title: 'TechWave Electronics',
-        category: 'logo',
-        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_Electronics_nq7ful.png',
-        brief: {
-            challenge: 'This logo for a fictional electronics brand uses "TechWave" to suggest modern technology and a flow of innovation.',
-            solution: 'The logo directly represents the brand name with a solid vertical bar for "Tech" and a wave for "Wave." It is simple, memorable, and visually interesting.'
-        },
-        logoVariations: [
-            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_Electronics_nq7ful.png' },
-            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_white.png' }
-        ],
-        mockupGallery: [
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_mockup_1.jpg' },
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755166018/TechWave_mockup_2.jpg' }
         ]
     },
     {
