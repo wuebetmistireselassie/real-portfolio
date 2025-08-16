@@ -7,7 +7,7 @@ const profileInfo = {
 };
 
 const designs = [
-   {
+    {
         id: 'beanbloom',
         title: 'Bean & Bloom Coffee Shop',
         category: 'logo',
@@ -22,7 +22,7 @@ const designs = [
         ],
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755343786/Bean_and_Bloom_Coffee_Brand_Mockup_jedwwq.jpg' },
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg' },
+            { url: 'https://res.com.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755344880/Bean_and_Bloom_coffee_shop_mockup_vuepvc.jpg' },
         ]
     },
@@ -48,34 +48,32 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336437/SkyPulse_Drones_MacBook_Mockup_yednal.jpg' }
         ]
     },
-// ...
-{
-    id: 'techwave',
-    title: 'TechWave Electronics Shop',
-    category: 'logo',
-    heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755346107/TechWave_Smartphone_Clay_Mockup_qyv9tu.jpg',
-    brief: {
-        challenge: 'This logo for a fictional electronics brand uses "TechWave" to suggest modern technology and a flow of innovation.',
-        solution: 'The logo combines the letters "T" and "W" with the "W" taking the form of a wave. The design is simple, memorable, and visually interesting.'
-    },
-    logoVariations: [
-        { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346880/TechWave_Electronics_c6lf2v.png' },
-        { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346986/White_version_bxbzte.png' }
-    ],
-    mockupGallery: [
-        { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346107/TechWave_Smartphone_Clay_Mockup_qyv9tu.jpg' },
-        { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346108/TechWave_Electronics_shop_Free_iMac_Mockup_fve7eh.jpg' }
-    ]
-},
-// ...
     {
-        id: 'leafinity Eco-Goods',
-        title: 'Leafinity',
+        id: 'techwave',
+        title: 'TechWave Electronics',
+        category: 'logo',
+        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755346107/TechWave_Smartphone_Clay_Mockup_qyv9tu.jpg',
+        brief: {
+            challenge: 'To select a powerful hero image for the TechWave Electronics website that communicates a modern, high-tech brand identity.',
+            solution: 'The strategic selection of a high-tech mockup that positions the brand as a leader in innovation. The chosen image, a minimalist clay smartphone, serves as a digital touchpoint, conveying a message of quality and trust in the digital age.'
+        },
+        logoVariations: [
+            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346880/TechWave_Electronics_c6lf2v.png' },
+            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346986/White_version_bxbzte.png' }
+        ],
+        mockupGallery: [
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346107/TechWave_Smartphone_Clay_Mockup_qyv9tu.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346108/TechWave_Electronics_shop_Free_iMac_Mockup_fve7eh.jpg' }
+        ]
+    },
+    {
+        id: 'leafinity',
+        title: 'Leafinity Eco-Goods',
         category: 'logo',
         heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755353099/Leafinity_Eco-Goods_Wooden_Frame_Mockup_gaei5m.jpg',
         brief: {
             challenge: 'To create a minimalist and elegant brand identity for a sustainable goods company that not only conveys a message of environmental consciousness, but also positions the brand as a premium and artistic lifestyle choice.',
-            solution: 'The logo skillfully merges a leaf with the infinity symbol to create a single, cohesive mark. The brand's visual identity successfully showcases this logo in a clean, artistic context, using a simple wooden frame and natural lighting to convey a message of authenticity and high quality. The chosen hero image positions the brand as an aspirational, eco-conscious statement, rather than just a product line.'
+            solution: 'The logo skillfully merges a leaf with the infinity symbol to create a single, cohesive mark. The brand\'s visual identity successfully showcases this logo in a clean, artistic context, using a simple wooden frame and natural lighting to convey a message of authenticity and high quality. The chosen hero image positions the brand as an aspirational, eco-conscious statement, rather than just a product line.'
         },
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348325/Leafinity_Eco-Goods_ufcvkm.png' },
@@ -93,7 +91,7 @@ const designs = [
         heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755351039/A_R_Star_Partners_Billboard_Mockup_om2hjo.jpg',
         brief: {
             challenge: 'To design a professional logo and establish a credible brand presence for a fictional professional services firm, ensuring the visual identity conveys trust, partnership, and excellence.',
-            solution: 'The logo creatively merges a stylized "A" and "R" with a separate, impactful star icon, directly referencing the firm's name. The final brand application is showcased on a large-scale sign in a high-end corporate interior, effectively communicating the firm’s authority and prestige, and giving clients immediate confidence in its professional stature.'
+            solution: 'The logo creatively merges a stylized "A" and "R" with a separate, impactful star icon, directly referencing the firm\'s name. The final brand application is showcased on a large-scale sign in a high-end corporate interior, effectively communicating the firm’s authority and prestige, and giving clients immediate confidence in its professional stature.'
         },
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png' },
@@ -101,7 +99,8 @@ const designs = [
         ],
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351039/A_R_Star_Partners_Billboard_Mockup_om2hjo.jpg' },
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351039/A_R_Star_Partners_Sign_Mockup_1_hidp3y.jpg' }
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351039/A_R_Star_Partners_Sign_Mockup_1_hidp3y.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351040/A_R_Star_Partners_Three_Banner_Flags_Mockup_a3f2p4.jpg' }
         ]
     },
 ];
