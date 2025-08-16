@@ -16,104 +16,81 @@
         <div class="header-container">
             <div class="logo-container">
                 <img id="profile-picture" src="" alt="Profile Picture">
-                <a href="#" class="logo-name">Mistireselassie W.</a>
+                <a href="#home" class="logo-name">Mistireselassie W.</a>
             </div>
             <nav>
                 <ul>
-                    <li><a href="#about-me">About</a></li>
-                    <li><a href="#skills">Skills</a></li>
-                    <li><a href="#portfolio">My Work</a></li>
+                    <li><a href="#designs">Designs</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#about">About</a></li>
                     <li><a href="#contact">Contact</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main>
+    <main id="app-container">
+        <div id="home-page">
+            <section id="hero-intro" class="hero-intro">
+                <h1>Creative Designer & Office Expert</h1>
+                <p>Hello! I’m a creative designer specializing in building strong brand identities. I craft original, handcrafted logos and provide expert support in PowerPoint, Word, and Excel. Let's make your brand shine!</p>
+            </section>
+            
+            <section id="designs">
+                <div class="section-container">
+                    <h2>My Designs</h2>
+                    <p class="section-intro">Explore my original logo concepts and mockups. Each project tells a story of creative problem-solving and brand identity.</p>
+                    <div id="designs-grid" class="portfolio-grid">
+                        <p>Loading designs...</p>
+                    </div>
+                </div>
+            </section>
 
-        <section id="about-me">
-            <div class="section-container about-me-container">
-                <h2>About Me</h2>
-                <p>
-                    Hello! I’m a creative designer and MS Office expert specializing in building strong brand identities. I craft original, handcrafted logos and provide expert support in PowerPoint, Word, and Excel.
-                </p>
-                <p>
-                    My goal is to be a reliable resource for my clients' creative and administrative needs, delivering polished, professional results every time. Let's work together to make your brand shine!
-                </p>
+            <section id="services">
+                <div class="section-container">
+                    <h2>Additional Services</h2>
+                    <div id="services-list" class="skills-list">
+                        <p>Loading services...</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="about">
+                <div class="section-container">
+                    <h2>About Me</h2>
+                    <div class="mission-vision-container">
+                        <div class="mission-item">
+                            <h3>Mission</h3>
+                            <p>To provide businesses and individuals with clear, compelling, and professional visual identities by merging creative design with technical precision.</p>
+                        </div>
+                        <div class="mission-item">
+                            <h3>Vision</h3>
+                            <p>To be the go-to resource for clients seeking seamless, high-quality design and document solutions, empowering them to present their best work.</p>
+                        </div>
+                        <div class="mission-item">
+                            <h3>Goal</h3>
+                            <p>To build lasting partnerships by consistently delivering exceptional results with reliability and clear communication on every single project.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="contact">
+                <div class="section-container">
+                    <h2>Contact Me</h2>
+                    <ul class="contact-list">
+                        <li><strong>Email:</strong> <a href="mailto:changesat2021@gmail.com">changesat2021@gmail.com</a></li>
+                        <li><strong>WhatsApp:</strong> <a href="https://wa.me/251919981116">+251 919 981 116</a></li>
+                        <li><strong>Telegram:</strong> <a href="https://t.me/google4to" target="_blank">@google4to</a></li>
+                        <li><strong>Location:</strong> Addis Ababa, Ethiopia</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+        
+        <div id="project-page" class="hidden">
             </div>
-        </section>
 
-        <section id="about" class="hero">
-            <h1>Creative Designer & Office Expert</h1>
-            <div class="mission-vision-container">
-                <div class="mission-item">
-                    <h3>Mission</h3>
-                    <p>To provide businesses and individuals with clear, compelling, and professional visual identities by merging creative design with technical precision.</p>
-                </div>
-                <div class="mission-item">
-                    <h3>Vision</h3>
-                    <p>To be the go-to resource for clients seeking seamless, high-quality design and document solutions, empowering them to present their best work.</p>
-                </div>
-                <div class="mission-item">
-                    <h3>Goal</h3>
-                    <p>To build lasting partnerships by consistently delivering exceptional results with reliability and clear communication on every single project.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="skills">
-            <div class="section-container">
-                <h2>My Skills</h2>
-                <ul class="skills-list">
-                    <li>🎨 Logo Design (Original, Handcrafted Concepts)</li>
-                    <li>✅ PowerPoint Presentation Design</li>
-                    <li>✅ Microsoft Word Document Formatting</li>
-                    <li>✅ Microsoft Excel Tasks (Data Entry, Formulas, Formatting)</li>
-                    <li>✅ File Conversion (PDF, SVG, PNG, etc.)</li>
-                    <li>💻 Data Entry & Administrative Support</li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="portfolio">
-            <div class="section-container">
-                <h2>My Work</h2>
-                
-                <h3 class="portfolio-subheader">Logo Designs & Graphics</h3>
-                <p class="portfolio-intro">These are my original logo concepts. Click any image to view it with a full description.</p>
-                <div id="image-grid" class="portfolio-grid">
-                    <p>Loading designs...</p>
-                </div>
-
-                <h3 class="portfolio-subheader">Logo Mockups & Case Studies</h3>
-                <p class="portfolio-intro">Here is how my logo designs look in real-world applications. Click to see the full case study.</p>
-                <div id="mockup-grid" class="portfolio-grid">
-                     <p>Loading mockups...</p>
-                </div>
-                
-                <h3 class="portfolio-subheader">Video Presentations</h3>
-                <div id="video-grid" class="video-grid">
-                     <p>Loading videos...</p>
-                </div>
-
-                <h3 class="portfolio-subheader">Document Samples & Downloads</h3>
-                <div id="document-list" class="document-list">
-                    <p>Loading documents...</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact">
-            <div class="section-container">
-                <h2>Contact Me</h2>
-                <ul class="contact-list">
-                    <li><strong>Email:</strong> <a href="mailto:changesat2021@gmail.com">changesat2021@gmail.com</a></li>
-                    <li><strong>WhatsApp:</strong> <a href="https://wa.me/251919981116">+251 919 981 116</a></li>
-                    <li><strong>Telegram:</strong> <a href="https://t.me/google4to" target="_blank">@google4to</a></li>
-                    <li><strong>Location:</strong> Addis Ababa, Ethiopia</li>
-                </ul>
-            </div>
-        </section>
     </main>
 
     <footer>
