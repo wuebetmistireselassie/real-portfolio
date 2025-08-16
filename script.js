@@ -95,7 +95,27 @@ function renderProjectPage(projectId) {
         `;
     }).join('');
 
+    // --- NEW CODE BLOCK STARTS HERE ---
+    // Dynamically build the design process gallery (if it exists)
+    let processGalleryHTML = '';
+    if (project.processGallery && project.processGallery.length > 0) {
+        const processImagesHTML = project.processGallery.map(processItem => `
+            <img src="${processItem.url}" alt="${project.title} Design Process">
+        `).join('');
+
+        processGalleryHTML = `
+            <div class="project-section">
+                <h3>The Design Process</h3>
+                <div class="process-gallery">
+                    ${processImagesHTML}
+                </div>
+            </div>
+        `;
+    }
+    // --- NEW CODE BLOCK ENDS HERE ---
+
     const projectContent = `
+        <button id="back-to-home" class="back-button">← Back to All Projects</button>
         <img class="project-hero" src="${project.heroImage}" alt="${project.title} Hero Image">
         <section>
             <div class="section-container project-content">
@@ -120,6 +140,9 @@ function renderProjectPage(projectId) {
                         `).join('')}
                     </div>
                 </div>
+
+                ${processGalleryHTML}
+
             </div>
         </section>
     `;
@@ -128,6 +151,11 @@ function renderProjectPage(projectId) {
     homePage.classList.add('hidden');
     projectPage.classList.remove('hidden');
     window.scrollTo(0, 0); // Scroll to top of the page
+
+    // Add event listener for the back button
+    document.getElementById('back-to-home').addEventListener('click', () => {
+        window.location.hash = '#home';
+    });
 }
 
 /**
@@ -150,4 +178,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setProfilePicture();
     handleRouting();
     window.addEventListener('hashchange', handleRouting);
+
+    // Make the logo name in header a "home" button
+    document.querySelector('.logo-name').addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.hash = '#home';
+    });
 });
