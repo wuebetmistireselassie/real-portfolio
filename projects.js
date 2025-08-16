@@ -26,9 +26,9 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755344880/Bean_and_Bloom_coffee_shop_mockup_vuepvc.jpg' },
         ],
         processGallery: [
-            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=1.+Rough+Sketches' },
-            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=2.+Vector+Outlines' },
-            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=3.+Grid+Construction' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755367015/Bean_and_Bloom_Design_Process_1_ntpmsz.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755367081/Bean_and_Bloom_Design_Process_2_rqgtq1.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755367129/Bean_and_Bloom_Design_Process_3_ui1r9z.png' },
         ]
     },
     {
