@@ -7,6 +7,44 @@ const profileInfo = {
 };
 
 const designs = [
+   {
+        id: 'beanbloom',
+        title: 'Bean & Bloom Logo',
+        category: 'logo',
+        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg',
+        brief: {
+            challenge: 'A professional mockup demonstrating the Bean & Bloom logo on a business card, showcasing its application in a real-world branding scenario.',
+            solution: 'The design itself is a stylized "B" which also incorporates a coffee bean shape. The two "B"s from "Bean & Bloom" are cleverly intertwined.'
+        },
+        logoVariations: [
+            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg' },
+        ],
+        mockupGallery: [
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg' },
+        ]
+    },
+    {
+        id: 'skypulse',
+        title: 'SkyPulse Logo',
+        category: 'logo',
+        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755336438/SkyPulse_Drones_Office_Mockup_mrqjlw.jpg',
+        brief: {
+            challenge: 'To select a powerful and impactful hero image for the SkyPulse Drones website that effectively communicates the brand\'s professional and high-tech identity and makes a memorable first impression.',
+            solution: 'The strategic selection of a hero image that transcends a simple product photo. The chosen image, a high-end corporate lobby, positions the brand not just as a drone company, but as a leading, established technology firm. This image serves as the website\'s welcoming \'front door,\' immediately conveying a message of quality and trust, and creating a strong \'wow\' factor that is both aspirational and professional.'
+        },
+        logoVariations: [
+            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_z1vkr9.svg' },
+            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336807/SkyPylse_Drones_White_vesrion_moejta.png' }
+        ],
+        mockupGallery: [
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336438/SkyPulse_Drones_Office_Mockup_mrqjlw.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336440/SkyPulse_Drones_Logo_in_Conference_Room_Mockup_kkg1rx.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336439/SkyPulse_Drones_Large_City_Banner_Mockup_tvpppz.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336439/SkyPulse_Drones_Square_Signboard_Mockup_atztth.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336438/SkyPulse_Drones_Business_Card_Mockup_kqxcql.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336437/SkyPulse_Drones_MacBook_Mockup_yednal.jpg' }
+        ]
+    },
     {
         id: 'leafinity',
         title: 'Leafinity',
@@ -81,22 +119,6 @@ const designs = [
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_mockup_1.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_mockup_2.jpg' }
-        ]
-    },
-    {
-        id: 'beanbloom',
-        title: 'Bean & Bloom Logo',
-        category: 'logo',
-        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg',
-        brief: {
-            challenge: 'A professional mockup demonstrating the Bean & Bloom logo on a business card, showcasing its application in a real-world branding scenario.',
-            solution: 'The design itself is a stylized "B" which also incorporates a coffee bean shape. The two "B"s from "Bean & Bloom" are cleverly intertwined.'
-        },
-        logoVariations: [
-            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg' },
-        ],
-        mockupGallery: [
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg' },
         ]
     },
 ];
