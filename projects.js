@@ -88,7 +88,7 @@ const designs = [
     },
     {
         id: 'arstar',
-        title: 'ARStar Logo',
+        title: 'A&R Star Partners, LLP',
         category: 'logo',
         heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png',
         brief: {
@@ -97,7 +97,7 @@ const designs = [
         },
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png' },
-            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_white.png' }
+            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348560/A_R_Star_Partners_LLP_White_version_lcsmyd.png' }
         ],
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_mockup_1.jpg' },
