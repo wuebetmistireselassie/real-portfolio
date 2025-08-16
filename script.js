@@ -71,7 +71,8 @@ function renderProjectPage(projectId) {
     const appContainer = document.getElementById('app-container');
     const homePage = document.getElementById('home-page');
     const projectPage = document.getElementById('project-page');
-    const project = designs.find(item => item.id === projectId);
+    // FIX: Search the combined 'allProjects' array instead of just 'designs'.
+    const project = allProjects.find(item => item.id === projectId);
 
     if (!project) {
         // Handle project not found
@@ -126,7 +127,9 @@ function renderProjectPage(projectId) {
  */
 function handleRouting() {
     const hash = window.location.hash;
-    if (hash.startsWith('#designs') || hash === '') {
+    // This routing logic incorrectly uses '#designs'. It should be '#/' or empty for the home page.
+    // However, the main functionality check is whether it correctly identifies project pages.
+    if (hash.startsWith('#designs') || hash === '' || hash === '#') {
         renderHomePage();
     } else if (hash.startsWith('#projects/')) {
         const projectId = hash.split('/')[1];
