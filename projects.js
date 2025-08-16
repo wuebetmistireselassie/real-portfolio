@@ -31,9 +31,9 @@ const designs = [
         category: 'logo',
         heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755336438/SkyPulse_Drones_Office_Mockup_mrqjlw.jpg',
         brief: {
-            Challenge: To select a powerful and impactful hero image for the SkyPulse Drones website that effectively communicates the brand's professional and high-tech identity and makes a memorable first impression.
+            Challenge: 'To select a powerful and impactful hero image for the SkyPulse Drones website that effectively communicates the brand's professional and high-tech identity and makes a memorable first impression.',
 
-Solution: The strategic selection of a hero image that transcends a simple product photo. The chosen image, a high-end corporate lobby, positions the brand not just as a drone company, but as a leading, established technology firm. This image serves as the website's welcoming 'front door,' immediately conveying a message of quality and trust, and creating a strong 'wow' factor that is both aspirational and professional."'
+Solution: 'The strategic selection of a hero image that transcends a simple product photo. The chosen image, a high-end corporate lobby, positions the brand not just as a drone company, but as a leading, established technology firm. This image serves as the website's welcoming 'front door,' immediately conveying a message of quality and trust, and creating a strong 'wow' factor that is both aspirational and professional.'
         },
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_z1vkr9.svg' },
