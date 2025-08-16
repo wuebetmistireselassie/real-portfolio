@@ -9,7 +9,7 @@ const profileInfo = {
 const designs = [
    {
         id: 'beanbloom',
-        title: 'Bean & Bloom Logo',
+        title: 'Bean & Bloom Coffee Shop',
         category: 'logo',
         heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755343786/Bean_and_Bloom_Coffee_Brand_Mockup_jedwwq.jpg',
         brief: {
@@ -28,7 +28,7 @@ const designs = [
     },
     {
         id: 'skypulse',
-        title: 'SkyPulse Logo',
+        title: 'SkyPulse Drones',
         category: 'logo',
         heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755336438/SkyPulse_Drones_Office_Mockup_mrqjlw.jpg',
         brief: {
@@ -51,7 +51,7 @@ const designs = [
 // ...
 {
     id: 'techwave',
-    title: 'TechWave Electronics',
+    title: 'TechWave Electronics Shop',
     category: 'logo',
     heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755346107/TechWave_Smartphone_Clay_Mockup_qyv9tu.jpg',
     brief: {
@@ -69,7 +69,7 @@ const designs = [
 },
 // ...
     {
-        id: 'leafinity',
+        id: 'leafinity Eco-Goods',
         title: 'Leafinity',
         category: 'logo',
         heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_1_ya5std.png',
@@ -78,8 +78,8 @@ const designs = [
             solution: 'This logo merges a leaf with the infinity symbol to create a single, cohesive mark. The design is simple, elegant, and conveys a message of environmental longevity.'
         },
         logoVariations: [
-            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082554/SkyPulse_uapeed.png' },
-            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336807/SkyPylse_Drones_White_vesrion_moejta.png' }
+            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348325/Leafinity_Eco-Goods_ufcvkm.png' },
+            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348356/Leafinity_Eco-Goods_White_version_eietmr.png' }
         ],
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_mockup_1.jpg' },
