@@ -71,8 +71,7 @@ function renderProjectPage(projectId) {
     const appContainer = document.getElementById('app-container');
     const homePage = document.getElementById('home-page');
     const projectPage = document.getElementById('project-page');
-    // FIX: Search the combined 'allProjects' array instead of just 'designs'.
-    const project = allProjects.find(item => item.id === projectId);
+    const project = designs.find(item => item.id === projectId);
 
     if (!project) {
         // Handle project not found
@@ -81,6 +80,20 @@ function renderProjectPage(projectId) {
         projectPage.classList.remove('hidden');
         return;
     }
+    
+    // Dynamically build the logo variations
+    const logoVariationsHTML = project.logoVariations.map(variation => {
+        let classes = 'logo-system-item';
+        if (variation.type === 'white') {
+            classes += ' logo-display-dark-bg';
+        }
+        return `
+            <div class="${classes}">
+                <img src="${variation.url}" alt="${project.title} ${variation.type} Logo">
+                <p>${variation.type} Version</p>
+            </div>
+        `;
+    }).join('');
 
     const projectContent = `
         <img class="project-hero" src="${project.heroImage}" alt="${project.title} Hero Image">
@@ -95,12 +108,7 @@ function renderProjectPage(projectId) {
                 <div class="project-section">
                     <h3>Logo System</h3>
                     <div class="logo-system-grid">
-                        ${project.logoVariations.map(variation => `
-                            <div>
-                                <img src="${variation.url}" alt="${project.title} ${variation.type} Logo">
-                                <p>${variation.type} Version</p>
-                            </div>
-                        `).join('')}
+                        ${logoVariationsHTML}
                     </div>
                 </div>
 
@@ -127,9 +135,7 @@ function renderProjectPage(projectId) {
  */
 function handleRouting() {
     const hash = window.location.hash;
-    // This routing logic incorrectly uses '#designs'. It should be '#/' or empty for the home page.
-    // However, the main functionality check is whether it correctly identifies project pages.
-    if (hash.startsWith('#designs') || hash === '' || hash === '#') {
+    if (hash === '' || hash === '#home') {
         renderHomePage();
     } else if (hash.startsWith('#projects/')) {
         const projectId = hash.split('/')[1];
