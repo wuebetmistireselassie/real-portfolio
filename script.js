@@ -185,3 +185,18 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.hash = '#home';
     });
 });
+/* Styles for the new Design Process Gallery */
+.process-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.process-gallery img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
