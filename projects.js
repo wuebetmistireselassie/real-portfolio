@@ -29,6 +29,7 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755367015/Bean_and_Bloom_Design_Process_1_ntpmsz.png' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755367081/Bean_and_Bloom_Design_Process_2_rqgtq1.png' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755367129/Bean_and_Bloom_Design_Process_3_ui1r9z.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755369056/Bean_and_Bloom_Design_Process_4_ixgvkk.png' },
         ]
     },
     {
