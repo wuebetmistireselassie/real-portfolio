@@ -1,4 +1,6 @@
-// This file defines the functions to build the portfolio and handle animations.
+// ===================================================================================
+// DYNAMIC CONTENT AND PORTFOLIO FUNCTIONS
+// ===================================================================================
 
 /**
  * Sets the profile picture in the header from a profileInfo object.
@@ -8,169 +10,135 @@ function setProfilePicture() {
     if (profilePicElement && typeof profileInfo !== 'undefined' && profileInfo.imageUrl) {
         profilePicElement.src = profileInfo.imageUrl;
     } else {
-        if(profilePicElement) profilePicElement.style.display = 'none';
+        if (profilePicElement) profilePicElement.style.display = 'none';
     }
 }
 
 /**
- * Builds the full portfolio, now visible to all visitors.
+ * Renders the initial homepage with design and service grids.
  */
-function buildPortfolio() {
-    const imageGrid = document.getElementById('image-grid');
-    const mockupGrid = document.getElementById('mockup-grid'); // Added this line
-    const documentList = document.getElementById('document-list');
-    const videoGrid = document.getElementById('video-grid');
+function renderHomePage() {
+    const appContainer = document.getElementById('app-container');
+    const homePage = document.getElementById('home-page');
+    const projectPage = document.getElementById('project-page');
+    
+    if (appContainer && homePage && projectPage) {
+        homePage.classList.remove('hidden');
+        projectPage.classList.add('hidden');
+    }
 
-    if (typeof portfolioItems === 'undefined' || portfolioItems.length === 0) {
-        if (imageGrid) imageGrid.innerHTML = '<p>No projects have been added yet.</p>';
+    const designsGrid = document.getElementById('designs-grid');
+    if (designsGrid) {
+        designsGrid.innerHTML = '';
+        designs.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'portfolio-item';
+            itemElement.dataset.id = item.id;
+            itemElement.innerHTML = `
+                <a href="#projects/${item.id}">
+                    <img src="${item.heroImage}" alt="${item.title}">
+                    <div class="portfolio-text-content">
+                        <p class="portfolio-title">${item.title}</p>
+                    </div>
+                </a>
+            `;
+            designsGrid.appendChild(itemElement);
+        });
+    }
+
+    const servicesList = document.getElementById('services-list');
+    if (servicesList) {
+        servicesList.innerHTML = '';
+        services.forEach(item => {
+            const itemElement = document.createElement('li');
+            if (item.url) {
+                 itemElement.innerHTML = `
+                    <a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>
+                `;
+            } else {
+                itemElement.textContent = item.title;
+            }
+            servicesList.appendChild(itemElement);
+        });
+    }
+}
+
+/**
+ * Renders a specific project page based on the ID.
+ * @param {string} projectId The ID of the project to render.
+ */
+function renderProjectPage(projectId) {
+    const appContainer = document.getElementById('app-container');
+    const homePage = document.getElementById('home-page');
+    const projectPage = document.getElementById('project-page');
+    const project = designs.find(item => item.id === projectId);
+
+    if (!project) {
+        // Handle project not found
+        projectPage.innerHTML = `<section><div class="section-container"><h2>Project Not Found</h2><p>The project you're looking for does not exist.</p></div></section>`;
+        homePage.classList.add('hidden');
+        projectPage.classList.remove('hidden');
         return;
     }
 
-    if (imageGrid) imageGrid.innerHTML = '';
-    if (mockupGrid) mockupGrid.innerHTML = ''; // Added this line
-    if (videoGrid) videoGrid.innerHTML = '';
-    if (documentList) documentList.innerHTML = '';
+    const projectContent = `
+        <img class="project-hero" src="${project.heroImage}" alt="${project.title} Hero Image">
+        <section>
+            <div class="section-container project-content">
+                <h2 class="project-title">${project.title}</h2>
+                <div class="project-brief">
+                    <p><strong>The Challenge:</strong> ${project.brief.challenge}</p>
+                    <p><strong>The Solution:</strong> ${project.brief.solution}</p>
+                </div>
+                
+                <div class="project-section">
+                    <h3>Logo System</h3>
+                    <div class="logo-system-grid">
+                        ${project.logoVariations.map(variation => `
+                            <div>
+                                <img src="${variation.url}" alt="${project.title} ${variation.type} Logo">
+                                <p>${variation.type} Version</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
 
-    portfolioItems.forEach(item => {
-        switch (item.type) {
-            case 'image':
-                const imageItem = document.createElement('div');
-                imageItem.className = 'portfolio-item';
-                imageItem.innerHTML = `
-                    <a href="${item.url}" class="gallery-link" title="${item.title}: ${item.description || ''}">
-                        <img src="${item.url}" alt="${item.title}">
-                        <div class="portfolio-text-content">
-                            <p class="portfolio-title">${item.title}</p>
-                            <p class="portfolio-description">${item.description || 'No description available.'}</p>
-                        </div>
-                    </a>`;
-                imageGrid.appendChild(imageItem);
-                break;
-            
-            // New 'mockup' case added here
-            case 'mockup':
-                const mockupItem = document.createElement('div');
-                mockupItem.className = 'portfolio-item';
-                mockupItem.innerHTML = `
-                    <a href="${item.url}" class="gallery-link" title="${item.title}: ${item.description || ''}">
-                        <img src="${item.url}" alt="${item.title}">
-                        <div class="portfolio-text-content">
-                            <p class="portfolio-title">${item.title}</p>
-                            <p class="portfolio-description">${item.description || 'No description available.'}</p>
-                        </div>
-                    </a>`;
-                mockupGrid.appendChild(mockupItem);
-                break;
+                <div class="project-section">
+                    <h3>Real-World Mockups</h3>
+                    <div class="mockup-gallery">
+                        ${project.mockupGallery.map(mockup => `
+                            <img src="${mockup.url}" alt="${project.title} Mockup">
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </section>
+    `;
 
-            case 'video':
-                const videoItem = document.createElement('div');
-                videoItem.className = 'video-item';
-                videoItem.innerHTML = `<h4>${item.title}</h4><div class="video-embed-container"><iframe src="${item.url}" title="${item.title}" frameborder="0" allowfullscreen></iframe></div>`;
-                videoGrid.appendChild(videoItem);
-                break;
-            case 'document':
-                const docItem = document.createElement('div');
-                docItem.className = 'document-item';
-                docItem.innerHTML = `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>`;
-                documentList.appendChild(docItem);
-                break;
-        }
-    });
+    projectPage.innerHTML = projectContent;
+    homePage.classList.add('hidden');
+    projectPage.classList.remove('hidden');
+    window.scrollTo(0, 0); // Scroll to top of the page
 }
-
 
 /**
- * Creates and animates the particle background.
+ * Handles the routing logic based on the URL hash.
  */
-function createDynamicBackground() {
-    const backgroundContainer = document.getElementById('dynamic-background');
-    if (!backgroundContainer) return;
-
-    const canvas = document.createElement('canvas');
-    canvas.id = 'background-canvas';
-    backgroundContainer.appendChild(canvas);
-    const ctx = canvas.getContext('2d');
-
-    let particles = [];
-    const particleCount = 70;
-    const maxDistance = 120;
-
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+function handleRouting() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#designs') || hash === '') {
+        renderHomePage();
+    } else if (hash.startsWith('#projects/')) {
+        const projectId = hash.split('/')[1];
+        renderProjectPage(projectId);
+    } else {
+        renderHomePage(); // Fallback to home page if hash is invalid
     }
-
-    class Particle {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.vx = (Math.random() - 0.5) * 0.5;
-            this.vy = (Math.random() - 0.5) * 0.5;
-            this.radius = Math.random() * 1.5 + 1;
-        }
-
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-
-            if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-            if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-        }
-
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            ctx.fill();
-        }
-    }
-
-    function init() {
-        resizeCanvas();
-        particles = [];
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
-    }
-
-    function connectParticles() {
-        for (let i = 0; i < particles.length; i++) {
-            for (let j = i; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < maxDistance) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = `rgba(0, 0, 0, ${0.4 * (1 - distance / maxDistance)})`;
-                    ctx.lineWidth = 0.5;
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.stroke();
-                }
-            }
-        }
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-            p.update();
-            p.draw();
-        });
-        connectParticles();
-        requestAnimationFrame(animate);
-    }
-
-    init();
-    animate();
-    window.addEventListener('resize', init);
 }
 
-
-// This function runs when the page is ready
+// Event Listeners and Initial Load
 document.addEventListener('DOMContentLoaded', () => {
     setProfilePicture();
-    buildPortfolio();
-    createDynamicBackground();
+    handleRouting();
+    window.addEventListener('hashchange', handleRouting);
 });
