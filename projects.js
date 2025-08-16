@@ -17,7 +17,7 @@ const designs = [
             solution: 'The design itself is a stylized "B" which also incorporates a coffee bean shape. The two "B"s from "Bean & Bloom" are cleverly intertwined.'
         },
         logoVariations: [
-            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg' },
+            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167320/Bean_and_Bloom_hfoasb.svg' },
         ],
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg' },
