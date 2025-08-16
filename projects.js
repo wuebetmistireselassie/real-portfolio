@@ -78,7 +78,10 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346108/TechWave_Electronics_shop_Free_iMac_Mockup_fve7eh.jpg' }
         ],
         processGallery: [
-            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=Replace+Me' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755371139/TechWave_1_yaharz.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755371140/TechWave_2_xvvvhz.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755371140/TechWave_3_ufqss3.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755371141/TechWave_4_tc3qyd.png' },
         ]
     },
     {
