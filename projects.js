@@ -90,18 +90,18 @@ const designs = [
         id: 'arstar',
         title: 'A&R Star Partners, LLP',
         category: 'logo',
-        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png',
+        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755351039/A_R_Star_Partners_Billboard_Mockup_om2hjo.jpg',
         brief: {
-            challenge: 'Designed for a fictional company in the Augmented Reality (AR) or entertainment space, suggesting a leading, high-quality brand.',
-            solution: 'The logo combines an "A" and an "R" into a star shape, directly referencing the "AR" and "Star" in the name. The design is dynamic and modern.'
+            challenge: 'To design a professional logo and establish a credible brand presence for a fictional professional services firm, ensuring the visual identity conveys trust, partnership, and excellence.',
+            solution: 'The logo creatively merges a stylized "A" and "R" with a separate, impactful star icon, directly referencing the firm's name. The final brand application is showcased on a large-scale sign in a high-end corporate interior, effectively communicating the firm’s authority and prestige, and giving clients immediate confidence in its professional stature.'
         },
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348560/A_R_Star_Partners_LLP_White_version_lcsmyd.png' }
         ],
         mockupGallery: [
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_mockup_1.jpg' },
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_mockup_2.jpg' }
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351039/A_R_Star_Partners_Billboard_Mockup_om2hjo.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351039/A_R_Star_Partners_Sign_Mockup_1_hidp3y.jpg' }
         ]
     },
 ];
