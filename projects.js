@@ -25,11 +25,10 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755344880/Bean_and_Bloom_coffee_shop_mockup_vuepvc.jpg' },
         ],
-        // NEW SECTION ADDED HERE - REPLACE WITH YOUR IMAGE URLS
         processGallery: [
-            { url: 'x' },
-            { url: 'x' },
-            { url: 'x' },
+            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=1.+Rough+Sketches' },
+            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=2.+Vector+Outlines' },
+            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=3.+Grid+Construction' },
         ]
     },
     {
@@ -54,10 +53,8 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336437/SkyPulse_Drones_MacBook_Mockup_yednal.jpg' }
         ],
         processGallery: [
-            { url: 'x' },
-            { url: 'x' },
-            { url: 'x' },
-] // Leave empty or add your process images
+            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=Replace+Me' },
+        ]
     },
     {
         id: 'techwave',
@@ -77,10 +74,8 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346108/TechWave_Electronics_shop_Free_iMac_Mockup_fve7eh.jpg' }
         ],
         processGallery: [
-            { url: 'x' },
-            { url: 'x' },
-            { url: 'x' },
-]
+            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=Replace+Me' },
+        ]
     },
     {
         id: 'leafinity',
@@ -100,10 +95,8 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755353099/Leafinity_Eco-Goods_Wooden_Stamp_Mockup_djfmts.jpg' }
         ],
         processGallery: [
-            { url: 'x' },
-            { url: 'x' },
-            { url: 'x' },
-]
+            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=Replace+Me' },
+        ]
     },
     {
         id: 'arstar',
@@ -124,10 +117,8 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351040/A_R_Star_Partners_Three_Banner_Flags_Mockup_a3f2p4.jpg' }
         ],
         processGallery: [
-            { url: 'x' },
-            { url: 'x' },
-            { url: 'x' },
-]
+            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=Replace+Me' },
+        ]
     },
 ];
 
