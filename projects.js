@@ -48,24 +48,26 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336437/SkyPulse_Drones_MacBook_Mockup_yednal.jpg' }
         ]
     },
-  {
-        id: 'techwave',
-        title: 'TechWave Electronics',
-        category: 'logo',
-        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755346107/TechWave_Smartphone_Clay_Mockup_qyv9tu.jpg',
-        brief: {
-            challenge: 'This logo for a fictional electronics brand uses "TechWave" to suggest modern technology and a flow of innovation.',
-            solution: 'The logo directly represents the brand name with a solid vertical bar for "Tech" and a wave for "Wave." It is simple, memorable, and visually interesting.'
-        },
-        logoVariations: [
-            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346880/TechWave_Electronics_c6lf2v.png' },
-            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346986/White_version_bxbzte.png' }
-        ],
-        mockupGallery: [
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346107/TechWave_Smartphone_Clay_Mockup_qyv9tu.jpg' },
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346108/TechWave_Electronics_shop_Free_iMac_Mockup_fve7eh.jpg' }
-        ]
+// ...
+{
+    id: 'techwave',
+    title: 'TechWave Electronics',
+    category: 'logo',
+    heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755346107/TechWave_Smartphone_Clay_Mockup_qyv9tu.jpg',
+    brief: {
+        challenge: 'This logo for a fictional electronics brand uses "TechWave" to suggest modern technology and a flow of innovation.',
+        solution: 'The logo combines the letters "T" and "W" with the "W" taking the form of a wave. The design is simple, memorable, and visually interesting.'
     },
+    logoVariations: [
+        { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346880/TechWave_Electronics_c6lf2v.png' },
+        { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346986/White_version_bxbzte.png' }
+    ],
+    mockupGallery: [
+        { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346107/TechWave_Smartphone_Clay_Mockup_qyv9tu.jpg' },
+        { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346108/TechWave_Electronics_shop_Free_iMac_Mockup_fve7eh.jpg' }
+    ]
+},
+// ...
     {
         id: 'leafinity',
         title: 'Leafinity',
