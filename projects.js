@@ -29,7 +29,7 @@ const designs = [
         id: 'skypulse',
         title: 'SkyPulse Logo',
         category: 'logo',
-        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_z1vkr9.svg',
+        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755336438/SkyPulse_Drones_Office_Mockup_mrqjlw.jpg',
         brief: {
             challenge: 'A modern logo for a fictional tech or aviation company. The name implies data signals ("Pulse") and cloud computing ("Sky").',
             solution: 'The design cleverly integrates the letters "S" and "P" into the body of a drone. The pulse line running through the center is a great way to visually represent "Pulse."'
