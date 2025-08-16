@@ -17,8 +17,8 @@ const designs = [
             solution: 'This logo merges a leaf with the infinity symbol to create a single, cohesive mark. The design is simple, elegant, and conveys a message of environmental longevity.'
         },
         logoVariations: [
-            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_1_ya5std.png' },
-            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_white.png' }
+            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082554/SkyPulse_uapeed.png' },
+            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336807/SkyPylse_Drones_White_vesrion_moejta.png' }
         ],
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_mockup_1.jpg' },
