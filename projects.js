@@ -14,7 +14,7 @@ const designs = [
         heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755343786/Bean_and_Bloom_Coffee_Brand_Mockup_jedwwq.jpg',
         brief: {
             challenge: 'To create a complete and cohesive brand identity for a modern coffee shop, ensuring the logo and its elements are versatile enough to work seamlessly across a wide range of real-world applications.',
-            solution: 'The design itself is a stylized "B" which also incorporates a coffee bean shape. The two "B"s from "Bean & Bloom" are cleverly intertwined.'
+            solution: 'The brand identity centers around a clever and clean logo that integrates two coffee beans and a leaf into a stylized "B." The solution demonstrates the logo’s versatility by applying it consistently across an entire brand ecosystem, including packaging (coffee bags and paper bags), branded stationery (business cards and clipboards), and essential customer-facing items like coffee cups and mugs.'
         },
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167320/Bean_and_Bloom_hfoasb.svg' },
