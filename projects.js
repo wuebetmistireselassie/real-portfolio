@@ -72,7 +72,7 @@ const designs = [
         id: 'leafinity Eco-Goods',
         title: 'Leafinity',
         category: 'logo',
-        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/Leafinity_1_ya5std.png',
+        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755348325/Leafinity_Eco-Goods_ufcvkm.png',
         brief: {
             challenge: 'Represents a fictional company focused on nature and sustainability. The name combines "Leaf" and "Infinity" to suggest endless nature.',
             solution: 'This logo merges a leaf with the infinity symbol to create a single, cohesive mark. The design is simple, elegant, and conveys a message of environmental longevity.'
