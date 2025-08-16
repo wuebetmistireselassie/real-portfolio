@@ -54,7 +54,10 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336437/SkyPulse_Drones_MacBook_Mockup_yednal.jpg' }
         ],
         processGallery: [
-            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=Replace+Me' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755369252/SkyPulse_Drones_1_wane29.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755369386/SkyPulse_Drones_2_ylxxt1.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755369448/SkyPulse_Drones_3_kqmsy1.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755369447/SkyPulse_Drones_4_wdao9b.png' },
         ]
     },
     {
