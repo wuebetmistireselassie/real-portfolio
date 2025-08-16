@@ -40,8 +40,12 @@ Solution: The strategic selection of a hero image that transcends a simple produ
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_white.png' }
         ],
         mockupGallery: [
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_drone_mockup.jpg' },
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_card_mockup.jpg' }
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336438/SkyPulse_Drones_Office_Mockup_mrqjlw.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336440/SkyPulse_Drones_Logo_in_Conference_Room_Mockup_kkg1rx.jpg' }
+{ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336439/SkyPulse_Drones_Large_City_Banner_Mockup_tvpppz.jpg' }
+{ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336439/SkyPulse_Drones_Square_Signboard_Mockup_atztth.jpg' }
+{ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336438/SkyPulse_Drones_Business_Card_Mockup_kqxcql.jpg' }
+{ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336437/SkyPulse_Drones_MacBook_Mockup_yednal.jpg' }
         ]
     },
     {
