@@ -102,7 +102,11 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755353099/Leafinity_Eco-Goods_Wooden_Stamp_Mockup_djfmts.jpg' }
         ],
         processGallery: [
-            { url: 'https://placehold.co/800x600/2d3436/ffffff?text=Replace+Me' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373521/Leafinity_Eco-Goods_1_pupy0c.png' },
+  { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373521/Leafinity_Eco-Goods_2_otwa1b.png' },
+  { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373522/Leafinity_Eco-Goods_3_wfvwmo.png' },
+  { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373521/Leafinity_Eco-Goods_4_ylwbqe.png' },
+  { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373520/Leafinity_Eco-Goods_5_xifuqg.png' },
         ]
     },
     {
