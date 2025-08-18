@@ -135,7 +135,30 @@ const designs = [
         ]
     },
 ];
-
+  {
+        id: 'ironcore',
+        title: 'IronCore Fitness center',
+        category: 'logo',
+        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONCORE_Business_Card_6_if2g8z.jpg',
+        brief: {
+            challenge: 'The challenge was to launch a new, premium fitness brand in a competitive market. IronCore needed a powerful and modern logo that conveyed strength and professionalism, and was versatile enough for both gym apparel and corporate branding.',
+            solution: 'The solution is a bold and minimalist brand identity. A simplified weight plate icon inside a modern hexagonal shield, paired with a powerful, solid font, creates a mark that communicates core strength and professionalism. The final design successfully positions IronCore Fitness as a premium leader in the industry.'
+        },
+        logoVariations: [
+            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542139/IronCore_Fitness_Gym_training_black_d1ex3p.png' },
+            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542139/IronCore_Fitness_Gym_training_white_bjtbxb.png' }
+        ],
+        mockupGallery: [
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONCORE_Business_Card_6_if2g8z.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONECORE_T-Shirt_Mannequin_Mockup_2_kzfcug.jpg' }
+        ],
+        processGallery: [
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONECORE_T-Shirt_Mannequin_Mockup_2_kzfcug.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONECORE_T-Shirt_Mannequin_Mockup_2_kzfcug.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONECORE_T-Shirt_Mannequin_Mockup_2_kzfcug.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONECORE_T-Shirt_Mannequin_Mockup_2_kzfcug.jpg' },
+        ]
+    },
 const services = [
     {
         id: 'powerpoint',
