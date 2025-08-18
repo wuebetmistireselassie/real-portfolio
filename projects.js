@@ -103,10 +103,10 @@ const designs = [
         ],
         processGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373521/Leafinity_Eco-Goods_1_pupy0c.png' },
-  { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373521/Leafinity_Eco-Goods_2_otwa1b.png' },
-  { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373522/Leafinity_Eco-Goods_3_wfvwmo.png' },
-  { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373521/Leafinity_Eco-Goods_4_ylwbqe.png' },
-  { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373520/Leafinity_Eco-Goods_5_xifuqg.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373521/Leafinity_Eco-Goods_2_otwa1b.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373522/Leafinity_Eco-Goods_3_wfvwmo.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373521/Leafinity_Eco-Goods_4_ylwbqe.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755373520/Leafinity_Eco-Goods_5_xifuqg.png' },
         ]
     },
     {
@@ -129,13 +129,13 @@ const designs = [
         ],
         processGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375260/A_R_Star_Partners_1_w2xvge.png' },
-{ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375261/A_R_Star_Partners_2_kmrolw.png' },
-{ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375260/A_R_Star_Partners_3_cci0wa.png' },
-{ url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375260/A_R_Star_Partners_4_ihhhe5.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375261/A_R_Star_Partners_2_kmrolw.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375260/A_R_Star_Partners_3_cci0wa.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375260/A_R_Star_Partners_4_ihhhe5.png' },
         ]
     },
-];
-  {
+    // --- IRONCORE OBJECT MOVED TO HERE (INSIDE THE ARRAY) ---
+    {
         id: 'ironcore',
         title: 'IronCore Fitness center',
         category: 'logo',
@@ -158,7 +158,9 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755543943/IronCore_Fitness_Gym_training_3_y3dsry.png' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755543943/IronCore_Fitness_Gym_training_4_lztpl6.png' },
         ]
-    },
+    }
+]; // --- THIS IS THE CORRECT CLOSING BRACKET FOR THE 'designs' ARRAY ---
+
 const services = [
     {
         id: 'powerpoint',
