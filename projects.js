@@ -153,10 +153,10 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONECORE_T-Shirt_Mannequin_Mockup_2_kzfcug.jpg' }
         ],
         processGallery: [
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONECORE_T-Shirt_Mannequin_Mockup_2_kzfcug.jpg' },
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONECORE_T-Shirt_Mannequin_Mockup_2_kzfcug.jpg' },
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONECORE_T-Shirt_Mannequin_Mockup_2_kzfcug.jpg' },
-            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONECORE_T-Shirt_Mannequin_Mockup_2_kzfcug.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755543943/IronCore_Fitness_Gym_training_1_djteii.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755543945/IronCore_Fitness_Gym_training_2_tdlcv7.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755543943/IronCore_Fitness_Gym_training_3_y3dsry.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755543943/IronCore_Fitness_Gym_training_4_lztpl6.png' },
         ]
     },
 const services = [
