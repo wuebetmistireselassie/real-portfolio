@@ -134,7 +134,6 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755375260/A_R_Star_Partners_4_ihhhe5.png' },
         ]
     },
-    // --- IRONCORE OBJECT MOVED TO HERE (INSIDE THE ARRAY) ---
     {
         id: 'ironcore',
         title: 'IronCore Fitness center',
@@ -158,8 +157,33 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755543943/IronCore_Fitness_Gym_training_3_y3dsry.png' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755543943/IronCore_Fitness_Gym_training_4_lztpl6.png' },
         ]
+    },
+    // --- UNICOMBO OBJECT MOVED TO HERE (INSIDE THE ARRAY) & CASE STUDY CORRECTED ---
+    {
+        id: 'unicombo',
+        title: 'UniCombo Gaming Website',
+        category: 'logo',
+        heroImage: 'https://res.cloudinary.com/dreresany/image/upload/v1755554301/UniCombo_Mackbook_Mockup_nok8ri.jpg',
+        brief: {
+            challenge: 'The challenge was to design a unique and memorable brand identity for "UniCombo," a new, all-in-one entertainment web app. The logo needed to be modern, vibrant, and instantly communicate the idea of "unlimited combinations" of entertainment, all available at the click of a button.',
+            solution: 'The solution is a clever and dynamic logomark that visually fuses a "power on" symbol with an "infinity" loop, creating a unique shape that communicates "always-on, endless entertainment." A vibrant purple-to-blue gradient gives the brand a modern, digital-first feel that is energetic and trustworthy.'
+        },
+        logoVariations: [
+            { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755554178/UniCombo_mobile_App_cjzwyr.png' },
+            { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755554178/UniCombo_mobile_App_white_version_pfrhqc.png' }
+        ],
+        mockupGallery: [
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755554301/UniCombo_Mackbook_Mockup_nok8ri.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755554300/Unicombo_Smartphone_Mockup_i7elc4.jpg' }
+        ],
+        processGallery: [
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755555875/UniCombo_1_kql7qs.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755555876/UniCombo_2_eipglo.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755555875/UniCombo_3_rxsckk.png' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755555875/UniCombo_4_rzqr3v.png' },
+        ]
     }
-]; // --- THIS IS THE CORRECT CLOSING BRACKET FOR THE 'designs' ARRAY ---
+];
 
 const services = [
     {
