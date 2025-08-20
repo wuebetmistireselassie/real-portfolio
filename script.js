@@ -180,10 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('hashchange', handleRouting);
 
     // Make the logo name in header a "home" button
-    document.querySelector('.logo-name').addEventListener('click', (e) => {
+    const logoEl = document.querySelector('.logo-name');
+    if (logoEl) {
+        logoEl.addEventListener('click', (e) => {
         e.preventDefault();
         window.location.hash = '#home';
-    });
+            });
+    }
 });
-
-
