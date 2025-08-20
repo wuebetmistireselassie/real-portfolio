@@ -206,16 +206,14 @@ nav a:hover {
 .portfolio-item:hover .services-placeholder { transform: scale(1.05); background: #111111; }
 
 /* --- SERVICES CARD ADJUSTMENT --- */
-/* To make the services placeholder the only element on its card, 
-   add class="services-card" to that specific .portfolio-item in your HTML. */
 .portfolio-item.services-card .portfolio-text-content {
-    display: none; /* Hides the unnecessary text block */
+    display: none;
 }
 .portfolio-item.services-card a {
-    height: 100%; /* Ensures the link fills the entire card */
+    height: 100%;
 }
 .portfolio-item.services-card .services-placeholder {
-    height: 100%; /* Overrides fixed height to fill the card */
+    height: 100%;
 }
 
 
@@ -240,6 +238,26 @@ nav a:hover {
     text-align: center;
     max-width: 700px;
     margin: 0 auto 3rem;
+}
+
+/* --- ABOUT ME SECTION --- */
+.mission-vision-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+.mission-item {
+    flex: 1;
+}
+.mission-item h3 {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--heading-color);
+}
+.mission-item p {
+    text-align: justify;
 }
 
 /* --- PROJECT PAGE LAYOUT --- */
@@ -358,7 +376,6 @@ footer {
     .hero-intro p { font-size: 1rem; }
     h2 { font-size: 2.5rem; margin-bottom: 2rem; }
     section { padding: 2rem 1.5rem; }
-    .mission-vision-container { flex-direction: column; }
     .project-content { padding: 1rem; }
     .logo-system-grid, .mockup-gallery { grid-template-columns: 1fr; }
 }
