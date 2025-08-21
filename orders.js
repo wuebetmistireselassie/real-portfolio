@@ -37,10 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const generalContactBtn = document.getElementById('general-contact-btn');
   const ordersList = document.getElementById('orders-list');
 
-  // NEW: elements used for pricing
+  // Elements used for pricing
   const serviceTypeSelect = document.getElementById('service-type');
   const deliveryTimeSelect = document.getElementById('delivery-time');
   const deliverablesContainer = document.getElementById('deliverables-container');
+  const totalPriceEl = document.getElementById('total-price');
+  const upfrontEl = document.getElementById('upfront-payment');
 
   // --- Auth State Logic ---
   onAuthStateChanged(auth, user => {
@@ -66,10 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
 
-  // Recalculate price on any relevant change
-  orderForm.addEventListener('input', updatePrice);               // textareas/inputs
+  // Recalculate price on relevant changes
+  orderForm.addEventListener('input', updatePrice); // covers most inputs
   serviceTypeSelect.addEventListener('change', () => {
-    // Wait for dynamic checkboxes to be injected by your inline script
+    // Allow the dynamic checkbox script to inject items first
     setTimeout(updatePrice, 0);
   });
   deliveryTimeSelect.addEventListener('change', updatePrice);
@@ -121,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     authError.classList.remove('hidden');
   }
 
-  // NEW: helper to read selected deliverables (checkboxes)
+  // Read selected deliverables (checkboxes)
   function getSelectedDeliverables() {
     const checked = Array.from(
       deliverablesContainer.querySelectorAll('input[type="checkbox"]:checked')
@@ -132,10 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function updatePrice() {
     const serviceType = serviceTypeSelect.value;
     const deliveryTime = deliveryTimeSelect.value;
-    const selectedDeliverables = getSelectedDeliverables(); // array
+    const selectedDeliverables = getSelectedDeliverables();
+
     if (!serviceType || !deliveryTime) {
-      document.getElementById('total-price').textContent = (0).toFixed(2);
-      document.getElementById('upfront-payment').textContent = (0).toFixed(2);
+      totalPriceEl.textContent = (0).toFixed(2);
+      upfrontEl.textContent = (0).toFixed(2);
       return;
     }
 
@@ -143,8 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPrice = calculatePrice(serviceType, deliveryTime, deliverablesStr);
     const upfrontPayment = totalPrice * 0.3;
 
-    document.getElementById('total-price').textContent = totalPrice.toFixed(2);
-    document.getElementById('upfront-payment').textContent = upfrontPayment.toFixed(2);
+    totalPriceEl.textContent = totalPrice.toFixed(2);
+    upfrontEl.textContent = upfrontPayment.toFixed(2);
   }
 
   async function handleOrderSubmit(e) {
@@ -157,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Make sure price is up-to-date right before submit
+    // Ensure price is up to date
     updatePrice();
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
@@ -188,8 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
         serviceType: serviceTypeSelect.value,
         deliveryTime: deliveryTimeSelect.value,
         deliverables: selectedDeliverables.join(', '),
-        totalPrice: parseFloat(document.getElementById('total-price').textContent),
-        upfrontPayment: parseFloat(document.getElementById('upfront-payment').textContent),
+        totalPrice: parseFloat(totalPriceEl.textContent),
+        upfrontPayment: parseFloat(upfrontEl.textContent),
         transactionNumber: transactionNumber,
         status: 'Pending Confirmation',
         createdAt: serverTimestamp()
