@@ -209,5 +209,44 @@
       }
     });
   </script>
+
+  <!-- 🔥 Price update logic -->
+  <script type="module">
+    import { calculatePrice } from './price.js';
+
+    const serviceSelect = document.getElementById("service-type");
+    const deliveryTimeSelect = document.getElementById("delivery-time");
+    const deliverablesContainer = document.getElementById("deliverables-container");
+    const totalPriceEl = document.getElementById("total-price");
+    const upfrontPaymentEl = document.getElementById("upfront-payment");
+
+    function getSelectedDeliverables() {
+      return Array.from(document.querySelectorAll("input[name='deliverables']:checked"))
+        .map(cb => cb.value)
+        .join(",");
+    }
+
+    function updatePriceUI() {
+      const service = serviceSelect.value;
+      const delivery = deliveryTimeSelect.value;
+      const deliverables = getSelectedDeliverables();
+
+      if (!service) {
+        totalPriceEl.textContent = "0.00";
+        upfrontPaymentEl.textContent = "0.00";
+        return;
+      }
+
+      const total = calculatePrice(service, delivery, deliverables);
+      const upfront = (total * 0.3).toFixed(2);
+
+      totalPriceEl.textContent = total.toFixed(2);
+      upfrontPaymentEl.textContent = upfront;
+    }
+
+    serviceSelect.addEventListener("change", updatePriceUI);
+    deliveryTimeSelect.addEventListener("change", updatePriceUI);
+    deliverablesContainer.addEventListener("change", updatePriceUI);
+  </script>
 </body>
 </html>
