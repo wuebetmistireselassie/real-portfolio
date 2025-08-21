@@ -12,7 +12,7 @@ export function calculatePrice(serviceType, deliveryTime, deliverables) {
         case 'stationery':  // Business Card & Stationery
             basePrice = 150;
             break;
-        case 'socialmedia': // Social Media Kit
+        case 'socialkit': // Social Media Kit
             basePrice = 250;
             break;
         case 'digitalassets': // Marketing & Digital Assets
@@ -69,3 +69,4 @@ export function calculatePrice(serviceType, deliveryTime, deliverables) {
 
     return totalPrice;
 }
+
