@@ -1,39 +1,39 @@
 export function calculatePrice(serviceType, deliveryTime, deliverables) {
     let basePrice = 0;
 
-    // --- Base prices per service ---
+    // --- Base prices per service (in ETB) ---
     switch (serviceType) {
         case 'logo':        // Custom Logo Design
-            basePrice = 300;
+            basePrice = 6500;
             break;
-        case 'branding':    // Branding Kit
-            basePrice = 500;
+        case 'branding':    // Brand Identity & Guidelines
+            basePrice = 12000;
             break;
-        case 'stationery':  // Business Card & Stationery
-            basePrice = 150;
+        case 'stationery':  // Business Stationery Design
+            basePrice = 4000;
             break;
-        case 'socialkit': // Social Media Kit
-            basePrice = 250;
+        case 'socialkit':   // Social Media Kit
+            basePrice = 5000;
             break;
-        case 'digitalassets': // Marketing & Digital Assets
-            basePrice = 400;
+        case 'digitalassets': // Website & Digital Assets
+            basePrice = 9000;
             break;
 
-        // Existing services
-        case 'powerpoint':
-            basePrice = 50;
+        // --- Document & Office Services ---
+        case 'powerpoint':  // Presentation Design
+            basePrice = 3000;
             break;
-        case 'word':
-            basePrice = 30;
+        case 'word':        // Word Formatting
+            basePrice = 1800;
             break;
-        case 'excel':
-            basePrice = 40;
+        case 'excel':       // Excel Tasks
+            basePrice = 2500;
             break;
-        case 'files':
-            basePrice = 20;
+        case 'files':       // File Conversion
+            basePrice = 1000;
             break;
-        case 'admin':
-            basePrice = 25;
+        case 'admin':       // Data Entry/Admin Support
+            basePrice = 1500;
             break;
     }
 
@@ -58,15 +58,14 @@ export function calculatePrice(serviceType, deliveryTime, deliverables) {
             .split(',')
             .map(d => d.trim())
             .filter(d => d);
-        deliverablesFee = deliverablesArray.length * 5; // $5 per deliverable
+        deliverablesFee = deliverablesArray.length * 150; // 150 ETB per deliverable
     }
 
     // --- Final total ---
     let totalPrice = basePrice * deliveryMultiplier + deliverablesFee;
 
     // --- Minimum price rule ---
-    if (totalPrice < 20) totalPrice = 20;
+    if (totalPrice < 1000) totalPrice = 1000; // make sure very small tasks aren’t underpriced
 
     return totalPrice;
 }
-
