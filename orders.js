@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const signupForm = document.getElementById('signup-form');
   const authError = document.getElementById('auth-error');
   const showLoginTabBtn = document.getElementById('show-login-tab');
-  const showSignupTabBtn = document.getElementById('show-signup-tab');
+  const showSignupTabBtn = document = document.getElementById('show-signup-tab');
   const loginFormContainer = document.getElementById('login-form-container');
   const signupFormContainer = document.getElementById('signup-form-container');
   const logoutBtn = document.getElementById('logout-btn');
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
 
-  // Deliverables per service (moved from orders.html)
+  // Deliverables per service
   const deliverables = {
     logo: ["PNG", "JPG", "SVG", "PDF", "AI (Adobe Illustrator)", "EPS"],
     branding: ["Brand Guidelines PDF", "Color Palette (ASE file)", "Typography Files", "Logo Variations (PNG, JPG, SVG)"],
@@ -82,9 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
 
-  // The fix: Now, all event listeners are in one place.
+  // The fix: All event listeners are now in one place.
   orderForm.addEventListener('change', updatePrice);
-  serviceTypeSelect.addEventListener('change', function() {
+  serviceTypeSelect.addEventListener("change", function() {
     const selectedService = this.value;
     deliverablesContainer.innerHTML = ""; // Clear previous
 
@@ -107,7 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
         deliverablesContainer.appendChild(wrapper);
       });
     }
-    setTimeout(updatePrice, 0); // Re-calculate after dynamic elements are added
+    // Re-calculate after dynamic elements are added
+    setTimeout(updatePrice, 0); 
   });
 
   orderForm.addEventListener('submit', handleOrderSubmit);
