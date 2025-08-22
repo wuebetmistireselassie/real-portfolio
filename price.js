@@ -2,67 +2,66 @@
 
 // Base prices per service
 const BASE_PRICES = {
-  logo: 1500,
-  branding: 2500,
-  stationery: 1200,
-  socialkit: 1800,
-  digitalassets: 2200,
-  files: 500,
-  admin: 800,
-  powerpoint: 1000, // single-file fixed
-  word: 700,        // single-file fixed
-  excel: 900        // single-file fixed
+  logo: 6500,
+  branding: 12000,
+  stationery: 4000,
+  socialkit: 5000,
+  digitalassets: 9000,
+  files: 1000,
+  admin: 1500,
+  powerpoint: 3000, 
+  word: 1800,        
+  excel: 1800        
 };
 
 // Deliverable fees per service
 const DELIVERABLE_FEES = {
   logo: {
-    PNG: 200,
-    JPG: 200,
-    SVG: 400,
+    PNG: 0,
+    JPG: 0,
+    SVG: 1000,
     PDF: 300,
-    AI: 500,
-    EPS: 500
+    AI: 1000,
+    EPS: 1000
   },
   branding: {
-    "Brand Guidelines": 800,
-    "Color Palette": 300,
-    "Typography": 400,
-    "Logo Variations": 600
+    "Brand Guidelines": 2000,
+    "Color Palette": 1500,
+    "Typography": 1000,
+    "Logo Variations": 1000
   },
   stationery: {
-    "Business Card": 300,
-    "Letterhead": 300,
-    "Envelope": 250,
-    "Email Signature": 350
+    "Business Card": 500,
+    "Letterhead": 500,
+    "Envelope": 500,
+    "Email Signature": 500
   },
   socialkit: {
-    "Profile Pictures": 300,
-    "Cover Images": 300,
-    "Post Templates": 400,
-    "Story Templates": 400
+    "Profile Pictures": 1500,
+    "Cover Images": 1500,
+    "Post Templates": 1500,
+    "Story Templates": 1500
   },
   digitalassets: {
-    "Website Banners": 500,
-    "App Icons": 400,
-    "Favicon": 200,
-    "Presentation Templates": 600
+    "Website Banners": 1000,
+    "App Icons": 1500,
+    "Favicon": 2000,
+    "Presentation Templates": 1500
   },
   files: {
-    file_DOCX: 150,
-    file_PDF: 150,
-    file_XLSX: 200,
-    file_JPG: 120,
-    file_PNG: 120,
-    file_Other: 200
+    file_DOCX: 500,
+    file_PDF: 500,
+    file_XLSX: 500,
+    file_JPG: 500,
+    file_PNG: 500,
+    file_Other: 500
   },
   admin: {
-    "Excel/CSV Report": 250,
-    "Formatted Data": 300,
-    "Word Document": 200,
-    "PDF Output": 200
+    "Excel/CSV Report": 500,
+    "Formatted Data": 500,
+    "Word Document": 500,
+    "PDF Output": 500
   },
-  // 🚫 No deliverables for these (fixed)
   powerpoint: {},
   word: {},
   excel: {}
@@ -100,3 +99,4 @@ export function calculatePrice(serviceType, deliveryTime, deliverables = []) {
   const multiplier = DELIVERY_MULTIPLIERS[deliveryTime] || 1;
   return total * multiplier;
 }
+
