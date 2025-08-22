@@ -222,8 +222,7 @@
 
     function getSelectedDeliverables() {
       return Array.from(document.querySelectorAll("input[name='deliverables']:checked"))
-        .map(cb => cb.value)
-        .join(",");
+        .map(cb => cb.value); // ✅ return array, not joined string
     }
 
     function updatePriceUI() {
