@@ -44,20 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
 
-  // Deliverables per service (moved from orders.html)
-  const deliverables = {
-    logo: ["PNG", "JPG", "SVG", "PDF", "AI (Adobe Illustrator)", "EPS"],
-    branding: ["Brand Guidelines PDF", "Color Palette (ASE file)", "Typography Files", "Logo Variations (PNG, JPG, SVG)"],
-    stationery: ["Business Card (JPG, PDF)", "Letterhead (DOCX, PDF)", "Envelope Design (JPG, PDF)", "Email Signature (HTML/PNG)"],
-    socialkit: ["Profile Pictures (PNG, JPG)", "Cover Images (PNG, JPG)", "Post Templates (PSD/AI)", "Story Templates (PNG, JPG)"],
-    digitalassets: ["Website Banners (PNG, JPG)", "App Icons (PNG, SVG)", "Favicon (ICO/PNG)", "Presentation Templates (PPTX, PDF)"],
-    powerpoint: ["Editable PPTX File", "PDF Version", "Custom Slide Templates", "Icons/Graphics Pack"],
-    word: ["Formatted DOCX", "Exported PDF", "Custom Word Template (DOTX)", "Styles & Headings Setup"],
-    excel: ["Formatted XLSX File", "Exported PDF", "Custom Templates", "Pivot Tables/Charts"],
-    files: ["DOCX", "PDF", "XLSX", "JPG", "PNG", "Other File Conversions"],
-    admin: ["Excel/CSV Report", "Cleaned/Formatted Data", "Word Document", "PDF Output"]
-  };
-
   // --- Auth State Logic ---
   onAuthStateChanged(auth, user => {
     if (user) {
@@ -82,35 +68,27 @@ document.addEventListener('DOMContentLoaded', () => {
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
 
-  orderForm.addEventListener('change', updatePrice);
-  serviceTypeSelect.addEventListener("change", function() {
-    const selectedService = this.value;
-    deliverablesContainer.innerHTML = "";
-    if (deliverables[selectedService]) {
-      deliverables[selectedService].forEach(item => {
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.name = "deliverables";
-        checkbox.value = item;
-        checkbox.id = item.replace(/\s+/g, '_').toLowerCase();
-        const label = document.createElement("label");
-        label.htmlFor = checkbox.id;
-        label.textContent = " " + item;
-        const wrapper = document.createElement("div");
-        wrapper.appendChild(checkbox);
-        wrapper.appendChild(label);
-        deliverablesContainer.appendChild(wrapper);
-      });
-    }
+  // Recalculate price on relevant changes
+  orderForm.addEventListener('input', updatePrice); // covers most inputs
+  serviceTypeSelect.addEventListener('change', () => {
+    // Allow the dynamic checkbox script to inject items first
     setTimeout(updatePrice, 0);
+  });
+  deliveryTimeSelect.addEventListener('change', updatePrice);
+
+  // Listen for checking/unchecking deliverables (event delegation)
+  deliverablesContainer.addEventListener('change', (e) => {
+    if (e.target && e.target.matches('input[type="checkbox"]')) updatePrice();
   });
 
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
   generalContactBtn.addEventListener('click', handleGeneralContactClick);
 
+  // Initial compute (in case defaults are pre-selected)
   setTimeout(updatePrice, 0);
 
+  // --- Functions ---
   function switchTab(tabName) {
     if (tabName === 'login') {
       loginFormContainer.classList.remove('hidden');
@@ -145,8 +123,11 @@ document.addEventListener('DOMContentLoaded', () => {
     authError.classList.remove('hidden');
   }
 
+  // Read selected deliverables (checkboxes)
   function getSelectedDeliverables() {
-    const checked = Array.from(deliverablesContainer.querySelectorAll('input[type="checkbox"]:checked'));
+    const checked = Array.from(
+      deliverablesContainer.querySelectorAll('input[type="checkbox"]:checked')
+    );
     return checked.map(cb => cb.value);
   }
 
@@ -154,14 +135,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const serviceType = serviceTypeSelect.value;
     const deliveryTime = deliveryTimeSelect.value;
     const selectedDeliverables = getSelectedDeliverables();
-    if (!serviceType) {
+
+    if (!serviceType || !deliveryTime) {
       totalPriceEl.textContent = (0).toFixed(2);
       upfrontEl.textContent = (0).toFixed(2);
       return;
     }
+
     const deliverablesStr = selectedDeliverables.join(', ');
     const totalPrice = calculatePrice(serviceType, deliveryTime, deliverablesStr);
     const upfrontPayment = totalPrice * 0.3;
+
     totalPriceEl.textContent = totalPrice.toFixed(2);
     upfrontEl.textContent = upfrontPayment.toFixed(2);
   }
@@ -169,24 +153,31 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleOrderSubmit(e) {
     e.preventDefault();
     if (!currentUser) return;
+
     const selectedDeliverables = getSelectedDeliverables();
     if (selectedDeliverables.length === 0) {
       alert("Please select at least one deliverable.");
       return;
     }
+
+    // Ensure price is up to date
     updatePrice();
+
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Verifying...';
+
     const transactionNumber = document.getElementById('transaction-number').value;
     const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
     const querySnapshot = await getDocs(q);
+
     if (!querySnapshot.empty) {
       alert("This Transaction ID has already been used.");
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit Order';
       return;
     }
+
     submitBtn.textContent = 'Submitting...';
     try {
       const orderId = `order_${Date.now()}`;
@@ -206,13 +197,17 @@ document.addEventListener('DOMContentLoaded', () => {
         status: 'Pending Confirmation',
         createdAt: serverTimestamp()
       });
+
       await setDoc(doc(db, 'conversations', currentUser.uid), {
         userId: currentUser.uid,
         userEmail: currentUser.email,
         lastUpdate: serverTimestamp()
       }, { merge: true });
+
       alert("Order placed successfully!");
       orderForm.reset();
+
+      // Clear deliverables UI after reset
       deliverablesContainer.innerHTML = '';
       setTimeout(updatePrice, 0);
     } catch (error) {
