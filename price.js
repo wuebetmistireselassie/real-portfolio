@@ -1,9 +1,10 @@
 // price.js
 
 // -----------------------------------------------------
-// Service Pricing Table
+// Centralized service pricing & deliverables table
 // -----------------------------------------------------
 export const SERVICE_PRICING = {
+  // ---------- Creative & Design ----------
   logo: {
     base: 6500,
     deliverables: {
@@ -19,6 +20,7 @@ export const SERVICE_PRICING = {
       usage_sheet_1p: 2000,
     },
   },
+
   branding: {
     base: 12000,
     deliverables: {
@@ -33,81 +35,102 @@ export const SERVICE_PRICING = {
       brand_guide_extended: 5000,
     },
   },
+
   stationery: {
     base: 4000,
     deliverables: {
-      business_card: 500,
-      letterhead: 500,
-      envelope: 500,
-      email_signature: 1000,
+      compliment_slip: 500,
+      envelope: 600,
+      business_card: 700,
+      letterhead: 700,
+      id_card_template: 700,
+      email_signature: 800,
+      invoice_template: 900,
     },
   },
+
   socialkit: {
     base: 5000,
     deliverables: {
-      profile_image_set: 500,
-      cover_banner: 500,
-      post_templates5: 2000,
-      story_templates5: 1500,
+      profile_image_set: 300,
+      highlight_icons5: 500,
+      cover_banner: 700,
+      reels_cover_pack10: 800,
+      post_templates5: 900,
+      story_templates5: 900,
     },
   },
+
   digitalassets: {
-    base: 7000,
+    base: 9000,
     deliverables: {
-      hero_banners3: 2500,
+      image_opt_pack: 800,
+      favicon_manifest: 900,
+      hero_banners3: 1800,
       icon_set20: 2000,
-      favicon_manifest: 1000,
-      ui_kit_basic: 3000,
+      illustration1: 2000,
+      ui_kit_basic: 2200,
     },
   },
+
+  // ---------- Document & Office ----------
   powerpoint: {
-    base: 6000,
-    deliverables: {
-      pptx_editable: 1000,
-      pdf_export: 500,
-      template_masters: 2000,
-      custom_icons20: 1500,
-    },
-  },
-  word: {
     base: 3000,
     deliverables: {
-      dotx_template: 1000,
-      styleset: 1000,
-      pdf_export: 500,
+      pdf_export: 200,
+      pptx_editable: 300,
+      chart_styles: 600,
+      custom_icons20: 700,
+      animation_builds: 800,
+      template_masters: 900,
     },
   },
-  excel: {
-    base: 3500,
+
+  word: {
+    base: 1800,
     deliverables: {
-      data_cleaning: 1000,
-      dashboard_basic: 2000,
-      pivot_report: 1500,
-      pdf_export: 500,
+      header_footer: 300,
+      styleset: 400,
+      toc_setup: 400,
+      dotx_template: 500,
+      mail_merge_setup: 700,
     },
   },
+
+  excel: {
+    base: 2500,
+    deliverables: {
+      data_cleaning: 600,
+      pivot_report: 700,
+      chart_pack: 700,
+      dashboard_basic: 1200,
+      vba_automation_light: 1500,
+    },
+  },
+
   files: {
     base: 1000,
     deliverables: {
-      pdf_to_word: 500,
-      compress_optimize: 500,
-      batch_rename: 500,
-      image_to_vector: 1500,
+      pdf_to_word: 200,
+      compress_optimize: 200,
+      batch_rename: 250,
+      image_to_vector: 2000,
     },
   },
+
   admin: {
-    base: 2000,
+    base: 1500,
     deliverables: {
-      data_entry_100rows: 1000,
-      deduplicate_1000rows: 1500,
-      formatting_50pages: 2000,
-      web_research_1h: 2000,
+      data_entry_100rows: 300,
+      deduplicate_1000rows: 300,
+      web_research_1h: 400,
+      formatting_50pages: 500,
     },
   },
 };
 
 // -----------------------------------------------------
-// Mapping from UI labels (orders.html) → pricing slugs
+// Label map: UI label → internal slug
 // -----------------------------------------------------
 const DELIVERABLE_LABEL_MAP = {
   // --- Logo ---
@@ -172,7 +195,7 @@ const DELIVERABLE_LABEL_MAP = {
   "Excel/CSV Report": "data_entry_100rows",
   "Cleaned/Formatted Data": "deduplicate_1000rows",
   "Word Document": "formatting_50pages",
-  "PDF Output": "web_research_1h",
+  "PDF Output": "web_research_1h"
 };
 
 // -----------------------------------------------------
@@ -186,34 +209,44 @@ function roundToNearest(value, step = 50) {
 // Main calculator
 // -----------------------------------------------------
 export function calculatePrice(serviceType, deliveryTime, deliverables) {
-  const serviceConfig = SERVICE_PRICING[serviceType];
+  const svcKey = String(serviceType || "").toLowerCase();
+  const serviceConfig = SERVICE_PRICING[svcKey];
   if (!serviceConfig) return 0;
 
+  // Base
   const basePrice = serviceConfig.base || 0;
 
   // Delivery multiplier
   let multiplier = 1;
-  if (deliveryTime === "express") multiplier = 1.5;
-  if (deliveryTime === "urgent") multiplier = 2;
-
-  // Normalize deliverables (string or array)
-  let selected = [];
-  if (Array.isArray(deliverables)) {
-    selected = deliverables;
-  } else if (typeof deliverables === "string") {
-    selected = deliverables.split(/[,;|/]+/);
+  switch (String(deliveryTime || "").toLowerCase()) {
+    case "express":
+      multiplier = 1.5;
+      break;
+    case "urgent":
+      multiplier = 2;
+      break;
+    default:
+      multiplier = 1;
   }
 
-  // Map UI labels → internal slugs and add fees
+  // Normalize deliverables (array expected)
+  const selected = Array.isArray(deliverables) ? deliverables : [];
+
+  // Add up mapped deliverable fees
   let fee = 0;
   for (let d of selected) {
-    const key = DELIVERABLE_LABEL_MAP[d.trim()];
+    const key = DELIVERABLE_LABEL_MAP[d];
     if (key && serviceConfig.deliverables[key]) {
       fee += serviceConfig.deliverables[key];
     }
   }
 
+  // Total = (base + fees) × multiplier
   let total = (basePrice + fee) * multiplier;
+
+  // Round & enforce min
   total = roundToNearest(total, 50);
-  return total < 1000 ? 1000 : total;
+  if (total < 1000) total = 1000;
+
+  return total;
 }
