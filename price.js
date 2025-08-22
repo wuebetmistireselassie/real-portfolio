@@ -132,11 +132,11 @@ export const SERVICE_PRICING = {
 // Label mapping (UI → internal slugs)
 // -----------------------------------------------------
 const DELIVERABLE_LABEL_MAP = {
-  // Logo
+  // Logo (from orders.html checkboxes)
   "png": "png_pack",
   "jpg": "jpg_pack",
-  "pdf": "pdf_print",
   "svg": "svg_vector",
+  "pdf": "pdf_print",
   "eps": "eps_print",
   "ai (adobe illustrator)": "ai_source",
 
@@ -227,7 +227,7 @@ function parseDeliverables(input) {
   }
   return Array.from(new Set(
     raw.split(/[\,\n\r;|\/\s]+/)
-      .map((d) => normalizeKey(d))
+      .map((d) => d.trim().toLowerCase())
       .filter(Boolean)
   ));
 }
@@ -241,11 +241,10 @@ function resolveSlug(serviceConfig, maybeSlug) {
   // direct key
   if (Object.prototype.hasOwnProperty.call(fees, normalized)) return normalized;
 
-  // via label map
+  // via label map (both raw and normalized)
   if (DELIVERABLE_LABEL_MAP[maybeSlug.toLowerCase()]) {
     return DELIVERABLE_LABEL_MAP[maybeSlug.toLowerCase()];
   }
-
   if (DELIVERABLE_LABEL_MAP[normalized]) {
     return DELIVERABLE_LABEL_MAP[normalized];
   }
