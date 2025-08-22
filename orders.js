@@ -69,14 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
   logoutBtn.addEventListener('click', () => signOut(auth));
 
   // Recalculate price on relevant changes
-  orderForm.addEventListener('input', updatePrice); // covers most inputs
+  orderForm.addEventListener('input', updatePrice);
   serviceTypeSelect.addEventListener('change', () => {
-    // Allow the dynamic checkbox script to inject items first
     setTimeout(updatePrice, 0);
   });
   deliveryTimeSelect.addEventListener('change', updatePrice);
 
-  // Listen for checking/unchecking deliverables (event delegation)
   deliverablesContainer.addEventListener('change', (e) => {
     if (e.target && e.target.matches('input[type="checkbox"]')) updatePrice();
   });
@@ -85,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
   ordersList.addEventListener('click', handleOrdersListClick);
   generalContactBtn.addEventListener('click', handleGeneralContactClick);
 
-  // Initial compute (in case defaults are pre-selected)
   setTimeout(updatePrice, 0);
 
   // --- Functions ---
@@ -123,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     authError.classList.remove('hidden');
   }
 
-  // Read selected deliverables (checkboxes)
+  // Get selected deliverables as array
   function getSelectedDeliverables() {
     const checked = Array.from(
       deliverablesContainer.querySelectorAll('input[type="checkbox"]:checked')
@@ -142,8 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const deliverablesStr = selectedDeliverables.join(', ');
-    const totalPrice = calculatePrice(serviceType, deliveryTime, deliverablesStr);
+    // ✅ Pass as array, not joined string
+    const totalPrice = calculatePrice(serviceType, deliveryTime, selectedDeliverables);
     const upfrontPayment = totalPrice * 0.3;
 
     totalPriceEl.textContent = totalPrice.toFixed(2);
@@ -160,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Ensure price is up to date
     updatePrice();
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
@@ -190,7 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
         projectDescription: document.getElementById('project-description').value,
         serviceType: serviceTypeSelect.value,
         deliveryTime: deliveryTimeSelect.value,
-        deliverables: selectedDeliverables.join(', '),
+        // ✅ Store as array instead of joined string
+        deliverables: selectedDeliverables,
         totalPrice: parseFloat(totalPriceEl.textContent),
         upfrontPayment: parseFloat(upfrontEl.textContent),
         transactionNumber: transactionNumber,
@@ -207,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
       alert("Order placed successfully!");
       orderForm.reset();
 
-      // Clear deliverables UI after reset
       deliverablesContainer.innerHTML = '';
       setTimeout(updatePrice, 0);
     } catch (error) {
