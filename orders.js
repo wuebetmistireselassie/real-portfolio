@@ -68,21 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
 
-  // Recalculate price on relevant changes
-  orderForm.addEventListener('input', updatePrice);
-  serviceTypeSelect.addEventListener('change', () => {
-    setTimeout(updatePrice, 0);
-  });
-  deliveryTimeSelect.addEventListener('change', updatePrice);
-
-  // Listen for checking/unchecking deliverables (event delegation)
-  // This is the fix: we listen on the form itself, not the container,
-  // to catch changes on dynamically added elements.
-  orderForm.addEventListener('change', (e) => {
-    if (e.target && (e.target.matches('input[type="checkbox"]') || e.target.matches('select'))) {
-      updatePrice();
-    }
-  });
+  // The fix: Use a single 'change' event listener on the form for all price-related fields.
+  orderForm.addEventListener('change', updatePrice);
 
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
