@@ -168,18 +168,21 @@
 
   <script>
     // Deliverables per service
-    const deliverables = {
-      logo: ["PNG", "JPG", "SVG", "PDF", "AI (Adobe Illustrator)", "EPS"],
-      branding: ["Brand Guidelines PDF", "Color Palette (ASE file)", "Typography Files", "Logo Variations (PNG, JPG, SVG)"],
-      stationery: ["Business Card (JPG, PDF)", "Letterhead (DOCX, PDF)", "Envelope Design (JPG, PDF)", "Email Signature (HTML/PNG)"],
-      socialkit: ["Profile Pictures (PNG, JPG)", "Cover Images (PNG, JPG)", "Post Templates (PSD/AI)", "Story Templates (PNG, JPG)"],
-      digitalassets: ["Website Banners (PNG, JPG)", "App Icons (PNG, SVG)", "Favicon (ICO/PNG)", "Presentation Templates (PPTX, PDF)"],
-      powerpoint: ["Editable PPTX File", "PDF Version", "Custom Slide Templates", "Icons/Graphics Pack"],
-      word: ["Formatted DOCX", "Exported PDF", "Custom Word Template (DOTX)", "Styles & Headings Setup"],
-      excel: ["Formatted XLSX File", "Exported PDF", "Custom Templates", "Pivot Tables/Charts"],
-      files: ["DOCX", "PDF", "XLSX", "JPG", "PNG", "Other File Conversions"],
-      admin: ["Excel/CSV Report", "Cleaned/Formatted Data", "Word Document", "PDF Output"]
-    };
+ const deliverables = {
+  logo: ["PNG", "JPG", "SVG", "PDF", "AI", "EPS"],
+  branding: ["Brand Guidelines", "Color Palette", "Typography", "Logo Variations"],
+  stationery: ["Business Card", "Letterhead", "Envelope", "Email Signature"],
+  socialkit: ["Profile Pictures", "Cover Images", "Post Templates", "Story Templates"],
+  digitalassets: ["Website Banners", "App Icons", "Favicon", "Presentation Templates"],
+  
+  // ✅ Prefixed for clarity
+  files: ["file_DOCX", "file_PDF", "file_XLSX", "file_JPG", "file_PNG", "file_Other"],
+  
+  admin: ["Excel/CSV Report", "Formatted Data", "Word Document", "PDF Output"]
+
+  // 🚫 Word, PowerPoint, Excel → fixed single deliverables (no checkboxes needed)
+};
+
 
     const serviceSelect = document.getElementById("service-type");
     const deliverablesContainer = document.getElementById("deliverables-container");
@@ -249,3 +252,4 @@
   </script>
 </body>
 </html>
+
