@@ -286,8 +286,8 @@ export function calculatePrice(serviceType, deliveryTime, deliverables) {
   let deliverablesFee = 0;
 
   if (serviceConfig && selected.length > 0) {
-    // The previous version had a bug here. It was subtracting the baseline fee, which caused the price to not update correctly.
-    // The fix is to simply sum up all selected deliverables' fees.
+    // This is the correct logic: sum up the fees of all selected deliverables
+    // without subtracting a baseline fee.
     deliverablesFee = sumSelectedFees(serviceConfig, selected);
   }
 
