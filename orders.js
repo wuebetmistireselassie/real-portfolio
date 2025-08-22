@@ -69,16 +69,19 @@ document.addEventListener('DOMContentLoaded', () => {
   logoutBtn.addEventListener('click', () => signOut(auth));
 
   // Recalculate price on relevant changes
-  orderForm.addEventListener('input', updatePrice); // covers most inputs
+  orderForm.addEventListener('input', updatePrice);
   serviceTypeSelect.addEventListener('change', () => {
-    // Allow the dynamic checkbox script to inject items first
     setTimeout(updatePrice, 0);
   });
   deliveryTimeSelect.addEventListener('change', updatePrice);
 
   // Listen for checking/unchecking deliverables (event delegation)
-  deliverablesContainer.addEventListener('change', (e) => {
-    if (e.target && e.target.matches('input[type="checkbox"]')) updatePrice();
+  // This is the fix: we listen on the form itself, not the container,
+  // to catch changes on dynamically added elements.
+  orderForm.addEventListener('change', (e) => {
+    if (e.target && (e.target.matches('input[type="checkbox"]') || e.target.matches('select'))) {
+      updatePrice();
+    }
   });
 
   orderForm.addEventListener('submit', handleOrderSubmit);
