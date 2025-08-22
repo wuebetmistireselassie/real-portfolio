@@ -90,6 +90,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const order = docSnap.data();
                 const div = document.createElement("div");
                 div.className = "order-item";
+                
+                let actionButtons = '';
+                if (order.status === 'Pending Confirmation') {
+                    actionButtons = `
+                        <button class="btn btn-approve" data-order-id="${docSnap.id}">Approve</button>
+                        <button class="btn btn-reject" data-order-id="${docSnap.id}">Reject</button>
+                    `;
+                }
+                
+                actionButtons += `<button class="btn btn-contact-client" data-user-id="${order.userId}" data-user-email="${order.email}">Contact Client</button>`;
+
                 div.innerHTML = `
                     <h4>Order ID: ${order.orderId}</h4>
                     <p><strong>Client:</strong> ${order.clientName} (${order.email})</p>
@@ -102,9 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p><strong>Status:</strong> <span class="status-${order.status.toLowerCase().replace(/\s+/g, '-')}">${order.status}</span></p>
                     <p><strong>Description:</strong> ${order.projectDescription}</p>
                     <div class="order-actions">
-                        <button class="btn btn-approve" data-order-id="${docSnap.id}">Approve</button>
-                        <button class="btn btn-reject" data-order-id="${docSnap.id}">Reject</button>
-                        <button class="btn btn-contact-client" data-user-id="${order.userId}" data-user-email="${order.email}">Contact Client</button>
+                        ${actionButtons}
                     </div>
                     <hr>
                 `;
@@ -112,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-    
+
     // Event listener for the Approve/Reject buttons
     allOrdersList.addEventListener('click', async (e) => {
         const orderId = e.target.dataset.orderId;
