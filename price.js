@@ -4,27 +4,22 @@
 // Centralized service pricing & deliverables table
 // -----------------------------------------------------
 export const SERVICE_PRICING = {
-  // ---------- Creative & Design ----------
   logo: {
     base: 6500,
-    baseline: "png_pack", // kept for reference; not used in simplified math
+    baseline: "png_pack",
     deliverables: {
-      // Baseline-level (light exports/variants)
       png_pack: 200,
       jpg_pack: 200,
       pdf_print: 200,
       mono_variant: 200,
       inverse_variant: 200,
-      // Premium/source/scalable
       svg_vector: 1000,
       eps_print: 1000,
       ai_source: 1000,
       favicon_set: 1000,
-      // Documentation
       usage_sheet_1p: 2000,
     },
   },
-
   branding: {
     base: 12000,
     baseline: "color_palette_spec",
@@ -40,7 +35,6 @@ export const SERVICE_PRICING = {
       brand_guide_extended: 5000,
     },
   },
-
   stationery: {
     base: 4000,
     baseline: "compliment_slip",
@@ -54,7 +48,6 @@ export const SERVICE_PRICING = {
       invoice_template: 900,
     },
   },
-
   socialkit: {
     base: 5000,
     baseline: "profile_image_set",
@@ -67,7 +60,6 @@ export const SERVICE_PRICING = {
       story_templates5: 900,
     },
   },
-
   digitalassets: {
     base: 9000,
     baseline: "image_opt_pack",
@@ -80,8 +72,6 @@ export const SERVICE_PRICING = {
       ui_kit_basic: 2200,
     },
   },
-
-  // ---------- Document & Office ----------
   powerpoint: {
     base: 3000,
     baseline: "pdf_export",
@@ -94,7 +84,6 @@ export const SERVICE_PRICING = {
       template_masters: 900,
     },
   },
-
   word: {
     base: 1800,
     baseline: "header_footer",
@@ -106,7 +95,6 @@ export const SERVICE_PRICING = {
       mail_merge_setup: 700,
     },
   },
-
   excel: {
     base: 2500,
     baseline: "data_cleaning",
@@ -118,7 +106,6 @@ export const SERVICE_PRICING = {
       vba_automation_light: 1500,
     },
   },
-
   files: {
     base: 1000,
     baseline: "pdf_to_word",
@@ -126,10 +113,9 @@ export const SERVICE_PRICING = {
       pdf_to_word: 200,
       compress_optimize: 200,
       batch_rename: 250,
-      image_to_vector: 2000, // skilled vector tracing/redraw (logo recreation)
+      image_to_vector: 2000,
     },
   },
-
   admin: {
     base: 1500,
     baseline: "data_entry_100rows",
@@ -143,15 +129,81 @@ export const SERVICE_PRICING = {
 };
 
 // -----------------------------------------------------
+// Label mapping (UI → internal slugs)
+// -----------------------------------------------------
+const DELIVERABLE_LABEL_MAP = {
+  // Logo
+  "png": "png_pack",
+  "jpg": "jpg_pack",
+  "pdf": "pdf_print",
+  "svg": "svg_vector",
+  "eps": "eps_print",
+  "ai (adobe illustrator)": "ai_source",
+
+  // Branding
+  "brand guidelines pdf": "brand_guide_core",
+  "color palette (ase file)": "color_palette_spec",
+  "typography files": "typography_spec",
+  "logo variations (png, jpg, svg)": "logo_lockups_pack",
+
+  // Stationery
+  "business card (jpg, pdf)": "business_card",
+  "letterhead (docx, pdf)": "letterhead",
+  "envelope design (jpg, pdf)": "envelope",
+  "email signature (html/png)": "email_signature",
+
+  // Social kit
+  "profile pictures (png, jpg)": "profile_image_set",
+  "cover images (png, jpg)": "cover_banner",
+  "post templates (psd/ai)": "post_templates5",
+  "story templates (png, jpg)": "story_templates5",
+
+  // Digital assets
+  "website banners (png, jpg)": "hero_banners3",
+  "app icons (png, svg)": "icon_set20",
+  "favicon (ico/png)": "favicon_manifest",
+  "presentation templates (pptx, pdf)": "ui_kit_basic",
+
+  // PowerPoint
+  "editable pptx file": "pptx_editable",
+  "pdf version": "pdf_export",
+  "custom slide templates": "template_masters",
+  "icons/graphics pack": "custom_icons20",
+
+  // Word
+  "formatted docx": "header_footer",
+  "exported pdf": "pdf_export",
+  "custom word template (dotx)": "dotx_template",
+  "styles & headings setup": "styleset",
+
+  // Excel
+  "formatted xlsx file": "data_cleaning",
+  "exported pdf": "pdf_export",
+  "custom templates": "dashboard_basic",
+  "pivot tables/charts": "pivot_report",
+
+  // Files
+  "docx": "pdf_to_word",
+  "pdf": "pdf_to_word",
+  "xlsx": "batch_rename",
+  "jpg": "compress_optimize",
+  "png": "compress_optimize",
+  "other file conversions": "image_to_vector",
+
+  // Admin
+  "excel/csv report": "data_entry_100rows",
+  "cleaned/formatted data": "deduplicate_1000rows",
+  "word document": "formatting_50pages",
+  "pdf output": "formatting_50pages",
+};
+
+// -----------------------------------------------------
 // Helpers
 // -----------------------------------------------------
-
-/** Round to nearest step (default ETB 50). */
 function roundToNearest(value, step = 50) {
   return Math.round(value / step) * step;
 }
 
-/** Normalize any label/slug to a comparable key (e.g., "SVG Vector" -> "svg_vector"). */
 function normalizeKey(str) {
   return String(str || "")
     .toLowerCase()
@@ -159,72 +211,54 @@ function normalizeKey(str) {
     .replace(/^_+|_+$/g, "");
 }
 
-/**
- * Parse deliverables from:
- * - Array of strings
- * - JSON string '["a","b"]'
- * - CSV / semicolon / pipe / slash / whitespace separated string
- * - Single string value
- * Returns a deduplicated array of normalized slugs.
- */
 function parseDeliverables(input) {
   if (!input) return [];
-
-  // Already an array?
   if (Array.isArray(input)) {
-    return Array.from(
-      new Set(input.map((d) => normalizeKey(d)).filter(Boolean))
-    );
+    return Array.from(new Set(input.map((d) => normalizeKey(d)).filter(Boolean)));
   }
-
   const raw = String(input).trim();
-
-  // JSON array string?
   if (raw.startsWith("[") && raw.endsWith("]")) {
     try {
       const arr = JSON.parse(raw);
       if (Array.isArray(arr)) {
         return Array.from(new Set(arr.map((d) => normalizeKey(d)).filter(Boolean)));
       }
-    } catch (_) {
-      // if JSON parse fails, fall through to separator parsing
-    }
+    } catch (_) {}
   }
-
-  // ✅ BULLETPROOF SPLIT:
-  // split by comma, semicolon, pipe, slash OR any whitespace (spaces, tabs, newlines)
-  const parts = raw
-    .split(/[,\n\r;|\/\s]+/)
-    .map((d) => normalizeKey(d))
-    .filter(Boolean);
-
-  // de-duplicate
-  return Array.from(new Set(parts));
+  return Array.from(new Set(
+    raw.split(/[\,\n\r;|\/\s]+/)
+      .map((d) => normalizeKey(d))
+      .filter(Boolean)
+  ));
 }
 
-/** Resolve a possibly human label to a real fee key in the service's deliverables. */
 function resolveSlug(serviceConfig, maybeSlug) {
   const fees = serviceConfig?.deliverables || {};
   if (!maybeSlug) return null;
 
-  // Exact key hit
-  if (Object.prototype.hasOwnProperty.call(fees, maybeSlug)) return maybeSlug;
+  const normalized = normalizeKey(maybeSlug);
 
-  // Try normalized match against each existing key
-  const target = normalizeKey(maybeSlug);
-  for (const key of Object.keys(fees)) {
-    if (normalizeKey(key) === target) return key;
+  // direct key
+  if (Object.prototype.hasOwnProperty.call(fees, normalized)) return normalized;
+
+  // via label map
+  if (DELIVERABLE_LABEL_MAP[maybeSlug.toLowerCase()]) {
+    return DELIVERABLE_LABEL_MAP[maybeSlug.toLowerCase()];
   }
-  return null; // unknown deliverable -> ignored
+
+  if (DELIVERABLE_LABEL_MAP[normalized]) {
+    return DELIVERABLE_LABEL_MAP[normalized];
+  }
+
+  return null;
 }
 
-/** Sum fees for selected deliverables, resolving labels->slugs and ignoring unknowns. */
 function sumSelectedFees(serviceConfig, selectedSlugs) {
   const fees = serviceConfig?.deliverables || {};
   let sum = 0;
   for (const raw of selectedSlugs) {
     const key = resolveSlug(serviceConfig, raw);
-    if (key) sum += Number(fees[key]) || 0;
+    if (key && fees[key]) sum += Number(fees[key]) || 0;
   }
   return sum;
 }
@@ -232,48 +266,22 @@ function sumSelectedFees(serviceConfig, selectedSlugs) {
 // -----------------------------------------------------
 // Main calculator
 // -----------------------------------------------------
-
-/**
- * Simplified formula:
- * totalPrice = (basePrice + sum(deliverables)) * deliveryMultiplier
- *
- * @param {string} serviceType one of the SERVICE_PRICING keys (e.g., 'logo', 'branding', ...)
- * @param {string} deliveryTime 'standard' | 'express' | 'urgent'
- * @param {string|string[]} deliverables CSV/labels/JSON array string or array of slugs
- * @returns {number} total price in ETB
- */
 export function calculatePrice(serviceType, deliveryTime, deliverables) {
   const svcKey = normalizeKey(serviceType);
   const serviceConfig = SERVICE_PRICING[svcKey];
-
-  // Base price
   const basePrice = serviceConfig?.base ?? 0;
 
-  // Delivery time multipliers
   let deliveryMultiplier = 1;
   switch (normalizeKey(deliveryTime)) {
-    case "express":
-      deliveryMultiplier = 1.5;
-      break;
-    case "urgent":
-      deliveryMultiplier = 2;
-      break;
-    case "standard":
-    default:
-      deliveryMultiplier = 1;
-      break;
+    case "express": deliveryMultiplier = 1.5; break;
+    case "urgent": deliveryMultiplier = 2; break;
+    default: deliveryMultiplier = 1;
   }
 
-  // Sum all selected deliverables (ignore unknown ones)
   const selected = parseDeliverables(deliverables);
-  const deliverablesFee = serviceConfig
-    ? sumSelectedFees(serviceConfig, selected)
-    : 0;
+  const deliverablesFee = serviceConfig ? sumSelectedFees(serviceConfig, selected) : 0;
 
-  // Final price
   let totalPrice = (basePrice + deliverablesFee) * deliveryMultiplier;
-
-  // Round to nearest 50 and enforce minimum 1000 ETB
   totalPrice = roundToNearest(totalPrice, 50);
   if (totalPrice < 1000) totalPrice = 1000;
 
