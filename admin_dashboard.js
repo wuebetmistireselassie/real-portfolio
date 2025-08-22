@@ -1,134 +1,100 @@
-// admin_dashboard.js
 import {
-  auth,
-  onAuthStateChanged,
-  signOut,
-  db,
-  collection,
-  query,
-  onSnapshot,
-  doc,
-  getDoc,
-  updateDoc,
-  orderBy
+    auth,
+    onAuthStateChanged,
+    signOut,
+    db,
+    collection,
+    query,
+    onSnapshot,
+    doc,
+    updateDoc,
+    signInWithEmailAndPassword,
+    orderBy
 } from './auth.js';
 import { openChat } from './chat.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  let chatsUnsubscribe = null;
+    // ✅ Hardcoded Admin UID
+    const ADMIN_UID = "mL8wfi0Bgvan5yh9yxCthmEDhJc2"; 
+    
+    const loginSection = document.getElementById('login-section');
+    const dashboardSection = document.getElementById('dashboard-container');
+    const loginForm = document.getElementById('login-form');
+    const logoutBtn = document.getElementById('logout-btn');
 
-  const loginView = document.getElementById('admin-login-view');       // exists in admin.html
-  const dashboardView = document.getElementById('admin-dashboard-view'); 
-  const unauthorizedView = document.getElementById('unauthorized-view');
-  const logoutBtn = document.getElementById('admin-logout-btn');       // ✅ correct ID in admin.html
+    let chatsUnsubscribe = null;
+    let ordersUnsubscribe = null;
 
-  // Ensure a clean initial state
-  function show(view) {
-    loginView.classList.add('hidden');
-    dashboardView.classList.add('hidden');
-    unauthorizedView.classList.add('hidden');
-    view.classList.remove('hidden');
-  }
-
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      // Not signed in anywhere → back to main site
-      window.location.href = 'index.html';
-      return;
-    }
-
-    try {
-      // Check role from Firestore
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      const role = userDoc.exists() ? userDoc.data().role : null;
-
-      if (role !== 'admin') {
-        // Signed-in but not admin → send to client portal
-        window.location.href = 'orders.html';
-        return;
-      }
-
-      // ✅ Admin verified: show dashboard directly (no separate login)
-      show(dashboardView);
-
-      // Optional: if you want to show their email, add a span with id="admin-email" to admin.html
-      // const emailEl = document.getElementById('admin-email');
-      // if (emailEl) emailEl.textContent = user.email;
-
-      listenForAllOrders();
-      listenForAllChats();
-    } catch (err) {
-      console.error('Admin role check failed:', err);
-      show(unauthorizedView);
-    }
-  });
-
-  // Logout (admin)
-  logoutBtn.addEventListener('click', () => signOut(auth));
-
-  function listenForAllOrders() {
-    const ordersListDiv = document.getElementById('all-orders-list');
-    const qOrders = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-
-    onSnapshot(qOrders, (snapshot) => {
-      if (snapshot.empty) {
-        ordersListDiv.innerHTML = '<p>No orders found.</p>';
-        return;
-      }
-      ordersListDiv.innerHTML = '';
-      snapshot.forEach(docSnap => {
-        const order = docSnap.data();
-        const el = document.createElement('div');
-        el.className = 'order-list-item';
-        el.innerHTML = `
-          <p><strong>Order ID:</strong> ${order.orderId}</p>
-          <p><strong>Client:</strong> ${order.clientName} (${order.email})</p>
-          <p><strong>Status:</strong> ${order.status}</p>
-        `;
-        ordersListDiv.appendChild(el);
-      });
-    });
-  }
-
-  function listenForAllChats() {
-    const chatsListDiv = document.getElementById('all-chats-list');
-    const qChats = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
-
-    chatsUnsubscribe = onSnapshot(qChats, (snapshot) => {
-      if (snapshot.empty) {
-        chatsListDiv.innerHTML = '<p>No active chats.</p>';
-        return;
-      }
-      chatsListDiv.innerHTML = '';
-      snapshot.forEach(docSnap => {
-        const chat = docSnap.data();
-        if (chat.userId && chat.userEmail) {
-          const el = document.createElement('div');
-          el.className = 'chat-list-item';
-          el.dataset.userId = chat.userId;
-          el.dataset.userEmail = chat.userEmail;
-          el.innerHTML = `<p><strong>${chat.userEmail}</strong></p>`;
-          chatsListDiv.appendChild(el);
+    // 🔑 Watch authentication state
+    onAuthStateChanged(auth, user => {
+        if (user && user.uid === ADMIN_UID) {
+            // ✅ Admin recognized without re-login
+            loginSection.style.display = "none";
+            dashboardSection.style.display = "block";
+            listenForAllOrders();
+            listenForAllChats();
+        } else {
+            // Non-admins cannot view dashboard
+            loginSection.style.display = "block";
+            dashboardSection.style.display = "none";
         }
-      });
     });
-  }
 
-  // Example status updates (wire your buttons with .btn-update-status data attributes)
-  document.getElementById('dashboard-container').addEventListener('click', async (e) => {
-    if (e.target.classList.contains('btn-update-status')) {
-      const orderId = e.target.dataset.orderId;
-      const newStatus = e.target.dataset.newStatus;
-      await updateOrderStatus(orderId, newStatus);
-    }
-  });
+    // 👇 Keeping login form for fallback, but not needed if admin logs in via orders.html
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
 
-  async function updateOrderStatus(orderId, newStatus) {
-    try {
-      await updateDoc(doc(db, 'orders', orderId), { status: newStatus });
-      console.log(`Order ${orderId} updated to ${newStatus}`);
-    } catch (error) {
-      console.error('Error updating order:', error);
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+            alert("Login failed: " + error.message);
+        }
+    });
+
+    logoutBtn.addEventListener('click', () => signOut(auth));
+
+    function listenForAllOrders() {
+        const ordersListDiv = document.getElementById('orders-list');
+        const q = query(collection(db, 'orders'), orderBy('timestamp', 'desc'));
+        
+        ordersUnsubscribe = onSnapshot(q, (snapshot) => {
+            ordersListDiv.innerHTML = "";
+            snapshot.forEach(docSnap => {
+                const order = docSnap.data();
+                const div = document.createElement("div");
+                div.className = "order-item";
+                div.innerHTML = `
+                    <p><strong>${order.clientName}</strong> - ${order.serviceType}</p>
+                    <p>Status: ${order.status}</p>
+                `;
+                ordersListDiv.appendChild(div);
+            });
+        });
     }
-  }
+
+    function listenForAllChats() {
+        const chatsListDiv = document.getElementById('all-chats-list');
+        const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
+
+        chatsUnsubscribe = onSnapshot(q, (snapshot) => {
+            chatsListDiv.innerHTML = '';
+            if (snapshot.empty) {
+                chatsListDiv.innerHTML = '<p>No active chats.</p>';
+                return;
+            }
+            snapshot.forEach(doc => {
+                const chat = doc.data();
+                if (chat.userId && chat.userEmail) {
+                    const chatElement = document.createElement('div');
+                    chatElement.className = 'chat-list-item';
+                    chatElement.dataset.userId = chat.userId;
+                    chatElement.dataset.userEmail = chat.userEmail;
+                    chatElement.innerHTML = `<p><strong>${chat.userEmail}</strong></p>`;
+                    chatsListDiv.appendChild(chatElement);
+                }
+            });
+        });
+    }
 });
