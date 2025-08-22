@@ -36,11 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const orderForm = document.getElementById('order-form');
   const generalContactBtn = document.getElementById('general-contact-btn');
   const ordersList = document.getElementById('orders-list');
-
-  // Elements used for pricing
   const serviceTypeSelect = document.getElementById('service-type');
   const deliveryTimeSelect = document.getElementById('delivery-time');
-  const deliverablesContainer = document.getElementById('deliverables-container');
+  const deliverablesInput = document.getElementById('deliverables');
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
 
@@ -68,22 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
 
-  // Recalculate price on relevant changes
   orderForm.addEventListener('input', updatePrice);
-  serviceTypeSelect.addEventListener('change', () => {
-    setTimeout(updatePrice, 0);
-  });
-  deliveryTimeSelect.addEventListener('change', updatePrice);
-
-  deliverablesContainer.addEventListener('change', (e) => {
-    if (e.target && e.target.matches('input[type="checkbox"]')) updatePrice();
-  });
-
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
   generalContactBtn.addEventListener('click', handleGeneralContactClick);
-
-  setTimeout(updatePrice, 0);
 
   // --- Functions ---
   function switchTab(tabName) {
@@ -120,29 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
     authError.classList.remove('hidden');
   }
 
-  // Get selected deliverables as array
-  function getSelectedDeliverables() {
-    const checked = Array.from(
-      deliverablesContainer.querySelectorAll('input[type="checkbox"]:checked')
-    );
-    return checked.map(cb => cb.value);
-  }
-
   function updatePrice() {
     const serviceType = serviceTypeSelect.value;
     const deliveryTime = deliveryTimeSelect.value;
-    const selectedDeliverables = getSelectedDeliverables();
-
-    if (!serviceType || !deliveryTime) {
-      totalPriceEl.textContent = (0).toFixed(2);
-      upfrontEl.textContent = (0).toFixed(2);
-      return;
-    }
-
-    // ✅ Pass as array, not joined string
-    const totalPrice = calculatePrice(serviceType, deliveryTime, selectedDeliverables);
+    const deliverables = deliverablesInput.value;
+    if (!serviceType || !deliveryTime) return;
+    const totalPrice = calculatePrice(serviceType, deliveryTime, deliverables);
     const upfrontPayment = totalPrice * 0.3;
-
     totalPriceEl.textContent = totalPrice.toFixed(2);
     upfrontEl.textContent = upfrontPayment.toFixed(2);
   }
@@ -151,18 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     if (!currentUser) return;
 
-    const selectedDeliverables = getSelectedDeliverables();
-    if (selectedDeliverables.length === 0) {
-      alert("Please select at least one deliverable.");
-      return;
-    }
-
-    updatePrice();
-
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Verifying...';
-
+    
     const transactionNumber = document.getElementById('transaction-number').value;
     const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
     const querySnapshot = await getDocs(q);
@@ -178,34 +140,26 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const orderId = `order_${Date.now()}`;
       await setDoc(doc(db, 'orders', orderId), {
-        orderId: orderId,
-        userId: currentUser.uid,
-        email: currentUser.email,
+        orderId: orderId, userId: currentUser.uid, email: currentUser.email,
         clientName: document.getElementById('client-name').value,
         contactInfo: document.getElementById('contact-info').value,
         projectDescription: document.getElementById('project-description').value,
         serviceType: serviceTypeSelect.value,
         deliveryTime: deliveryTimeSelect.value,
-        // ✅ Store as array instead of joined string
-        deliverables: selectedDeliverables,
+        deliverables: deliverablesInput.value,
         totalPrice: parseFloat(totalPriceEl.textContent),
         upfrontPayment: parseFloat(upfrontEl.textContent),
-        transactionNumber: transactionNumber,
-        status: 'Pending Confirmation',
+        transactionNumber: transactionNumber, status: 'Pending Confirmation',
         createdAt: serverTimestamp()
       });
-
+      
       await setDoc(doc(db, 'conversations', currentUser.uid), {
-        userId: currentUser.uid,
-        userEmail: currentUser.email,
+        userId: currentUser.uid, userEmail: currentUser.email,
         lastUpdate: serverTimestamp()
       }, { merge: true });
 
       alert("Order placed successfully!");
       orderForm.reset();
-
-      deliverablesContainer.innerHTML = '';
-      setTimeout(updatePrice, 0);
     } catch (error) {
       console.error("Order submission error:", error);
       alert("There was an error submitting your order.");
@@ -231,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         orderElement.innerHTML = `
           <p><strong>Order ID:</strong> ${order.orderId}</p>
           <p><strong>Service:</strong> ${order.serviceType}</p>
-          <p><strong>Upfront Paid:</strong> ETB ${Number(order.upfrontPayment || 0).toFixed(2)}</p>
+          <p><strong>Upfront Paid:</strong> $${Number(order.upfrontPayment || 0).toFixed(2)}</p>
           <p><strong>Status:</strong> <span class="status-${String(order.status || '').toLowerCase().replace(/ /g, '-')}">${order.status}</span></p>
           <button class="btn btn-contact-designer" data-order-id="${order.orderId}">Contact Designer</button>
         `;
