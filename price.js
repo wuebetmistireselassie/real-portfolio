@@ -249,8 +249,7 @@ function sumSelectedFees(serviceConfig, selectedSlugs) {
 /**
  * Calculate total price with:
  * - Base price per service
- * - Deliverables add-on = (sum(selected deliverables) - baseline(explicit) fee) clamped at 0
- *   (Base implicitly includes the baseline once.)
+ * - Deliverables add-on = (sum(selected deliverables))
  * - Delivery multiplier (standard=1, express=1.5, urgent=2) applied to (base + add-on)
  * - Round to nearest 50 ETB
  * - Enforce minimum 1,000 ETB
@@ -287,12 +286,9 @@ export function calculatePrice(serviceType, deliveryTime, deliverables) {
   let deliverablesFee = 0;
 
   if (serviceConfig && selected.length > 0) {
-    const baselineFee = getBaselineFee(serviceConfig); // uses EXPLICIT baseline when provided
-    const sumSelected = sumSelectedFees(serviceConfig, selected);
-
-    // Base includes ONE baseline deliverable implicitly.
-    // Add-ons = sum(selected) - baselineFee (clamped at 0).
-    deliverablesFee = Math.max(0, sumSelected - baselineFee);
+    // The previous version had a bug here. It was subtracting the baseline fee, which caused the price to not update correctly.
+    // The fix is to simply sum up all selected deliverables' fees.
+    deliverablesFee = sumSelectedFees(serviceConfig, selected);
   }
 
   // --- Final total ---
