@@ -46,15 +46,67 @@ export async function openChat(chatId, title) {
 }
 
 function closeChat() {
-    // Function content remains the same...
+    const chatModal = document.getElementById('chat-modal');
+    if (currentUnsubscribe) {
+        currentUnsubscribe();
+        currentUnsubscribe = null;
+    }
+    chatModal.style.display = 'none';
 }
 
 function listenForMessages(chatId) {
-    // Function content remains the same...
+    const messagesDiv = document.getElementById('chat-messages');
+    const messagesRef = collection(db, `conversations/${chatId}/messages`);
+    const q = query(messagesRef, orderBy('timestamp', 'asc'));
+
+    currentUnsubscribe = onSnapshot(q, (snapshot) => {
+        messagesDiv.innerHTML = '';
+        if (snapshot.empty) {
+            messagesDiv.innerHTML = '<p>No messages yet. Start the conversation!</p>';
+        } else {
+            snapshot.forEach(doc => {
+                displayMessage(doc.data());
+            });
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    });
 }
 
 function displayMessage(msg) {
-    // Function content remains the same...
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const messagesDiv = document.getElementById('chat-messages');
+    const messageContainer = document.createElement('div');
+    const sender = msg.senderEmail ? msg.senderEmail.split('@')[0] : 'User';
+
+    messageContainer.className = `chat-message ${msg.senderId === user.uid ? 'sent' : 'received'}`;
+
+    let fileHTML = '';
+    if (msg.fileUrl) {
+        fileHTML = `
+            <div class="file-attachment">
+                <a href="${msg.fileUrl}" target="_blank" download="${msg.fileName}">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name">${sanitizeText(msg.fileName)}</span>
+                </a>
+            </div>
+        `;
+    }
+
+    if (msg.isSystemMessage) {
+        messageContainer.innerHTML = `<div class="message-bubble system" style="width: 100%; text-align: center; background: #eee; color: #777; font-style: italic; margin: 10px 0;">${sanitizeText(msg.text)}</div>`;
+    } else {
+         messageContainer.innerHTML = `
+            <div class="message-sender">${sanitizeText(sender)}</div>
+            <div class="message-bubble ${msg.senderId === user.uid ? 'sent' : 'received'}">
+                ${msg.text ? sanitizeText(msg.text) : ''}
+                ${fileHTML}
+            </div>
+        `;
+    }
+
+    messagesDiv.appendChild(messageContainer);
 }
 
 async function handleSendMessage(e) {
@@ -67,14 +119,14 @@ async function handleSendMessage(e) {
     if (!text && !document.getElementById('chat-file-input').files[0]) return;
 
     try {
-        // Add the message to the subcollection
         const messagesRef = collection(db, `conversations/${chatId}/messages`);
         await addDoc(messagesRef, {
-            text: text, senderId: user.uid,
-            senderEmail: user.email, timestamp: serverTimestamp()
+            text: text,
+            senderId: user.uid,
+            senderEmail: user.email,
+            timestamp: serverTimestamp()
         });
         
-        // --- ADDED THIS BLOCK TO UPDATE THE TIMESTAMP ---
         const conversationRef = doc(db, 'conversations', chatId);
         await setDoc(conversationRef, { lastUpdate: serverTimestamp() }, { merge: true });
         
@@ -101,16 +153,17 @@ async function handleFileSelect(e) {
     try {
         const fileUrl = await uploadFileToCloudinary(file);
         
-        // Add the message with file to the subcollection
         const messagesRef = collection(db, `conversations/${chatId}/messages`);
         await addDoc(messagesRef, {
             text: document.getElementById('chat-message-input').value.trim(),
-            senderId: user.uid, senderEmail: user.email,
-            timestamp: serverTimestamp(), fileUrl: fileUrl,
-            fileName: file.name, fileType: file.type
+            senderId: user.uid,
+            senderEmail: user.email,
+            timestamp: serverTimestamp(),
+            fileUrl: fileUrl,
+            fileName: file.name,
+            fileType: file.type
         });
         
-        // --- ADDED THIS BLOCK TO UPDATE THE TIMESTAMP ---
         const conversationRef = doc(db, 'conversations', chatId);
         await setDoc(conversationRef, { lastUpdate: serverTimestamp() }, { merge: true });
 
@@ -126,9 +179,31 @@ async function handleFileSelect(e) {
 }
 
 async function uploadFileToCloudinary(file) {
-    // Function content remains the same...
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_CONFIG.UPLOAD_PRESET);
+
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.CLOUD_NAME}/upload`, {
+        method: 'POST',
+        body: formData
+    });
+
+    if (!response.ok) throw new Error('Cloudinary upload failed');
+
+    const data = await response.json();
+    return data.secure_url;
 }
 
 export async function sendSystemMessage(chatId, text) {
-    // Function content remains the same...
+    if (!chatId || !text) return;
+    try {
+        const messagesRef = collection(db, `conversations/${chatId}/messages`);
+        await addDoc(messagesRef, {
+            text: text,
+            isSystemMessage: true,
+            timestamp: serverTimestamp()
+        });
+    } catch (error) {
+        console.error("Error sending system message:", error);
+    }
 }
