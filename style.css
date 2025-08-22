@@ -611,18 +611,21 @@ footer {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px var(--surface-shadow);
 }
-/* --- Deliverables checkboxes inline layout --- */
+/* ✅ Deliverables inline checkboxes */
 #deliverables-container {
   display: flex;
-  flex-wrap: wrap;      /* wrap to next line if needed */
-  gap: 10px 20px;       /* space between items */
+  flex-wrap: wrap;     /* allow wrapping if too long */
+  gap: 15px 30px;      /* space between items */
 }
 
 #deliverables-container div {
-  display: flex;
-  align-items: center;  /* align checkbox + label */
-  white-space: nowrap;  /* keep each together */
+  display: inline-flex;  /* keep checkbox + label together */
+  align-items: center;
+  white-space: nowrap;
+  min-width: 120px;      /* controls how wide each item is */
 }
+
+
 
 
 
