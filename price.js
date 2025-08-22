@@ -58,7 +58,9 @@ export function calculatePrice(serviceType, deliveryTime, deliverables) {
             .split(',')
             .map(d => d.trim())
             .filter(d => d);
-        deliverablesFee = deliverablesArray.length * 150; // 150 ETB per deliverable
+        if (deliverablesArray.length > 1) {
+            deliverablesFee = (deliverablesArray.length - 1) * 150; // fee applies only after the first
+        }
     }
 
     // --- Final total ---
