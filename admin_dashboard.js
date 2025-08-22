@@ -7,35 +7,68 @@ import {
     query,
     onSnapshot,
     doc,
+    getDoc,
     updateDoc,
-    signInWithEmailAndPassword,
-    orderBy // <-- ADDED THIS
+    orderBy
 } from './auth.js';
 import { openChat } from './chat.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const ADMIN_UID = "mL8wfi0Bgvan5yh9yxCthmEDhJc2"; 
-    
-    // ... (rest of the initial variable declarations remain the same) ...
+    let chatsUnsubscribe = null;
 
-    onAuthStateChanged(auth, user => {
-        // ... (function content remains the same) ...
+    // --- Auth State ---
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            // Not signed in → go to login
+            window.location.href = 'index.html';
+            return;
+        }
+
+        // Fetch user role from Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (!userDoc.exists() || userDoc.data().role !== "admin") {
+            // Not an admin → redirect to client dashboard
+            window.location.href = 'orders.html';
+            return;
+        }
+
+        // ✅ Admin verified → show dashboard
+        document.getElementById('admin-email').textContent = user.email;
+        listenForAllOrders();
+        listenForAllChats();
     });
 
-    loginForm.addEventListener('submit', (e) => {
-        // ... (function content remains the same) ...
-    });
+    // --- Logout ---
+    document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-    logoutBtn.addEventListener('click', () => signOut(auth));
-
+    // --- Listen for all orders ---
     function listenForAllOrders() {
-        // ... (function content remains the same) ...
+        const ordersListDiv = document.getElementById('all-orders-list');
+        const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+
+        onSnapshot(q, (snapshot) => {
+            if (snapshot.empty) {
+                ordersListDiv.innerHTML = '<p>No orders found.</p>';
+                return;
+            }
+            ordersListDiv.innerHTML = '';
+            snapshot.forEach(doc => {
+                const order = doc.data();
+                const orderElement = document.createElement('div');
+                orderElement.className = 'order-list-item';
+                orderElement.innerHTML = `
+                    <p><strong>Order ID:</strong> ${order.orderId}</p>
+                    <p><strong>Client:</strong> ${order.clientName} (${order.email})</p>
+                    <p><strong>Status:</strong> ${order.status}</p>
+                `;
+                ordersListDiv.appendChild(orderElement);
+            });
+        });
     }
 
-    // --- THIS FUNCTION HAS BEEN UPDATED ---
+    // --- Listen for all chats ---
     function listenForAllChats() {
         const chatsListDiv = document.getElementById('all-chats-list');
-        // UPDATED: Added orderBy() to sort by the 'lastUpdate' field in descending order
         const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
         
         chatsUnsubscribe = onSnapshot(q, (snapshot) => {
@@ -58,11 +91,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    document.getElementById('dashboard-container').addEventListener('click', async (e) => {
-        // ... (function content remains the same) ...
-    });
-
+    // --- Update Order Status ---
     async function updateOrderStatus(orderId, newStatus) {
-        // ... (function content remains the same) ...
+        try {
+            await updateDoc(doc(db, 'orders', orderId), { status: newStatus });
+            console.log(`Order ${orderId} updated to ${newStatus}`);
+        } catch (error) {
+            console.error("Error updating order:", error);
+        }
     }
+
+    // Example: handle dashboard clicks
+    document.getElementById('dashboard-container').addEventListener('click', async (e) => {
+        if (e.target.classList.contains('btn-update-status')) {
+            const orderId = e.target.dataset.orderId;
+            const newStatus = e.target.dataset.newStatus;
+            await updateOrderStatus(orderId, newStatus);
+        }
+    });
 });
