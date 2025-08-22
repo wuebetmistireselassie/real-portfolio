@@ -9,14 +9,16 @@ import {
     doc,
     updateDoc,
     signInWithEmailAndPassword,
-    orderBy
+    orderBy,
+    serverTimestamp,
+    addDoc
 } from './auth.js';
-import { openChat } from './chat.js';
+import { openChat, sendSystemMessage } from './chat.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ✅ Hardcoded Admin UID
-    const ADMIN_UID = "mL8wfi0Bgvan5yh9yxCthmEDhJc2"; 
-    
+    // Hardcoded Admin UID
+    const ADMIN_UID = "mL8wfi0Bgvan5yh9yxCthmEDhJc2";
+
     const adminLoginView = document.getElementById('admin-login-view');
     const adminDashboardView = document.getElementById('admin-dashboard-view');
     const adminLoginForm = document.getElementById('admin-login-form');
@@ -28,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let chatsUnsubscribe = null;
     let ordersUnsubscribe = null;
 
-    // 🔑 Watch authentication state
+    // Watch authentication state
     onAuthStateChanged(auth, user => {
         if (user && user.uid === ADMIN_UID) {
             adminLoginView.classList.add('hidden');
@@ -48,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Login form (for the first time or if the user is not logged in)
+    // Login form (for first-time or not logged-in admin access)
     adminLoginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('admin-login-email').value;
@@ -120,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     chatElement.dataset.userEmail = chat.userEmail;
                     chatElement.innerHTML = `
                         <p><strong>${chat.userEmail}</strong></p>
-                        <p>Last update: ${new Date(chat.lastUpdate?.toDate()).toLocaleString()}</p>
+                        <p>Last update: ${chat.lastUpdate ? new Date(chat.lastUpdate.toDate()).toLocaleString() : 'N/A'}</p>
                     `;
                     chatElement.addEventListener('click', () => {
                         openChat(chat.userId, `Chat with ${chat.userEmail}`);
