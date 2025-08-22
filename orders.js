@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
 
-  // Deliverables per service
+  // Deliverables per service (moved from orders.html)
   const deliverables = {
     logo: ["PNG", "JPG", "SVG", "PDF", "AI (Adobe Illustrator)", "EPS"],
     branding: ["Brand Guidelines PDF", "Color Palette (ASE file)", "Typography Files", "Logo Variations (PNG, JPG, SVG)"],
