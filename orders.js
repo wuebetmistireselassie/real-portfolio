@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const signupForm = document.getElementById('signup-form');
   const authError = document.getElementById('auth-error');
   const showLoginTabBtn = document.getElementById('show-login-tab');
-  const showSignupTabBtn = document = document.getElementById('show-signup-tab');
+  const showSignupTabBtn = document.getElementById('show-signup-tab');
   const loginFormContainer = document.getElementById('login-form-container');
   const signupFormContainer = document.getElementById('signup-form-container');
   const logoutBtn = document.getElementById('logout-btn');
@@ -82,12 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
 
-  // The fix: All event listeners are now in one place.
   orderForm.addEventListener('change', updatePrice);
   serviceTypeSelect.addEventListener("change", function() {
     const selectedService = this.value;
-    deliverablesContainer.innerHTML = ""; // Clear previous
-
+    deliverablesContainer.innerHTML = "";
     if (deliverables[selectedService]) {
       deliverables[selectedService].forEach(item => {
         const checkbox = document.createElement("input");
@@ -95,30 +93,24 @@ document.addEventListener('DOMContentLoaded', () => {
         checkbox.name = "deliverables";
         checkbox.value = item;
         checkbox.id = item.replace(/\s+/g, '_').toLowerCase();
-
         const label = document.createElement("label");
         label.htmlFor = checkbox.id;
         label.textContent = " " + item;
-
         const wrapper = document.createElement("div");
         wrapper.appendChild(checkbox);
         wrapper.appendChild(label);
-
         deliverablesContainer.appendChild(wrapper);
       });
     }
-    // Re-calculate after dynamic elements are added
-    setTimeout(updatePrice, 0); 
+    setTimeout(updatePrice, 0);
   });
 
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
   generalContactBtn.addEventListener('click', handleGeneralContactClick);
 
-  // Initial compute (in case defaults are pre-selected)
   setTimeout(updatePrice, 0);
 
-  // --- Functions ---
   function switchTab(tabName) {
     if (tabName === 'login') {
       loginFormContainer.classList.remove('hidden');
@@ -153,11 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
     authError.classList.remove('hidden');
   }
 
-  // Read selected deliverables (checkboxes)
   function getSelectedDeliverables() {
-    const checked = Array.from(
-      deliverablesContainer.querySelectorAll('input[type="checkbox"]:checked')
-    );
+    const checked = Array.from(deliverablesContainer.querySelectorAll('input[type="checkbox"]:checked'));
     return checked.map(cb => cb.value);
   }
 
@@ -165,17 +154,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const serviceType = serviceTypeSelect.value;
     const deliveryTime = deliveryTimeSelect.value;
     const selectedDeliverables = getSelectedDeliverables();
-
     if (!serviceType) {
       totalPriceEl.textContent = (0).toFixed(2);
       upfrontEl.textContent = (0).toFixed(2);
       return;
     }
-
     const deliverablesStr = selectedDeliverables.join(', ');
     const totalPrice = calculatePrice(serviceType, deliveryTime, deliverablesStr);
     const upfrontPayment = totalPrice * 0.3;
-
     totalPriceEl.textContent = totalPrice.toFixed(2);
     upfrontEl.textContent = upfrontPayment.toFixed(2);
   }
@@ -183,31 +169,24 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleOrderSubmit(e) {
     e.preventDefault();
     if (!currentUser) return;
-
     const selectedDeliverables = getSelectedDeliverables();
     if (selectedDeliverables.length === 0) {
       alert("Please select at least one deliverable.");
       return;
     }
-
-    // Ensure price is up to date
     updatePrice();
-
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Verifying...';
-
     const transactionNumber = document.getElementById('transaction-number').value;
     const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
     const querySnapshot = await getDocs(q);
-
     if (!querySnapshot.empty) {
       alert("This Transaction ID has already been used.");
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit Order';
       return;
     }
-
     submitBtn.textContent = 'Submitting...';
     try {
       const orderId = `order_${Date.now()}`;
@@ -227,17 +206,13 @@ document.addEventListener('DOMContentLoaded', () => {
         status: 'Pending Confirmation',
         createdAt: serverTimestamp()
       });
-
       await setDoc(doc(db, 'conversations', currentUser.uid), {
         userId: currentUser.uid,
         userEmail: currentUser.email,
         lastUpdate: serverTimestamp()
       }, { merge: true });
-
       alert("Order placed successfully!");
       orderForm.reset();
-
-      // Clear deliverables UI after reset
       deliverablesContainer.innerHTML = '';
       setTimeout(updatePrice, 0);
     } catch (error) {
