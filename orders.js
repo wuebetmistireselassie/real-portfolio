@@ -44,6 +44,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
 
+  // Deliverables per service (moved from orders.html)
+  const deliverables = {
+    logo: ["PNG", "JPG", "SVG", "PDF", "AI (Adobe Illustrator)", "EPS"],
+    branding: ["Brand Guidelines PDF", "Color Palette (ASE file)", "Typography Files", "Logo Variations (PNG, JPG, SVG)"],
+    stationery: ["Business Card (JPG, PDF)", "Letterhead (DOCX, PDF)", "Envelope Design (JPG, PDF)", "Email Signature (HTML/PNG)"],
+    socialkit: ["Profile Pictures (PNG, JPG)", "Cover Images (PNG, JPG)", "Post Templates (PSD/AI)", "Story Templates (PNG, JPG)"],
+    digitalassets: ["Website Banners (PNG, JPG)", "App Icons (PNG, SVG)", "Favicon (ICO/PNG)", "Presentation Templates (PPTX, PDF)"],
+    powerpoint: ["Editable PPTX File", "PDF Version", "Custom Slide Templates", "Icons/Graphics Pack"],
+    word: ["Formatted DOCX", "Exported PDF", "Custom Word Template (DOTX)", "Styles & Headings Setup"],
+    excel: ["Formatted XLSX File", "Exported PDF", "Custom Templates", "Pivot Tables/Charts"],
+    files: ["DOCX", "PDF", "XLSX", "JPG", "PNG", "Other File Conversions"],
+    admin: ["Excel/CSV Report", "Cleaned/Formatted Data", "Word Document", "PDF Output"]
+  };
+
   // --- Auth State Logic ---
   onAuthStateChanged(auth, user => {
     if (user) {
@@ -68,16 +82,34 @@ document.addEventListener('DOMContentLoaded', () => {
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
 
-  // The fix: Use a single 'change' event listener on the form for all price-related fields.
+  // The fix: Now, all event listeners are in one place.
   orderForm.addEventListener('change', updatePrice);
+  serviceTypeSelect.addEventListener('change', function() {
+    const selectedService = this.value;
+    deliverablesContainer.innerHTML = ""; // Clear previous
 
-  // Add this specific listener for the service type to trigger the price update
-  // when deliverables are dynamically injected.
-  serviceTypeSelect.addEventListener('change', () => {
-    // A slight delay is needed to ensure the deliverables checkboxes are rendered
-    setTimeout(updatePrice, 0); 
+    if (deliverables[selectedService]) {
+      deliverables[selectedService].forEach(item => {
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = "deliverables";
+        checkbox.value = item;
+        checkbox.id = item.replace(/\s+/g, '_').toLowerCase();
+
+        const label = document.createElement("label");
+        label.htmlFor = checkbox.id;
+        label.textContent = " " + item;
+
+        const wrapper = document.createElement("div");
+        wrapper.appendChild(checkbox);
+        wrapper.appendChild(label);
+
+        deliverablesContainer.appendChild(wrapper);
+      });
+    }
+    setTimeout(updatePrice, 0); // Re-calculate after dynamic elements are added
   });
-  
+
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
   generalContactBtn.addEventListener('click', handleGeneralContactClick);
