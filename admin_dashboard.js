@@ -16,7 +16,7 @@ import {
 import { openChat, sendSystemMessage } from './chat.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Hardcoded Admin UID
+    // ✅ Hardcoded Admin UID
     const ADMIN_UID = "mL8wfi0Bgvan5yh9yxCthmEDhJc2";
 
     const adminLoginView = document.getElementById('admin-login-view');
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let chatsUnsubscribe = null;
     let ordersUnsubscribe = null;
 
-    // Watch authentication state
+    // 🔑 Watch authentication state
     onAuthStateChanged(auth, user => {
         if (user && user.uid === ADMIN_UID) {
             adminLoginView.classList.add('hidden');
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function listenForAllOrders() {
         const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-        
+
         ordersUnsubscribe = onSnapshot(q, (snapshot) => {
             allOrdersList.innerHTML = "";
             if (snapshot.empty) {
@@ -93,16 +93,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 div.innerHTML = `
                     <h4>Order ID: ${order.orderId}</h4>
                     <p><strong>Client:</strong> ${order.clientName} (${order.email})</p>
+                    <p><strong>Contact:</strong> ${order.contactInfo}</p>
                     <p><strong>Service:</strong> ${order.serviceType}</p>
+                    <p><strong>Deliverables:</strong> ${order.deliverables}</p>
+                    <p><strong>Total Price:</strong> ${order.totalPrice.toFixed(2)} ETB</p>
+                    <p><strong>Upfront Payment:</strong> ${order.upfrontPayment.toFixed(2)} ETB</p>
+                    <p><strong>Transaction ID:</strong> ${order.transactionNumber}</p>
+                    <p><strong>Status:</strong> <span class="status-${order.status.toLowerCase().replace(/\s+/g, '-')}">${order.status}</span></p>
                     <p><strong>Description:</strong> ${order.projectDescription}</p>
-                    <p><strong>Status:</strong> ${order.status}</p>
-                    <button class="btn btn-contact-client" data-user-id="${order.userId}" data-user-email="${order.email}">Contact Client</button>
+                    <div class="order-actions">
+                        <button class="btn btn-approve" data-order-id="${docSnap.id}">Approve</button>
+                        <button class="btn btn-reject" data-order-id="${docSnap.id}">Reject</button>
+                        <button class="btn btn-contact-client" data-user-id="${order.userId}" data-user-email="${order.email}">Contact Client</button>
+                    </div>
                     <hr>
                 `;
                 allOrdersList.appendChild(div);
             });
         });
     }
+    
+    // Event listener for the Approve/Reject buttons
+    allOrdersList.addEventListener('click', async (e) => {
+        const orderId = e.target.dataset.orderId;
+        if (!orderId) return;
+
+        if (e.target.classList.contains('btn-approve')) {
+            await updateOrderStatus(orderId, 'In Progress');
+        } else if (e.target.classList.contains('btn-reject')) {
+            await updateOrderStatus(orderId, 'Rejected');
+        } else if (e.target.classList.contains('btn-contact-client')) {
+            const userId = e.target.dataset.userId;
+            const userEmail = e.target.dataset.userEmail;
+            openChat(userId, `Chat with ${userEmail}`);
+        }
+    });
+    
+    async function updateOrderStatus(orderId, newStatus) {
+        const orderRef = doc(db, 'orders', orderId);
+        try {
+            await updateDoc(orderRef, { status: newStatus });
+            alert(`Order ${orderId} status updated to ${newStatus}.`);
+            // Optionally, send a system message to the client
+            const orderDoc = await getDocs(query(collection(db, 'orders'), where('orderId', '==', orderId)));
+            if (!orderDoc.empty) {
+                const clientUserId = orderDoc.docs[0].data().userId;
+                sendSystemMessage(clientUserId, `Your order with ID ${orderId} has been updated to: "${newStatus}".`);
+            }
+        } catch (error) {
+            console.error("Error updating order status:", error);
+            alert("Failed to update order status.");
+        }
+    }
+
 
     function listenForAllChats() {
         const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
@@ -133,12 +176,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Attach event listener for the order list to open chat
-    document.getElementById('all-orders-list').addEventListener('click', (e) => {
-        if (e.target.classList.contains('btn-contact-client')) {
-            const userId = e.target.dataset.userId;
-            const userEmail = e.target.dataset.userEmail;
-            openChat(userId, `Chat with ${userEmail}`);
-        }
-    });
 });
