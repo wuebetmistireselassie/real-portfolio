@@ -219,10 +219,11 @@
     const deliverablesContainer = document.getElementById("deliverables-container");
     const totalPriceEl = document.getElementById("total-price");
     const upfrontPaymentEl = document.getElementById("upfront-payment");
+    const orderForm = document.getElementById("order-form");
 
     function getSelectedDeliverables() {
       return Array.from(document.querySelectorAll("input[name='deliverables']:checked"))
-        .map(cb => cb.value); // ✅ return array, not joined string
+        .map(cb => cb.value); 
     }
 
     function updatePriceUI() {
@@ -243,9 +244,13 @@
       upfrontPaymentEl.textContent = upfront;
     }
 
-    serviceSelect.addEventListener("change", updatePriceUI);
-    deliveryTimeSelect.addEventListener("change", updatePriceUI);
-    deliverablesContainer.addEventListener("change", updatePriceUI);
+    // This is the key change: Listen to the form for any input changes
+    orderForm.addEventListener('change', updatePriceUI);
+    
+    // Initial compute (in case defaults are pre-selected)
+    setTimeout(updatePriceUI, 0);
+
   </script>
+
 </body>
 </html>
