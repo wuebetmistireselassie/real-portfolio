@@ -71,6 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // The fix: Use a single 'change' event listener on the form for all price-related fields.
   orderForm.addEventListener('change', updatePrice);
 
+  // Add this specific listener for the service type to trigger the price update
+  // when deliverables are dynamically injected.
+  serviceTypeSelect.addEventListener('change', () => {
+    // A slight delay is needed to ensure the deliverables checkboxes are rendered
+    setTimeout(updatePrice, 0); 
+  });
+  
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
   generalContactBtn.addEventListener('click', handleGeneralContactClick);
@@ -126,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deliveryTime = deliveryTimeSelect.value;
     const selectedDeliverables = getSelectedDeliverables();
 
-    if (!serviceType || !deliveryTime) {
+    if (!serviceType) {
       totalPriceEl.textContent = (0).toFixed(2);
       upfrontEl.textContent = (0).toFixed(2);
       return;
