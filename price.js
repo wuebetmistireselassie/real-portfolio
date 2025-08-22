@@ -193,8 +193,8 @@ function parseDeliverables(input) {
     }
   }
 
-  // Split by common separators: comma, semicolon, pipe, newline, slash
-  const parts = raw.split(/[,;|\n/]+/).map((d) => normalizeKey(d)).filter(Boolean);
+  // ✅ FIXED regex: split by comma, semicolon, pipe, newline, carriage return, or slash
+  const parts = raw.split(/[,\n\r;|\/]+/).map((d) => normalizeKey(d)).filter(Boolean);
   return Array.from(new Set(parts));
 }
 
