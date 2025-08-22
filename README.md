@@ -5,4 +5,5 @@ This repository contains the code for my personal portfolio website, built with 
 Dynamic Gallery: The portfolio section automatically loads all images from the /images folder using the GitHub API.
 Responsive Design: Looks great on desktops, tablets, and mobile phones.
 Easy Updates: To add a new project, I simply upload a new image to the designated folder.
-You can view the live site here: [your-github-pages-link]
+
+You can view the live site here: https://www.mwdashboard.com/
