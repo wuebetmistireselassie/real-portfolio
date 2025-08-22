@@ -90,7 +90,7 @@ export function calculatePrice(serviceType, deliveryTime, deliverables = []) {
   // Add deliverable fees if defined
   if (DELIVERABLE_FEES[serviceType]) {
     for (const d of deliverables) {
-      if (DELIVERABLE_FEES[serviceType][d]) {
+      if (DELIVERABLE_FEES[serviceType].hasOwnProperty(d)) {
         total += DELIVERABLE_FEES[serviceType][d];
       }
     }
@@ -99,4 +99,3 @@ export function calculatePrice(serviceType, deliveryTime, deliverables = []) {
   const multiplier = DELIVERY_MULTIPLIERS[deliveryTime] || 1;
   return total * multiplier;
 }
-
