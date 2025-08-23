@@ -1,24 +1,23 @@
-/* orders.css */
-/* Styles for Deliverables checkboxes layout */
-
 #deliverables-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* responsive 2+ columns */
-  gap: 10px 20px; /* spacing between items */
+  grid-template-columns: repeat(3, 1fr); /* Creates 3 equal columns */
+  gap: 15px 25px; /* Adjusts spacing between grid items */
   margin-top: 0.5rem;
   margin-bottom: 1rem;
 }
 
 #deliverables-container div {
   display: flex;
-  align-items: center; /* align checkbox with text */
-  gap: 8px;
-  white-space: nowrap; /* keep text with checkbox */
+  align-items: center; /* This is key for vertical alignment */
+  white-space: nowrap;
 }
 
 #deliverables-container input[type="checkbox"] {
-  transform: scale(1.1); /* make checkbox a little larger */
+  /* This part is already good */
+  transform: scale(1.1);
   cursor: pointer;
+  /* Add margin to separate the checkbox from the text */
+  margin-right: 8px; 
 }
 
 #deliverables-container label {
