@@ -19,6 +19,18 @@
       margin-top: 0.5rem;
       margin-bottom: 1rem;
     }
+    /* New styles for the platform toggle */
+    #platform-toggle-container {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    #platform-options {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -41,6 +53,15 @@
   <main id="app-container">
     <section id="orders-section">
       <div class="section-container">
+        <div id="platform-toggle-container">
+          <button id="toggle-platforms-btn" class="btn btn-secondary">Prefer to order on a platform?</button>
+          <div id="platform-options" class="hidden">
+            <p>You can also hire me on:</p>
+            <a href="https://www.upwork.com/freelancers/~0199206f1f82364f9e" target="_blank" class="btn">Hire Me on Upwork</a>
+            <a href="https://www.fiverr.com/s/jj1NNpa" target="_blank" class="btn">Hire Me on Fiverr</a>
+          </div>
+        </div>
+
         <div id="logged-in-view" class="hidden">
           <div id="user-info" style="text-align: right; margin-bottom: 2rem;">
             <p style="margin-bottom: 1rem;">Welcome, <span id="user-name"></span>!</p>
@@ -76,8 +97,7 @@
 
               <label>Final Deliverables Required</label>
               <div id="deliverables-container">
-                <!-- Dynamic checkboxes will be injected here -->
-              </div>
+                </div>
 
               <label for="delivery-time">Delivery Time</label>
               <select id="delivery-time" name="delivery-time" required>
@@ -86,18 +106,43 @@
                 <option value="urgent">Urgent (within 24 hours)</option>
               </select>
 
+              <label for="currency-select">Currency</label>
+              <select id="currency-select" name="currency">
+                <option value="ETB">Ethiopian Birr (ETB)</option>
+                <option value="USD">US Dollar (USD)</option>
+                <option value="CNY">Chinese Yuan (CNY)</option>
+              </select>
+
               <div id="price-calculation">
-                <p>Total Price: <span id="total-price">0.00</span> ETB</p>
-                <p><strong>30% Upfront Payment: <span id="upfront-payment">0.00</span></strong> ETB</p>
+                <p>Total Price: <span id="total-price">0.00</span> <span id="currency-symbol">ETB</span></p>
+                <p><strong>30% Upfront Payment: <span id="upfront-payment">0.00</span></strong> <span id="upfront-symbol">ETB</span></p>
               </div>
-              <div id="payment-details">
-                <h4>Payment Information</h4>
-                <p>Please send the upfront payment via Telebirr to:</p>
-                <p><strong>Holder Name:</strong> Mistireselassie Taddese Wuebet</p>
-                <p><strong>Account:</strong> 0919981116</p>
+
+              <div id="payment-details-container">
+                <div id="payment-details-ETB">
+                  <h4>Payment Information (ETB)</h4>
+                  <p>Please send the upfront payment via Telebirr to:</p>
+                  <p><strong>Holder Name:</strong> Mistireselassie Taddese Wuebet</p>
+                  <p><strong>Account:</strong> 0919981116</p>
+                  <label for="transaction-number">Telebirr Transaction Number</label>
+                  <input type="text" id="transaction-number" name="transaction-number" placeholder="Enter the Txn ID here" required>
+                </div>
+
+                <div id="payment-details-USD" class="hidden">
+                  <h4>Payment Information (USD)</h4>
+                  <p>Please send the upfront payment via **AirTM** to the following email:</p>
+                  <p><strong>Payment Email:</strong> changesat2021@gmail.com</p>
+                  <p>Please include your full name and project description in the payment notes.</p>
+                </div>
+
+                <div id="payment-details-CNY" class="hidden">
+                  <h4>Payment Information (CNY)</h4>
+                  <p>Please send the upfront payment via **Alipay** to the following email:</p>
+                  <p><strong>Payment Email:</strong> changesat2021@gmail.com</p>
+                  <p>Please include your full name and project description in the payment notes.</p>
+                </div>
               </div>
-              <label for="transaction-number">Telebirr Transaction Number</label>
-              <input type="text" id="transaction-number" name="transaction-number" placeholder="Enter the Txn ID here" required>
+
               <button type="submit" class="btn">Submit Order</button>
             </form>
           </div>
@@ -169,20 +214,20 @@
 
   <script>
     // Deliverables per service
- const deliverables = {
-  logo: ["PNG", "JPG", "SVG", "PDF", "AI", "EPS"],
-  branding: ["Brand Guidelines", "Color Palette", "Typography", "Logo Variations"],
-  stationery: ["Business Card", "Letterhead", "Envelope", "Email Signature"],
-  socialkit: ["Profile Pictures", "Cover Images", "Post Templates", "Story Templates"],
-  digitalassets: ["Website Banners", "App Icons", "Favicon", "Presentation Templates"],
-  
-  // ✅ Prefixed for clarity
-  files: ["file_DOCX", "file_PDF", "file_XLSX", "file_JPG", "file_PNG", "file_Other"],
-  
-  admin: ["Excel/CSV Report", "Formatted Data", "Word Document", "PDF Output"]
+    const deliverables = {
+      logo: ["PNG", "JPG", "SVG", "PDF", "AI", "EPS"],
+      branding: ["Brand Guidelines", "Color Palette", "Typography", "Logo Variations"],
+      stationery: ["Business Card", "Letterhead", "Envelope", "Email Signature"],
+      socialkit: ["Profile Pictures", "Cover Images", "Post Templates", "Story Templates"],
+      digitalassets: ["Website Banners", "App Icons", "Favicon", "Presentation Templates"],
+      
+      // ✅ Prefixed for clarity
+      files: ["file_DOCX", "file_PDF", "file_XLSX", "file_JPG", "file_PNG", "file_Other"],
+      
+      admin: ["Excel/CSV Report", "Formatted Data", "Word Document", "PDF Output"]
 
-  // 🚫 Word, PowerPoint, Excel → fixed single deliverables (no checkboxes needed)
-};
+      // 🚫 Word, PowerPoint, Excel → fixed single deliverables (no checkboxes needed)
+    };
 
 
     const serviceSelect = document.getElementById("service-type");
@@ -214,15 +259,24 @@
     });
   </script>
 
-  <!-- 🔥 Price update logic -->
   <script type="module">
     import { calculatePrice } from './price.js';
 
     const serviceSelect = document.getElementById("service-type");
     const deliveryTimeSelect = document.getElementById("delivery-time");
     const deliverablesContainer = document.getElementById("deliverables-container");
+    const currencySelect = document.getElementById("currency-select"); // New
     const totalPriceEl = document.getElementById("total-price");
     const upfrontPaymentEl = document.getElementById("upfront-payment");
+    const currencySymbolEl = document.getElementById("currency-symbol"); // New
+    const upfrontSymbolEl = document.getElementById("upfront-symbol"); // New
+
+    // Exchange rates (for demonstration)
+    const exchangeRates = {
+        ETB: 1,
+        USD: 0.0070, // You can update this
+        CNY: 0.050  // You can update this
+    };
 
     function getSelectedDeliverables() {
       return Array.from(document.querySelectorAll("input[name='deliverables']:checked"))
@@ -233,26 +287,34 @@
       const service = serviceSelect.value;
       const delivery = deliveryTimeSelect.value;
       const deliverables = getSelectedDeliverables();
+      const currency = currencySelect.value; // Get selected currency
 
       if (!service) {
         totalPriceEl.textContent = "0.00";
         upfrontPaymentEl.textContent = "0.00";
+        currencySymbolEl.textContent = "ETB";
+        upfrontSymbolEl.textContent = "ETB";
         return;
       }
 
-      const total = calculatePrice(service, delivery, deliverables);
+      const totalETB = calculatePrice(service, delivery, deliverables);
+      
+      // Convert to the selected currency
+      const rate = exchangeRates[currency] || 1;
+      const total = (totalETB / rate).toFixed(2);
       const upfront = (total * 0.3).toFixed(2);
 
-      totalPriceEl.textContent = total.toFixed(2);
+      totalPriceEl.textContent = total;
       upfrontPaymentEl.textContent = upfront;
+      currencySymbolEl.textContent = currency;
+      upfrontSymbolEl.textContent = currency;
     }
 
     serviceSelect.addEventListener("change", updatePriceUI);
     deliveryTimeSelect.addEventListener("change", updatePriceUI);
     deliverablesContainer.addEventListener("change", updatePriceUI);
+    currencySelect.addEventListener("change", updatePriceUI); // New event listener for currency
   </script>
 
 </body>
 </html>
-
-
