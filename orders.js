@@ -38,9 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const ordersList = document.getElementById('orders-list');
   const serviceTypeSelect = document.getElementById('service-type');
   const deliveryTimeSelect = document.getElementById('delivery-time');
-  const deliverablesInput = document.getElementById('deliverables');
+  const deliverablesInput = document.getElementById('deliverables'); // Note: This might be an issue as you have multiple checkboxes
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
+  
+  // New DOM elements for new features
+  const togglePlatformsBtn = document.getElementById('toggle-platforms-btn');
+  const orderFormContainer = document.getElementById('order-form-container');
+  const platformOptions = document.getElementById('platform-options');
+  const currencySelect = document.getElementById('currency-select');
+  const paymentDetailsContainer = document.getElementById('payment-details-container');
+
 
   // --- Auth State Logic ---
   onAuthStateChanged(auth, user => {
@@ -70,6 +78,42 @@ document.addEventListener('DOMContentLoaded', () => {
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
   generalContactBtn.addEventListener('click', handleGeneralContactClick);
+
+  // New event listeners
+  togglePlatformsBtn.addEventListener('click', () => {
+    const isOrderFormVisible = !orderFormContainer.classList.contains('hidden');
+    if (isOrderFormVisible) {
+      orderFormContainer.classList.add('hidden');
+      platformOptions.classList.remove('hidden');
+      togglePlatformsBtn.textContent = 'Go back to direct order form';
+    } else {
+      orderFormContainer.classList.remove('hidden');
+      platformOptions.classList.add('hidden');
+      togglePlatformsBtn.textContent = 'Prefer to order on a platform?';
+    }
+  });
+
+  currencySelect.addEventListener('change', () => {
+    const selectedCurrency = currencySelect.value;
+    Array.from(paymentDetailsContainer.children).forEach(child => {
+      child.classList.add('hidden');
+    });
+
+    const selectedPaymentDiv = document.getElementById(`payment-details-${selectedCurrency}`);
+    if (selectedPaymentDiv) {
+      selectedPaymentDiv.classList.remove('hidden');
+    }
+
+    const transactionInput = document.getElementById('transaction-number');
+    if (selectedCurrency === 'ETB') {
+      transactionInput.setAttribute('required', 'true');
+    } else {
+      transactionInput.removeAttribute('required');
+    }
+  });
+
+  // Initially trigger the currency change to set the correct payment details on page load
+  currencySelect.dispatchEvent(new Event('change'));
 
   // --- Functions ---
   function switchTab(tabName) {
@@ -109,7 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function updatePrice() {
     const serviceType = serviceTypeSelect.value;
     const deliveryTime = deliveryTimeSelect.value;
-    const deliverables = deliverablesInput.value;
+    // This line needs to be updated to get all checked deliverables, not a single input
+    const deliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
+
     if (!serviceType || !deliveryTime) return;
     const totalPrice = calculatePrice(serviceType, deliveryTime, deliverables);
     const upfrontPayment = totalPrice * 0.3;
@@ -125,36 +171,49 @@ document.addEventListener('DOMContentLoaded', () => {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Verifying...';
     
-    const transactionNumber = document.getElementById('transaction-number').value;
-    const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
-    const querySnapshot = await getDocs(q);
+    // Check if the selected currency requires a transaction number
+    const selectedCurrency = document.getElementById('currency-select').value;
+    let transactionNumber = '';
+    if (selectedCurrency === 'ETB') {
+        transactionNumber = document.getElementById('transaction-number').value;
+        const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
+        const querySnapshot = await getDocs(q);
 
-    if (!querySnapshot.empty) {
-      alert("This Transaction ID has already been used.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit Order';
-      return;
+        if (!querySnapshot.empty) {
+            alert("This Transaction ID has already been used.");
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Order';
+            return;
+        }
     }
+    
+    // Get all checked deliverables
+    const selectedDeliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
 
     submitBtn.textContent = 'Submitting...';
     try {
       const orderId = `order_${Date.now()}`;
       await setDoc(doc(db, 'orders', orderId), {
-        orderId: orderId, userId: currentUser.uid, email: currentUser.email,
+        orderId: orderId,
+        userId: currentUser.uid,
+        email: currentUser.email,
         clientName: document.getElementById('client-name').value,
         contactInfo: document.getElementById('contact-info').value,
         projectDescription: document.getElementById('project-description').value,
         serviceType: serviceTypeSelect.value,
         deliveryTime: deliveryTimeSelect.value,
-        deliverables: deliverablesInput.value,
+        deliverables: selectedDeliverables,
         totalPrice: parseFloat(totalPriceEl.textContent),
         upfrontPayment: parseFloat(upfrontEl.textContent),
-        transactionNumber: transactionNumber, status: 'Pending Confirmation',
+        currency: selectedCurrency, // Save the selected currency
+        transactionNumber: transactionNumber,
+        status: 'Pending Confirmation',
         createdAt: serverTimestamp()
       });
       
       await setDoc(doc(db, 'conversations', currentUser.uid), {
-        userId: currentUser.uid, userEmail: currentUser.email,
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
         lastUpdate: serverTimestamp()
       }, { merge: true });
 
@@ -185,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         orderElement.innerHTML = `
           <p><strong>Order ID:</strong> ${order.orderId}</p>
           <p><strong>Service:</strong> ${order.serviceType}</p>
-          <p><strong>Upfront Paid:</strong> $${Number(order.upfrontPayment || 0).toFixed(2)}</p>
+          <p><strong>Upfront Paid:</strong> ${order.upfrontPayment} ${order.currency || 'ETB'}</p>
           <p><strong>Status:</strong> <span class="status-${String(order.status || '').toLowerCase().replace(/ /g, '-')}">${order.status}</span></p>
           <button class="btn btn-contact-designer" data-order-id="${order.orderId}">Contact Designer</button>
         `;
