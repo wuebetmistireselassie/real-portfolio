@@ -20,8 +20,6 @@ const designs = [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167320/Bean_and_Bloom_hfoasb.svg' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755344715/Bean_and_Bloom_White_version_fwd60r.png' }
         ],
-        // 👇 Added
-        brandGuidelinesPdf: 'URL/to/your/beanbloom-guidelines.pdf',
         processGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755367015/Bean_and_Bloom_Design_Process_1_ntpmsz.png' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755367081/Bean_and_Bloom_Design_Process_2_rqgtq1.png' },
@@ -42,7 +40,6 @@ const designs = [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_z1vkr9.svg' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336807/SkyPylse_Drones_White_vesrion_moejta.png' }
         ],
-        brandGuidelinesPdf: 'URL/to/your/skypulse-guidelines.pdf',
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336438/SkyPulse_Drones_Office_Mockup_mrqjlw.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755336440/SkyPulse_Drones_Logo_in_Conference_Room_Mockup_kkg1rx.jpg' },
@@ -71,7 +68,6 @@ const designs = [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346880/TechWave_Electronics_c6lf2v.png' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346986/White_version_bxbzte.png' }
         ],
-        brandGuidelinesPdf: 'URL/to/your/techwave-guidelines.pdf',
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346107/TechWave_Smartphone_Clay_Mockup_qyv9tu.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346108/TechWave_Electronics_shop_Free_iMac_Mockup_fve7eh.jpg' }
@@ -96,7 +92,6 @@ const designs = [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348325/Leafinity_Eco-Goods_ufcvkm.png' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348356/Leafinity_Eco-Goods_White_version_eietmr.png' }
         ],
-        brandGuidelinesPdf: 'URL/to/your/leafinity-guidelines.pdf',
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755353099/Leafinity_Eco-Goods_Wooden_Frame_Mockup_gaei5m.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755353099/Leafinity_Eco-Goods_Wooden_Stamp_Mockup_djfmts.jpg' }
@@ -122,7 +117,6 @@ const designs = [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348560/A_R_Star_Partners_LLP_White_version_lcsmyd.png' }
         ],
-        brandGuidelinesPdf: 'URL/to/your/arstar-guidelines.pdf',
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351039/A_R_Star_Partners_Billboard_Mockup_om2hjo.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755351039/A_R_Star_Partners_Sign_Mockup_1_hidp3y.jpg' },
@@ -148,7 +142,6 @@ const designs = [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542139/IronCore_Fitness_Gym_training_black_d1ex3p.png' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542139/IronCore_Fitness_Gym_training_white_bjtbxb.png' }
         ],
-        brandGuidelinesPdf: 'URL/to/your/ironcore-guidelines.pdf',
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONCORE_Business_Card_6_if2g8z.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542035/IRONECORE_T-Shirt_Mannequin_Mockup_2_kzfcug.jpg' }
@@ -173,7 +166,6 @@ const designs = [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755554178/UniCombo_mobile_App_cjzwyr.png' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755554178/UniCombo_mobile_App_white_version_pfrhqc.png' }
         ],
-        brandGuidelinesPdf: 'URL/to/your/unicombo-guidelines.pdf',
         mockupGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755554301/UniCombo_Mackbook_Mockup_nok8ri.jpg' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755554300/Unicombo_Smartphone_Mockup_i7elc4.jpg' }
@@ -209,5 +201,7 @@ const services = [
         title: 'Data Entry & Administrative Support'
     },
     {
-        id: 'excel-sample',
-        title: 'SkyPulse Interactive
+        id: 'interactive-dashboard',
+        title: 'SkyPulse Interactive Dashboard (Sample)'
+    }
+];
