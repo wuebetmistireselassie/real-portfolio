@@ -31,6 +31,10 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755367129/Bean_and_Bloom_Design_Process_3_ui1r9z.png' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755369056/Bean_and_Bloom_Design_Process_4_ixgvkk.png' },
         ]
+brandGuidelines: {
+            url: 'assets/pdfs/placeholder-brand-guidelines.pdf',
+            displayName: 'Brand Guidelines for Test Project'
+        }
     },
     {
         id: 'skypulse',
@@ -219,3 +223,4 @@ const services = [
 ];
 
 const allProjects = [...designs, ...services];
+
