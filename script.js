@@ -70,40 +70,38 @@ function renderProjectPage(projectId) {
     const project = designs.find(item => item.id === projectId);
 
     if (!project) {
-        // Handle project not found
         projectPage.innerHTML = `<section><div class="section-container"><h2>Project Not Found</h2><p>The project you're looking for does not exist.</p></div></section>`;
         homePage.classList.add('hidden');
         projectPage.classList.remove('hidden');
         return;
     }
     
-    // ✅ CODE BELOW IS THE ONLY PART THAT HAS BEEN CHANGED ✅
+    // ✅ --- CHANGE 1: The logo variations logic is now simpler ---
     // Dynamically build the logo variations
     const logoVariationsHTML = project.logoVariations.map(variation => {
         let classes = 'logo-system-item';
         if (variation.type === 'white') {
             classes += ' logo-display-dark-bg';
         }
-
-        // Check if this is the white logo and if a PDF link exists
-        let downloadLinkHTML = '';
-        if (variation.type === 'white' && project.brandGuidelinesPdf) {
-            downloadLinkHTML = `
-                <a href="${project.brandGuidelinesPdf}" class="brand-guidelines-download" download>
-                    Download brand guidelines pdf
-                </a>
-            `;
-        }
-
         return `
             <div class="${classes}">
                 <img src="${variation.url}" alt="${project.title} ${variation.type} Logo">
                 <p>${variation.type} Version</p>
-                ${downloadLinkHTML}
             </div>
         `;
     }).join('');
-    // ✅ END OF CHANGED CODE ✅
+
+    // ✅ --- CHANGE 2: Create the download link HTML outside the loop ---
+    let brandGuidelinesLinkHTML = '';
+    if (project.brandGuidelinesPdf) {
+        brandGuidelinesLinkHTML = `
+            <div class="brand-guidelines-container">
+                <a href="${project.brandGuidelinesPdf}" class="brand-guidelines-download" download>
+                    Download brand guidelines pdf
+                </a>
+            </div>
+        `;
+    }
 
     // Dynamically build the design process gallery (if it exists)
     let processGalleryHTML = '';
@@ -137,7 +135,8 @@ function renderProjectPage(projectId) {
                     <h3>Logo System</h3>
                     <div class="logo-system-grid">
                         ${logoVariationsHTML}
-                    </div>
+            _B_P_       </div>
+                        ${brandGuidelinesLinkHTML}
                 </div>
 
                 <div class="project-section">
@@ -158,9 +157,8 @@ function renderProjectPage(projectId) {
     projectPage.innerHTML = projectContent;
     homePage.classList.add('hidden');
     projectPage.classList.remove('hidden');
-    window.scrollTo(0, 0); // Scroll to top of the page
+    window.scrollTo(0, 0);
 
-    // Add event listener for the back button
     document.getElementById('back-to-home').addEventListener('click', () => {
         window.location.hash = '#home';
     });
@@ -177,7 +175,7 @@ function handleRouting() {
         const projectId = hash.split('/')[1];
         renderProjectPage(projectId);
     } else {
-        renderHomePage(); // Fallback to home page if hash is invalid
+        renderHomePage();
     }
 }
 
@@ -187,12 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
     handleRouting();
     window.addEventListener('hashchange', handleRouting);
 
-    // Make the logo name in header a "home" button
     const logoEl = document.querySelector('.logo-name');
     if (logoEl) {
         logoEl.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.location.hash = '#home';
-            });
+            e.preventDefault();
+            window.location.hash = '#home';
+        });
     }
 });
