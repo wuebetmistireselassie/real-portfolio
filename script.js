@@ -94,6 +94,17 @@ function renderProjectPage(projectId) {
             </div>
         `;
     }).join('');
+let brandGuidelinesHTML = '';
+if (project.brandGuidelines) {
+    brandGuidelinesHTML = `
+        <div class="project-section">
+            <a href="${project.brandGuidelines.url}" target="_blank" class="btn-link">
+                ${project.brandGuidelines.displayName}
+            </a>
+        </div>
+    `;
+}
+
 
     // --- NEW CODE BLOCK STARTS HERE ---
     // Dynamically build the design process gallery (if it exists)
@@ -114,38 +125,41 @@ function renderProjectPage(projectId) {
     }
     // --- NEW CODE BLOCK ENDS HERE ---
 
-    const projectContent = `
-        <button id="back-to-home" class="back-button">← Back to All Projects</button>
-        <img class="project-hero" src="${project.heroImage}" alt="${project.title} Hero Image">
-        <section>
-            <div class="section-container project-content">
-                <h2 class="project-title">${project.title}</h2>
-                <div class="project-brief">
-                    <p><strong>The Challenge:</strong> ${project.brief.challenge}</p>
-                    <p><strong>The Solution:</strong> ${project.brief.solution}</p>
-                </div>
-                
-                <div class="project-section">
-                    <h3>Logo System</h3>
-                    <div class="logo-system-grid">
-                        ${logoVariationsHTML}
-                    </div>
-                </div>
-
-                <div class="project-section">
-                    <h3>Real-World Mockups</h3>
-                    <div class="mockup-gallery">
-                        ${project.mockupGallery.map(mockup => `
-                            <img src="${mockup.url}" alt="${project.title} Mockup">
-                        `).join('')}
-                    </div>
-                </div>
-
-                ${processGalleryHTML}
-
+ const projectContent = `
+    <button id="back-to-home" class="back-button">← Back to All Projects</button>
+    <img class="project-hero" src="${project.heroImage}" alt="${project.title} Hero Image">
+    <section>
+        <div class="section-container project-content">
+            <h2 class="project-title">${project.title}</h2>
+            <div class="project-brief">
+                <p><strong>The Challenge:</strong> ${project.brief.challenge}</p>
+                <p><strong>The Solution:</strong> ${project.brief.solution}</p>
             </div>
-        </section>
-    `;
+            
+            <div class="project-section">
+                <h3>Logo System</h3>
+                <div class="logo-system-grid">
+                    ${logoVariationsHTML}
+                </div>
+            </div>
+
+            <div class="project-section">
+                <h3>Real-World Mockups</h3>
+                <div class="mockup-gallery">
+                    ${project.mockupGallery.map(mockup => `
+                        <img src="${mockup.url}" alt="${project.title} Mockup">
+                    `).join('')}
+                </div>
+            </div>
+
+            ${processGalleryHTML}
+
+            ${brandGuidelinesHTML}  <!-- <-- Add the brand guidelines link here -->
+
+        </div>
+    </section>
+`;
+
 
     projectPage.innerHTML = projectContent;
     homePage.classList.add('hidden');
@@ -188,3 +202,4 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 });
+
