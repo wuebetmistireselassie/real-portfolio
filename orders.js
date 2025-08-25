@@ -38,17 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const ordersList = document.getElementById('orders-list');
   const serviceTypeSelect = document.getElementById('service-type');
   const deliveryTimeSelect = document.getElementById('delivery-time');
-  const deliverablesInput = document.getElementById('deliverables'); // Note: This might be an issue as you have multiple checkboxes
+  const deliverablesInput = document.getElementById('deliverables');
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
-  
+
   // New DOM elements for new features
   const togglePlatformsBtn = document.getElementById('toggle-platforms-btn');
   const orderFormContainer = document.getElementById('order-form-container');
   const platformOptions = document.getElementById('platform-options');
   const currencySelect = document.getElementById('currency-select');
   const paymentDetailsContainer = document.getElementById('payment-details-container');
-
 
   // --- Auth State Logic ---
   onAuthStateChanged(auth, user => {
@@ -103,13 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (selectedPaymentDiv) {
       selectedPaymentDiv.classList.remove('hidden');
     }
-
-    const transactionInput = document.getElementById('transaction-number');
-    if (selectedCurrency === 'ETB') {
-      transactionInput.setAttribute('required', 'true');
-    } else {
-      transactionInput.removeAttribute('required');
-    }
   });
 
   // Initially trigger the currency change to set the correct payment details on page load
@@ -153,7 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function updatePrice() {
     const serviceType = serviceTypeSelect.value;
     const deliveryTime = deliveryTimeSelect.value;
-    // This line needs to be updated to get all checked deliverables, not a single input
     const deliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
 
     if (!serviceType || !deliveryTime) return;
@@ -170,24 +161,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Verifying...';
-    
-    // Check if the selected currency requires a transaction number
-    const selectedCurrency = document.getElementById('currency-select').value;
-    let transactionNumber = '';
-    if (selectedCurrency === 'ETB') {
-        transactionNumber = document.getElementById('transaction-number').value;
-        const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
-        const querySnapshot = await getDocs(q);
 
-        if (!querySnapshot.empty) {
-            alert("This Transaction ID has already been used.");
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit Order';
-            return;
-        }
+    const selectedCurrency = document.getElementById('currency-select').value;
+    let transactionNumberInput;
+
+    if (selectedCurrency === 'ETB') {
+      transactionNumberInput = document.getElementById('transaction-number');
+    } else if (selectedCurrency === 'USD') {
+      transactionNumberInput = document.getElementById('transaction-number-usd');
+    } else if (selectedCurrency === 'CNY') {
+      transactionNumberInput = document.getElementById('transaction-number-cny');
     }
-    
-    // Get all checked deliverables
+
+    const transactionNumber = transactionNumberInput ? transactionNumberInput.value : '';
+
+    const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      alert("This Transaction ID has already been used.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Order';
+      return;
+    }
+
     const selectedDeliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
 
     submitBtn.textContent = 'Submitting...';
@@ -205,12 +202,12 @@ document.addEventListener('DOMContentLoaded', () => {
         deliverables: selectedDeliverables,
         totalPrice: parseFloat(totalPriceEl.textContent),
         upfrontPayment: parseFloat(upfrontEl.textContent),
-        currency: selectedCurrency, // Save the selected currency
+        currency: selectedCurrency,
         transactionNumber: transactionNumber,
         status: 'Pending Confirmation',
         createdAt: serverTimestamp()
       });
-      
+
       await setDoc(doc(db, 'conversations', currentUser.uid), {
         userId: currentUser.uid,
         userEmail: currentUser.email,
