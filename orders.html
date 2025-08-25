@@ -31,6 +31,10 @@
       align-items: center;
       gap: 1rem;
     }
+    /* Add a class for elements that should be hidden */
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -97,7 +101,7 @@
 
               <label>Final Deliverables Required</label>
               <div id="deliverables-container">
-                </div>
+              </div>
 
               <label for="delivery-time">Delivery Time</label>
               <select id="delivery-time" name="delivery-time" required>
@@ -130,16 +134,14 @@
 
                 <div id="payment-details-USD" class="hidden">
                   <h4>Payment Information (USD)</h4>
-                  <p>Please send the upfront payment via **AirTM** to the following email:</p>
-                  <p><strong>Payment Email:</strong> changesat2021@gmail.com</p>
-                  <p>Please include your full name and project description in the payment notes.</p>
+                  <p>Please send the upfront payment via AirTM to:</p>
+                  <p><strong>Email:</strong> changesat2021@gmail.com</p>
                 </div>
 
                 <div id="payment-details-CNY" class="hidden">
                   <h4>Payment Information (CNY)</h4>
-                  <p>Please send the upfront payment via **Alipay** to the following email:</p>
-                  <p><strong>Payment Email:</strong> changesat2021@gmail.com</p>
-                  <p>Please include your full name and project description in the payment notes.</p>
+                  <p>Please send the upfront payment via Alipay to:</p>
+                  <p><strong>Email:</strong> changesat2021@gmail.com</p>
                 </div>
               </div>
 
@@ -213,30 +215,22 @@
   <script type="module" src="orders.js"></script>
 
   <script>
-    // Deliverables per service
     const deliverables = {
       logo: ["PNG", "JPG", "SVG", "PDF", "AI", "EPS"],
       branding: ["Brand Guidelines", "Color Palette", "Typography", "Logo Variations"],
       stationery: ["Business Card", "Letterhead", "Envelope", "Email Signature"],
       socialkit: ["Profile Pictures", "Cover Images", "Post Templates", "Story Templates"],
       digitalassets: ["Website Banners", "App Icons", "Favicon", "Presentation Templates"],
-      
-      // ✅ Prefixed for clarity
       files: ["file_DOCX", "file_PDF", "file_XLSX", "file_JPG", "file_PNG", "file_Other"],
-      
       admin: ["Excel/CSV Report", "Formatted Data", "Word Document", "PDF Output"]
-
-      // 🚫 Word, PowerPoint, Excel → fixed single deliverables (no checkboxes needed)
     };
-
 
     const serviceSelect = document.getElementById("service-type");
     const deliverablesContainer = document.getElementById("deliverables-container");
 
     serviceSelect.addEventListener("change", function() {
       const selectedService = this.value;
-      deliverablesContainer.innerHTML = ""; // Clear previous
-
+      deliverablesContainer.innerHTML = "";
       if (deliverables[selectedService]) {
         deliverables[selectedService].forEach(item => {
           const checkbox = document.createElement("input");
@@ -244,15 +238,12 @@
           checkbox.name = "deliverables";
           checkbox.value = item;
           checkbox.id = item.replace(/\s+/g, '_').toLowerCase();
-
           const label = document.createElement("label");
           label.htmlFor = checkbox.id;
           label.textContent = " " + item;
-
           const wrapper = document.createElement("div");
           wrapper.appendChild(checkbox);
           wrapper.appendChild(label);
-
           deliverablesContainer.appendChild(wrapper);
         });
       }
@@ -265,29 +256,28 @@
     const serviceSelect = document.getElementById("service-type");
     const deliveryTimeSelect = document.getElementById("delivery-time");
     const deliverablesContainer = document.getElementById("deliverables-container");
-    const currencySelect = document.getElementById("currency-select"); // New
+    const currencySelect = document.getElementById("currency-select");
     const totalPriceEl = document.getElementById("total-price");
     const upfrontPaymentEl = document.getElementById("upfront-payment");
-    const currencySymbolEl = document.getElementById("currency-symbol"); // New
-    const upfrontSymbolEl = document.getElementById("upfront-symbol"); // New
+    const currencySymbolEl = document.getElementById("currency-symbol");
+    const upfrontSymbolEl = document.getElementById("upfront-symbol");
 
-    // Exchange rates (for demonstration)
     const exchangeRates = {
         ETB: 1,
-        USD: 142.17, 
-        CNY: 19.83  
+        USD: 0.0070,
+        CNY: 0.050
     };
 
     function getSelectedDeliverables() {
       return Array.from(document.querySelectorAll("input[name='deliverables']:checked"))
-        .map(cb => cb.value); // ✅ return array, not joined string
+        .map(cb => cb.value);
     }
 
     function updatePriceUI() {
       const service = serviceSelect.value;
       const delivery = deliveryTimeSelect.value;
       const deliverables = getSelectedDeliverables();
-      const currency = currencySelect.value; // Get selected currency
+      const currency = currencySelect.value;
 
       if (!service) {
         totalPriceEl.textContent = "0.00";
@@ -298,10 +288,8 @@
       }
 
       const totalETB = calculatePrice(service, delivery, deliverables);
-      
-      // Convert to the selected currency
       const rate = exchangeRates[currency] || 1;
-      const total = (totalETB / rate).toFixed(2);
+      const total = (totalETB * rate).toFixed(2);
       const upfront = (total * 0.3).toFixed(2);
 
       totalPriceEl.textContent = total;
@@ -313,9 +301,7 @@
     serviceSelect.addEventListener("change", updatePriceUI);
     deliveryTimeSelect.addEventListener("change", updatePriceUI);
     deliverablesContainer.addEventListener("change", updatePriceUI);
-    currencySelect.addEventListener("change", updatePriceUI); // New event listener for currency
+    currencySelect.addEventListener("change", updatePriceUI);
   </script>
-
 </body>
 </html>
-
