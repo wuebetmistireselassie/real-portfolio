@@ -611,17 +611,6 @@ footer {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px var(--surface-shadow);
 }
-/* Styling for the new brand guidelines download link container */
-.brand-guidelines-container {
-    text-align: center;
-    margin-top: 20px; /* Adds some space above the link */
-}
-
-.brand-guidelines-download {
-    font-weight: 600;
-    text-decoration: underline;
-    color: #333; /* Or whatever color matches your site */
-}
 
 
 
