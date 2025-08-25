@@ -76,10 +76,8 @@ function renderProjectPage(projectId) {
         return;
     }
     
-    // Build the logo variations with corrected labels
     const logoVariationsHTML = project.logoVariations.map(variation => {
         let classes = 'logo-system-item';
-        // Use a variable for the label text to be more specific and reliable
         let labelText = variation.type.charAt(0).toUpperCase() + variation.type.slice(1) + ' Version';
 
         if (variation.type === 'white') {
@@ -94,19 +92,18 @@ function renderProjectPage(projectId) {
         `;
     }).join('');
 
-    // Create the download link HTML separately if it exists
-    let brandGuidelinesLinkHTML = '';
+    // ✅ --- NEW: Create a dedicated section for the download link ---
+    let brandGuidelinesSectionHTML = '';
     if (project.brandGuidelinesPdf) {
-        brandGuidelinesLinkHTML = `
-            <div class="brand-guidelines-container">
-                <a href="${project.brandGuidelinesPdf}" class="brand-guidelines-download" download>
-                    Download brand guidelines pdf
-                </a>
-            </div>
+        brandGuidelinesSectionHTML = `
+            <div class="project-section brand-guidelines-section">
+                <h3>Brand Guidelines</h3>
+                <p>Download the official brand guidelines to see the complete visual identity system.</p>
+                <a href="${project.brandGuidelinesPdf}" class="btn" download>Download PDF</a>
+            </div>
         `;
     }
 
-    // Dynamically build the design process gallery (if it exists)
     let processGalleryHTML = '';
     if (project.processGallery && project.processGallery.length > 0) {
         const processImagesHTML = project.processGallery.map(processItem => `
@@ -134,12 +131,13 @@ function renderProjectPage(projectId) {
                     <p><strong>The Solution:</strong> ${project.brief.solution}</p>
                 </div>
                 
+                ${brandGuidelinesSectionHTML}
+
                 <div class="project-section">
                     <h3>Logo System</h3>
                     <div class="logo-system-grid">
                         ${logoVariationsHTML}
                     </div>
-                    ${brandGuidelinesLinkHTML}
                 </div>
 
                 <div class="project-section">
