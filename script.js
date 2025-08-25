@@ -76,10 +76,10 @@ function renderProjectPage(projectId) {
         return;
     }
     
-    // ✅ --- FIX 1: Improved logo variation labeling ---
+    // Build the logo variations with corrected labels
     const logoVariationsHTML = project.logoVariations.map(variation => {
         let classes = 'logo-system-item';
-        // Use a variable for the label text to be more specific
+        // Use a variable for the label text to be more specific and reliable
         let labelText = variation.type.charAt(0).toUpperCase() + variation.type.slice(1) + ' Version';
 
         if (variation.type === 'white') {
@@ -94,6 +94,7 @@ function renderProjectPage(projectId) {
         `;
     }).join('');
 
+    // Create the download link HTML separately if it exists
     let brandGuidelinesLinkHTML = '';
     if (project.brandGuidelinesPdf) {
         brandGuidelinesLinkHTML = `
@@ -105,6 +106,7 @@ function renderProjectPage(projectId) {
         `;
     }
 
+    // Dynamically build the design process gallery (if it exists)
     let processGalleryHTML = '';
     if (project.processGallery && project.processGallery.length > 0) {
         const processImagesHTML = project.processGallery.map(processItem => `
@@ -137,7 +139,7 @@ function renderProjectPage(projectId) {
                     <div class="logo-system-grid">
                         ${logoVariationsHTML}
                     </div>
-                                           ${brandGuidelinesLinkHTML}
+                    ${brandGuidelinesLinkHTML}
                 </div>
 
                 <div class="project-section">
