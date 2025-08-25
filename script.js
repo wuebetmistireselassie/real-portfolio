@@ -76,34 +76,35 @@ function renderProjectPage(projectId) {
         return;
     }
     
-    // ✅ --- CHANGE 1: The logo variations logic is now simpler ---
-    // Dynamically build the logo variations
+    // ✅ --- FIX 1: Improved logo variation labeling ---
     const logoVariationsHTML = project.logoVariations.map(variation => {
         let classes = 'logo-system-item';
+        // Use a variable for the label text to be more specific
+        let labelText = variation.type.charAt(0).toUpperCase() + variation.type.slice(1) + ' Version';
+
         if (variation.type === 'white') {
             classes += ' logo-display-dark-bg';
         }
+
         return `
             <div class="${classes}">
                 <img src="${variation.url}" alt="${project.title} ${variation.type} Logo">
-                <p>${variation.type} Version</p>
+                <p>${labelText}</p>
             </div>
         `;
     }).join('');
 
-    // ✅ --- CHANGE 2: Create the download link HTML outside the loop ---
-    let brandGuidelinesLinkHTML = '';
-    if (project.brandGuidelinesPdf) {
-        brandGuidelinesLinkHTML = `
-            <div class="brand-guidelines-container">
-                <a href="${project.brandGuidelinesPdf}" class="brand-guidelines-download" download>
-                    Download brand guidelines pdf
-                </a>
-            </div>
-        `;
-    }
+    let brandGuidelinesLinkHTML = '';
+    if (project.brandGuidelinesPdf) {
+        brandGuidelinesLinkHTML = `
+            <div class="brand-guidelines-container">
+                <a href="${project.brandGuidelinesPdf}" class="brand-guidelines-download" download>
+                    Download brand guidelines pdf
+                </a>
+            </div>
+        `;
+    }
 
-    // Dynamically build the design process gallery (if it exists)
     let processGalleryHTML = '';
     if (project.processGallery && project.processGallery.length > 0) {
         const processImagesHTML = project.processGallery.map(processItem => `
@@ -135,8 +136,8 @@ function renderProjectPage(projectId) {
                     <h3>Logo System</h3>
                     <div class="logo-system-grid">
                         ${logoVariationsHTML}
-            _B_P_       </div>
-                        ${brandGuidelinesLinkHTML}
+                    </div>
+                                           ${brandGuidelinesLinkHTML}
                 </div>
 
                 <div class="project-section">
