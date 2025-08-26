@@ -1,187 +1,101 @@
-import {
-    auth,
-    onAuthStateChanged,
-    signOut,
-    db,
-    collection,
-    query,
-    onSnapshot,
-    doc,
-    updateDoc,
-    signInWithEmailAndPassword,
-    orderBy,
-    where,
-    getDocs,
-    getDoc // Make sure getDoc is imported
-} from './auth.js';
-import { openChat, sendSystemMessage } from './chat.js';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Orders</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo-container">
+                <a href="index.html" class="logo-name">Admin Dashboard</a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Back to Main Site</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-document.addEventListener('DOMContentLoaded', () => {
-    // ✅ Hardcoded Admin UID
-    const ADMIN_UID = "mL8wfi0Bgvan5yh9yxCthmEDhJc2";
-
-    const adminLoginView = document.getElementById('admin-login-view');
-    const adminDashboardView = document.getElementById('admin-dashboard-view');
-    const adminLoginForm = document.getElementById('admin-login-form');
-    const adminLogoutBtn = document.getElementById('admin-logout-btn');
-    const allOrdersList = document.getElementById('all-orders-list');
-    const allChatsList = document.getElementById('all-chats-list');
-    const unauthorizedView = document.getElementById('unauthorized-view');
-
-    let chatsUnsubscribe = null;
-    let ordersUnsubscribe = null;
-
-    // 🔑 Watch authentication state
-    onAuthStateChanged(auth, user => {
-        if (user && user.uid === ADMIN_UID) {
-            adminLoginView.classList.add('hidden');
-            unauthorizedView.classList.add('hidden');
-            adminDashboardView.classList.remove('hidden');
-            listenForAllOrders();
-            listenForAllChats();
-        } else {
-            adminDashboardView.classList.add('hidden');
-            if (user) {
-                unauthorizedView.classList.remove('hidden');
-                adminLoginView.classList.add('hidden');
-            } else {
-                adminLoginView.classList.remove('hidden');
-                unauthorizedView.classList.add('hidden');
-            }
-        }
-    });
-
-    // Login form
-    adminLoginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('admin-login-email').value;
-        const password = document.getElementById('admin-login-password').value;
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            if (userCredential.user.uid !== ADMIN_UID) {
-                signOut(auth);
-                unauthorizedView.classList.remove('hidden');
-            }
-        } catch (error) {
-            document.getElementById('admin-auth-error').textContent = "Login failed: " + error.message;
-            document.getElementById('admin-auth-error').classList.remove('hidden');
-        }
-    });
-
-    adminLogoutBtn.addEventListener('click', () => {
-        if (ordersUnsubscribe) ordersUnsubscribe();
-        if (chatsUnsubscribe) chatsUnsubscribe();
-        signOut(auth);
-    });
-
-    function listenForAllOrders() {
-        const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-        ordersUnsubscribe = onSnapshot(q, (snapshot) => {
-            allOrdersList.innerHTML = "";
-            if (snapshot.empty) {
-                allOrdersList.innerHTML = '<p>No orders found.</p>';
-                return;
-            }
-            snapshot.forEach(docSnap => {
-                const order = docSnap.data();
-                const div = document.createElement("div");
-                div.className = "order-item";
-                
-                let actionButtons = '';
-                if (order.status === 'Pending Confirmation') {
-                    // ✅ FIXED: Added data-user-id to buttons
-                    actionButtons = `
-                        <button class="btn btn-approve" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Approve</button>
-                        <button class="btn btn-reject" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Reject</button>
-                    `;
-                }
-                
-                actionButtons += `<button class="btn btn-contact-client" data-user-id="${order.userId}" data-user-email="${order.email}">Contact Client</button>`;
-
-                div.innerHTML = `
-                    <h4>Order ID: ${order.orderId}</h4>
-                    <p><strong>Client:</strong> ${order.clientName} (${order.email})</p>
-                    <p><strong>Contact:</strong> ${order.contactInfo}</p>
-                    <p><strong>Service:</strong> ${order.serviceType}</p>
-                    <p><strong>Deliverables:</strong> ${order.deliverables}</p>
-                    <p><strong>Total Price:</strong> ${order.totalPrice.toFixed(2)} ETB</p>
-                    <p><strong>Upfront Payment:</strong> ${order.upfrontPayment.toFixed(2)} ETB</p>
-                    <p><strong>Transaction ID:</strong> ${order.transactionNumber}</p>
-                    <p><strong>Status:</strong> <span class="status-${order.status.toLowerCase().replace(/\s+/g, '-')}">${order.status}</span></p>
-                    <p><strong>Description:</strong> ${order.projectDescription}</p>
-                    <div class="order-actions">
-                        ${actionButtons}
+    <main id="app-container">
+        <section id="admin-section">
+            <div class="section-container">
+                <div id="admin-login-view">
+                    <h2>Admin Login</h2>
+                    <div class="auth-wrapper" style="margin: 2rem 0;">
+                        <form id="admin-login-form">
+                            <label for="admin-login-email">Admin Email</label>
+                            <input type="email" id="admin-login-email" required>
+                            <label for="admin-login-password">Admin Password</label>
+                            <input type="password" id="admin-login-password" required>
+                            <button type="submit" class="btn">Login</button>
+                        </form>
+                        <p id="admin-auth-error" class="error-message hidden"></p>
                     </div>
-                    <hr>
-                `;
-                allOrdersList.appendChild(div);
-            });
-        });
-    }
+                </div>
 
-    // Event listener for the Approve/Reject buttons
-    allOrdersList.addEventListener('click', async (e) => {
-        const orderId = e.target.dataset.orderId;
-        const userId = e.target.dataset.userId; // ✅ FIXED: Get userId here
-        if (!orderId) return;
+                <div id="admin-dashboard-view" class="hidden">
+                    <div id="admin-user-info" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2>Admin Dashboard</h2>
+                        <button id="admin-logout-btn" class="btn btn-secondary">Logout</button>
+                    </div>
 
-        if (e.target.classList.contains('btn-approve')) {
-            await updateOrderStatus(orderId, 'Paid', userId); // ✅ FIXED: Pass userId
-        } else if (e.target.classList.contains('btn-reject')) {
-            await updateOrderStatus(orderId, 'Rejected', userId); // ✅ FIXED: Pass userId
-        } else if (e.target.classList.contains('btn-contact-client')) {
-            const userEmail = e.target.dataset.userEmail;
-            openChat(userId, `Chat with ${userEmail}`);
-        }
-    });
-    
-    // ✅ FIXED: This function is now much simpler and more reliable.
-    async function updateOrderStatus(orderId, newStatus, clientUserId) {
-        const orderRef = doc(db, 'orders', orderId);
-        try {
-            // This will now correctly update the status in Firestore
-            await updateDoc(orderRef, { status: newStatus });
-            console.log(`Order ${orderId} status updated to ${newStatus}.`);
-            
-            // This will now correctly send the system message
-            if (clientUserId) {
-                const orderSnap = await getDoc(orderRef);
-                const orderData = orderSnap.data();
-                sendSystemMessage(clientUserId, `Your order with ID ${orderData.orderId} has been updated to: "${newStatus}".`);
-            }
-        } catch (error) {
-            console.error("Error updating order status:", error);
-        }
-    }
+                    <div id="dashboard-container">
+                        <div id="orders-column">
+                            <div id="all-orders-list">
+                                <p>Loading all orders...</p>
+                            </div>
+                        </div>
 
-    function listenForAllChats() {
-        const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
-        chatsUnsubscribe = onSnapshot(q, (snapshot) => {
-            allChatsList.innerHTML = '';
-            if (snapshot.empty) {
-                allChatsList.innerHTML = '<p>No active chats.</p>';
-                return;
-            }
-            snapshot.forEach(doc => {
-                const chat = doc.data();
-                if (chat.userId && chat.userEmail) {
-                    const chatElement = document.createElement('div');
-                    chatElement.className = 'chat-list-item';
-                    chatElement.dataset.userId = chat.userId;
-                    chatElement.dataset.userEmail = chat.userEmail;
-                    chatElement.innerHTML = `
-                        <p><strong>${chat.userEmail}</strong></p>
-                        <p>Last update: ${chat.lastUpdate ? new Date(chat.lastUpdate.toDate()).toLocaleString() : 'N/A'}</p>
-                    `;
-                    chatElement.addEventListener('click', () => {
-                        openChat(chat.userId, `Chat with ${chat.userEmail}`);
-                    });
-                    allChatsList.appendChild(chatElement);
-                }
-            });
-        }, (error) => {
-            console.error("Error listening to chats:", error);
-            allChatsList.innerHTML = `<p class="error-message">Error loading chats. You may need to create a Firestore index.</p>`;
-        });
-    }
-});
+                        <div id="chats-column">
+                            <h3>Client Chats</h3>
+                            <div id="all-chats-list">
+                                <p>Loading chats...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="unauthorized-view" class="hidden">
+                    <h2>Access Denied</h2>
+                    <p>The credentials you entered do not belong to an authorized administrator.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="chat-modal" class="chat-modal-backdrop">
+        <div class="chat-modal">
+            <div class="chat-header">
+                <h3 id="chat-header-title">Chat</h3>
+                <button id="close-chat-btn">&times;</button>
+            </div>
+            <div id="chat-messages" class="chat-messages"></div>
+            <form id="chat-input-form" class="chat-input-form">
+                <textarea id="chat-message-input" placeholder="Type a message..." rows="1"></textarea>
+                <input type="file" id="chat-file-input">
+                <label for="chat-file-input" id="chat-file-label" title="Attach File">📎</label>
+                <button id="send-chat-btn" type="submit" class="btn">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Mistireselassie W. All rights reserved.</p>
+    </footer>
+
+    <script type="module" src="auth.js?=v6"></script>
+    <script type="module" src="config.js?=v6"></script>
+    <script type="module" src="chat.js?=v6"></script>
+    <script type="module" src="admin_dashboard.js?=v6"></script>
+</body>
+</html>
+
+
