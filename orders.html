@@ -1,313 +1,337 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Services | Mistireselassie W.</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="chat.css">
-  <link rel="stylesheet" href="orders.css">
-  <style>
-    /* Optional: make deliverables checkboxes look cleaner in 2 columns */
-    #deliverables-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 6px 20px;
-      margin-top: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    /* New styles for the platform toggle */
-    #platform-toggle-container {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    #platform-options {
-      margin-top: 1rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
-    /* Add a class for elements that should be hidden */
-    .hidden {
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Services | Mistireselassie W.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat.css">
+    <link rel="stylesheet" href="orders.css">
+    <style>
+        /* Optional: make deliverables checkboxes look cleaner in 2 columns */
+        #deliverables-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 6px 20px;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* New styles for the platform toggle */
+        #platform-toggle-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        #platform-options {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Add a class for elements that should be hidden */
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
+
 <body>
-  <header>
-    <div class="header-container">
-      <div class="logo-container">
-        <a href="index.html" class="logo-name">Mistireselassie W.</a>
-      </div>
-      <nav>
-        <ul>
-          <li><a href="index.html#designs">Designs</a></li>
-          <li><a href="orders.html">Order Services</a></li>
-          <li><a href="index.html#about">About</a></li>
-          <li><a href="index.html#contact">Contact</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
-  <main id="app-container">
-    <section id="orders-section">
-      <div class="section-container">
-        <div id="platform-toggle-container">
-          <button id="toggle-platforms-btn" class="btn btn-secondary">Prefer to order on a platform?</button>
-          <div id="platform-options" class="hidden">
-            <p>You can also hire me on:</p>
-            <a href="https://www.upwork.com/freelancers/~0199206f1f82364f9e" target="_blank" class="btn">Hire Me on Upwork</a>
-            <a href="https://www.fiverr.com/s/jj1NNpa" target="_blank" class="btn">Hire Me on Fiverr</a>
-          </div>
+    <header>
+        <div class="header-container">
+            <div class="logo-container">
+                <a href="index.html" class="logo-name">Mistireselassie W.</a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#designs">Designs</a></li>
+                    <li><a href="orders.html">Order Services</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                </ul>
+            </nav>
         </div>
+    </header>
 
-        <div id="logged-in-view" class="hidden">
-          <div id="user-info" style="text-align: right; margin-bottom: 2rem;">
-            <p style="margin-bottom: 1rem;">Welcome, <span id="user-name"></span>!</p>
-            <button id="general-contact-btn" class="btn">Have a Question? Contact Me</button>
-            <button id="logout-btn" class="btn btn-secondary">Logout</button>
-          </div>
-          <div id="order-form-container">
-            <h3>Place a New Order</h3>
-            <form id="order-form">
-              <label for="client-name">Full Name</label>
-              <input type="text" id="client-name" name="client-name" placeholder="Please enter your full name" required>
-
-              <label for="contact-info">WhatsApp or Telegram Number</label>
-              <input type="text" id="contact-info" name="contact-info" placeholder="e.g., +251 912 345 678" required>
-
-              <label for="service-type">Service Type</label>
-              <select id="service-type" name="service-type" required>
-                <option value="">-- Choose a Service --</option>
-                <option value="logo">Custom Logo Design</option>
-                <option value="branding">Brand Identity & Guidelines</option>
-                <option value="stationery">Business Stationery Design</option>
-                <option value="socialkit">Social Media Kit Design</option>
-                <option value="digitalassets">Website & Digital Asset Design</option>
-                <option value="powerpoint">PowerPoint Presentation Design</option>
-                <option value="word">Microsoft Word Document Formatting</option>
-                <option value="excel">Microsoft Excel Tasks</option>
-                <option value="files">File Conversion</option>
-                <option value="admin">Data Entry & Administrative Support</option>
-              </select>
-
-              <label for="project-description">Detailed Project Description</label>
-              <textarea id="project-description" name="project-description" rows="5" placeholder="Please describe your project requirements in detail..." required></textarea>
-
-              <label>Final Deliverables Required</label>
-              <div id="deliverables-container">
-              </div>
-
-              <label for="delivery-time">Delivery Time</label>
-              <select id="delivery-time" name="delivery-time" required>
-                <option value="standard">Standard (3-5 days)</option>
-                <option value="express">Express (1-2 days)</option>
-                <option value="urgent">Urgent (within 24 hours)</option>
-              </select>
-
-              <label for="currency-select">Currency</label>
-              <select id="currency-select" name="currency">
-                <option value="ETB">Ethiopian Birr (ETB)</option>
-                <option value="USD">US Dollar (USD)</option>
-                <option value="CNY">Chinese Yuan (CNY)</option>
-              </select>
-
-              <div id="price-calculation">
-                <p>Total Price: <span id="total-price">0.00</span> <span id="currency-symbol">ETB</span></p>
-                <p><strong>30% Upfront Payment: <span id="upfront-payment">0.00</span></strong> <span id="upfront-symbol">ETB</span></p>
-              </div>
-
-              <div id="payment-details-container">
-                <div id="payment-details-ETB">
-                  <h4>Payment Information (ETB)</h4>
-                  <p>Please send the upfront payment via Telebirr to:</p>
-                  <p><strong>Holder Name:</strong> Mistireselassie Taddese Wuebet</p>
-                  <p><strong>Account:</strong> 0919981116</p>
-                  <label for="transaction-number">Telebirr Transaction Number</label>
-                  <input type="text" id="transaction-number" name="transaction-number" placeholder="Enter the Txn ID here" required>
+    <main id="app-container">
+        <section id="orders-section">
+            <div class="section-container">
+                <div id="platform-toggle-container">
+                    <button id="toggle-platforms-btn" class="btn btn-secondary">Prefer to order on a platform?</button>
+                    <div id="platform-options" class="hidden">
+                        <p>You can also hire me on:</p>
+                        <a href="https://www.upwork.com/freelancers/~0199206f1f82364f9e" target="_blank" class="btn">Hire
+                            Me on Upwork</a>
+                        <a href="https://www.fiverr.com/s/jj1NNpa" target="_blank" class="btn">Hire Me on Fiverr</a>
+                    </div>
                 </div>
 
-                <div id="payment-details-USD" class="hidden">
-                  <h4>Payment Information (USD)</h4>
-                  <p>Please send the upfront payment via AirTM to the following email:</p>
-                  <p><strong>Payment Email:</strong> changesat2021@gmail.com</p>
-                  <label for="transaction-number-usd">AirTM Transaction Number</label>
-                  <input type="text" id="transaction-number-usd" name="transaction-number-usd" placeholder="Enter the Txn ID here" required>
+                <div id="logged-in-view" class="hidden">
+                    <div id="user-info" style="text-align: right; margin-bottom: 2rem;">
+                        <p style="margin-bottom: 1rem;">Welcome, <span id="user-name"></span>!</p>
+                        <button id="general-contact-btn" class="btn">Have a Question? Contact Me</button>
+                        <button id="logout-btn" class="btn btn-secondary">Logout</button>
+                    </div>
+                    <div id="order-form-container">
+                        <h3>Place a New Order</h3>
+                        <form id="order-form">
+                            <label for="client-name">Full Name</label>
+                            <input type="text" id="client-name" name="client-name"
+                                placeholder="Please enter your full name" required>
+
+                            <label for="contact-info">WhatsApp or Telegram Number</label>
+                            <input type="text" id="contact-info" name="contact-info" placeholder="e.g., +251 912 345 678"
+                                required>
+
+                            <label for="service-type">Service Type</label>
+                            <select id="service-type" name="service-type" required>
+                                <option value="">-- Choose a Service --</option>
+                                <option value="logo">Custom Logo Design</option>
+                                <option value="branding">Brand Identity & Guidelines</option>
+                                <option value="stationery">Business Stationery Design</option>
+                                <option value="socialkit">Social Media Kit Design</option>
+                                <option value="digitalassets">Website & Digital Asset Design</option>
+                                <option value="powerpoint">PowerPoint Presentation Design</option>
+                                <option value="word">Microsoft Word Document Formatting</option>
+                                <option value="excel">Microsoft Excel Tasks</option>
+                                <option value="files">File Conversion</option>
+                                <option value="admin">Data Entry & Administrative Support</option>
+                            </select>
+
+                            <label for="project-description">Detailed Project Description</label>
+                            <textarea id="project-description" name="project-description" rows="5"
+                                placeholder="Please describe your project requirements in detail..." required></textarea>
+
+                            <label>Final Deliverables Required</label>
+                            <div id="deliverables-container">
+                                <!-- Checkboxes will be dynamically inserted here -->
+                            </div>
+
+                            <label for="delivery-time">Delivery Time</label>
+                            <select id="delivery-time" name="delivery-time" required>
+                                <option value="standard">Standard (3-5 days)</option>
+                                <option value="express">Express (1-2 days)</option>
+                                <option value="urgent">Urgent (within 24 hours)</option>
+                            </select>
+
+                            <label for="currency-select">Currency</label>
+                            <select id="currency-select" name="currency">
+                                <option value="ETB">Ethiopian Birr (ETB)</option>
+                                <option value="USD">US Dollar (USD)</option>
+                                <option value="CNY">Chinese Yuan (CNY)</option>
+                            </select>
+
+                            <div id="price-calculation">
+                                <p>Total Price: <span id="total-price">0.00</span> <span
+                                        id="currency-symbol">ETB</span></p>
+                                <p><strong>30% Upfront Payment: <span id="upfront-payment">0.00</span></strong> <span
+                                        id="upfront-symbol">ETB</span></p>
+                            </div>
+
+                            <div id="payment-details-container">
+                                <div id="payment-details-ETB">
+                                    <h4>Payment Information (ETB)</h4>
+                                    <p>Please send the upfront payment via Telebirr to:</p>
+                                    <p><strong>Holder Name:</strong> Mistireselassie Taddese Wuebet</p>
+                                    <p><strong>Account:</strong> 0919981116</p>
+                                    <label for="transaction-number">Telebirr Transaction Number</label>
+                                    <input type="text" id="transaction-number" name="transaction-number"
+                                        placeholder="Enter the Txn ID here" required>
+                                </div>
+
+                                <div id="payment-details-USD" class="hidden">
+                                    <h4>Payment Information (USD)</h4>
+                                    <p>Please send the upfront payment via AirTM to the following email:</p>
+                                    <p><strong>Payment Email:</strong> changesat2021@gmail.com</p>
+                                    <label for="transaction-number-usd">AirTM Transaction Number</label>
+                                    <input type="text" id="transaction-number-usd" name="transaction-number-usd"
+                                        placeholder="Enter the Txn ID here">
+                                </div>
+
+                                <div id="payment-details-CNY" class="hidden">
+                                    <h4>Payment Information (CNY)</h4>
+                                    <p>Please send the upfront payment via Alipay to the following email:</p>
+                                    <p><strong>Payment Email:</strong> changesat2021@gmail.com</p>
+                                    <label for="transaction-number-cny">Alipay Transaction Number</label>
+                                    <input type="text" id="transaction-number-cny" name="transaction-number-cny"
+                                        placeholder="Enter the Txn ID here">
+                                </div>
+                            </div>
+                            
+                            <!-- Container for form messages -->
+                            <p id="form-message" class="hidden"></p>
+
+                            <button type="submit" class="btn">Submit Order</button>
+                        </form>
+                    </div>
+                    <div id="order-history-container">
+                        <h3>My Orders</h3>
+                        <div id="orders-list">
+                            <!-- User's past orders will be dynamically inserted here -->
+                        </div>
+                    </div>
                 </div>
 
-                <div id="payment-details-CNY" class="hidden">
-                  <h4>Payment Information (CNY)</h4>
-                  <p>Please send the upfront payment via Alipay to the following email:</p>
-                  <p><strong>Payment Email:</strong> changesat2021@gmail.com</p>
-                  <label for="transaction-number-cny">Alipay Transaction Number</label>
-                  <input type="text" id="transaction-number-cny" name="transaction-number-cny" placeholder="Enter the Txn ID here" required>
+                <div id="logged-out-view">
+                    <h2>Client Portal Access</h2>
+                    <div class="auth-wrapper">
+                        <div class="auth-tabs">
+                            <button id="show-login-tab" class="auth-tab-btn active">Sign In</button>
+                            <button id="show-signup-tab" class="auth-tab-btn">Sign Up</button>
+                        </div>
+                        <div id="auth-content">
+                            <div id="login-form-container">
+                                <form id="login-form">
+                                    <label for="login-email">Email</label>
+                                    <input type="email" id="login-email" required>
+                                    <label for="login-password">Password</label>
+                                    <input type="password" id="login-password" required>
+                                    <button type="submit" class="btn">Sign In</button>
+                                </form>
+                            </div>
+                            <div id="signup-form-container" class="hidden">
+                                <form id="signup-form">
+                                    <label for="signup-email">Email</label>
+                                    <input type="email" id="signup-email" required>
+                                    <label for="signup-password">Password (min. 6 characters)</label>
+                                    <input type="password" id="signup-password" required>
+                                    <button type="submit" class="btn">Sign Up</button>
+                                </form>
+                            </div>
+                        </div>
+                        <p id="auth-error" class="error-message hidden"></p>
+                    </div>
                 </div>
-              </div>
+            </div>
+        </section>
+    </main>
 
-              <button type="submit" class="btn">Submit Order</button>
+    <div id="chat-modal" class="chat-modal-backdrop">
+        <div class="chat-modal">
+            <div class="chat-header">
+                <h3 id="chat-header-title">Chat</h3>
+                <button id="close-chat-btn">&times;</button>
+            </div>
+            <div id="chat-messages" class="chat-messages"></div>
+            <form id="chat-input-form" class="chat-input-form">
+                <textarea id="chat-message-input" placeholder="Type a message..." rows="1"></textarea>
+                <input type="file" id="chat-file-input">
+                <label for="chat-file-input" id="chat-file-label" title="Attach File">📎</label>
+                <button id="send-chat-btn" type="submit" class="btn">Send</button>
             </form>
-          </div>
-          <div id="order-history-container">
-            <h3>My Orders</h3>
-            <div id="orders-list"></div>
-          </div>
         </div>
-
-        <div id="logged-out-view">
-          <h2>Client Portal Access</h2>
-          <div class="auth-wrapper">
-            <div class="auth-tabs">
-              <button id="show-login-tab" class="auth-tab-btn active">Sign In</button>
-              <button id="show-signup-tab" class="auth-tab-btn">Sign Up</button>
-            </div>
-            <div id="auth-content">
-              <div id="login-form-container">
-                <form id="login-form">
-                  <label for="login-email">Email</label>
-                  <input type="email" id="login-email" required>
-                  <label for="login-password">Password</label>
-                  <input type="password" id="login-password" required>
-                  <button type="submit" class="btn">Sign In</button>
-                </form>
-              </div>
-              <div id="signup-form-container" class="hidden">
-                <form id="signup-form">
-                  <label for="signup-email">Email</label>
-                  <input type="email" id="signup-email" required>
-                  <label for="signup-password">Password (min. 6 characters)</label>
-                  <input type="password" id="signup-password" required>
-                  <button type="submit" class="btn">Sign Up</button>
-                </form>
-              </div>
-            </div>
-            <p id="auth-error" class="error-message hidden"></p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <div id="chat-modal" class="chat-modal-backdrop">
-    <div class="chat-modal">
-      <div class="chat-header">
-        <h3 id="chat-header-title">Chat</h3>
-        <button id="close-chat-btn">&times;</button>
-      </div>
-      <div id="chat-messages" class="chat-messages"></div>
-      <form id="chat-input-form" class="chat-input-form">
-        <textarea id="chat-message-input" placeholder="Type a message..." rows="1"></textarea>
-        <input type="file" id="chat-file-input">
-        <label for="chat-file-input" id="chat-file-label" title="Attach File">📎</label>
-        <button id="send-chat-btn" type="submit" class="btn">Send</button>
-      </form>
     </div>
-  </div>
 
-  <footer>
-    <p>&copy; 2025 Mistireselassie W. All rights reserved.</p>
-  </footer>
+    <footer>
+        <p>&copy; 2025 Mistireselassie W. All rights reserved.</p>
+    </footer>
 
-  <script type="module" src="auth.js"></script>
-  <script type="module" src="config.js"></script>
-  <script type="module" src="price.js"></script>
-  <script type="module" src="chat.js"></script>
-  <script type="module" src="orders.js"></script>
+    <!-- Firebase and App Logic Scripts -->
+    <script type="module" src="config.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="price.js"></script>
+    <script type="module" src="chat.js"></script>
+    <script type="module" src="orders.js"></script> <!-- This script now handles the form -->
 
-  <script>
-    const deliverables = {
-      logo: ["PNG", "JPG", "SVG", "PDF", "AI", "EPS"],
-      branding: ["Brand Guidelines", "Color Palette", "Typography", "Logo Variations"],
-      stationery: ["Business Card", "Letterhead", "Envelope", "Email Signature"],
-      socialkit: ["Profile Pictures", "Cover Images", "Post Templates", "Story Templates"],
-      digitalassets: ["Website Banners", "App Icons", "Favicon", "Presentation Templates"],
-      files: ["file_DOCX", "file_PDF", "file_XLSX", "file_JPG", "file_PNG", "file_Other"],
-      admin: ["Excel/CSV Report", "Formatted Data", "Word Document", "PDF Output"]
-    };
+    <!-- Inline script for dynamically populating deliverables -->
+    <script>
+        const deliverables = {
+            logo: ["PNG", "JPG", "SVG", "PDF", "AI", "EPS"],
+            branding: ["Brand Guidelines", "Color Palette", "Typography", "Logo Variations"],
+            stationery: ["Business Card", "Letterhead", "Envelope", "Email Signature"],
+            socialkit: ["Profile Pictures", "Cover Images", "Post Templates", "Story Templates"],
+            digitalassets: ["Website Banners", "App Icons", "Favicon", "Presentation Templates"],
+            files: ["file_DOCX", "file_PDF", "file_XLSX", "file_JPG", "file_PNG", "file_Other"],
+            admin: ["Excel/CSV Report", "Formatted Data", "Word Document", "PDF Output"]
+        };
 
-    const serviceSelect = document.getElementById("service-type");
-    const deliverablesContainer = document.getElementById("deliverables-container");
+        const serviceSelectForDeliverables = document.getElementById("service-type");
+        const deliverablesContainer = document.getElementById("deliverables-container");
 
-    serviceSelect.addEventListener("change", function() {
-      const selectedService = this.value;
-      deliverablesContainer.innerHTML = "";
-      if (deliverables[selectedService]) {
-        deliverables[selectedService].forEach(item => {
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.name = "deliverables";
-          checkbox.value = item;
-          checkbox.id = item.replace(/\s+/g, '_').toLowerCase();
-          const label = document.createElement("label");
-          label.htmlFor = checkbox.id;
-          label.textContent = " " + item;
-          const wrapper = document.createElement("div");
-          wrapper.appendChild(checkbox);
-          wrapper.appendChild(label);
-          deliverablesContainer.appendChild(wrapper);
+        serviceSelectForDeliverables.addEventListener("change", function () {
+            const selectedService = this.value;
+            deliverablesContainer.innerHTML = ""; // Clear previous options
+            if (deliverables[selectedService]) {
+                deliverables[selectedService].forEach(item => {
+                    const checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.name = "deliverables";
+                    checkbox.value = item;
+                    checkbox.id = item.replace(/\s+/g, '_').toLowerCase();
+                    const label = document.createElement("label");
+                    label.htmlFor = checkbox.id;
+                    label.textContent = " " + item;
+                    const wrapper = document.createElement("div");
+                    wrapper.appendChild(checkbox);
+                    wrapper.appendChild(label);
+                    deliverablesContainer.appendChild(wrapper);
+                });
+            }
         });
-      }
-    });
-  </script>
+    </script>
 
-  <script type="module">
-    import { calculatePrice } from './price.js';
+    <!-- Inline script module for real-time price calculation -->
+    <script type="module">
+        import {
+            calculatePrice
+        } from './price.js';
 
-    const serviceSelect = document.getElementById("service-type");
-    const deliveryTimeSelect = document.getElementById("delivery-time");
-    const deliverablesContainer = document.getElementById("deliverables-container");
-    const currencySelect = document.getElementById("currency-select");
-    const totalPriceEl = document.getElementById("total-price");
-    const upfrontPaymentEl = document.getElementById("upfront-payment");
-    const currencySymbolEl = document.getElementById("currency-symbol");
-    const upfrontSymbolEl = document.getElementById("upfront-symbol");
+        const serviceSelectForPrice = document.getElementById("service-type");
+        const deliveryTimeSelect = document.getElementById("delivery-time");
+        const deliverablesContainerForPrice = document.getElementById("deliverables-container");
+        const currencySelectForPrice = document.getElementById("currency-select");
+        const totalPriceEl = document.getElementById("total-price");
+        const upfrontPaymentEl = document.getElementById("upfront-payment");
+        const currencySymbolEl = document.getElementById("currency-symbol");
+        const upfrontSymbolEl = document.getElementById("upfront-symbol");
 
-    const exchangeRates = {
-        ETB: 1,
-        USD: 0.007,
-        CNY: 0.05
-    };
+        const exchangeRates = {
+            ETB: 1,
+            USD: 0.007, // NOTE: Please verify and update this exchange rate
+            CNY: 0.05   // NOTE: Please verify and update this exchange rate
+        };
 
-    function getSelectedDeliverables() {
-      return Array.from(document.querySelectorAll("input[name='deliverables']:checked"))
-        .map(cb => cb.value);
-    }
+        function getSelectedDeliverables() {
+            return Array.from(document.querySelectorAll("input[name='deliverables']:checked"))
+                .map(cb => cb.value);
+        }
 
-    function updatePriceUI() {
-      const service = serviceSelect.value;
-      const delivery = deliveryTimeSelect.value;
-      const deliverables = getSelectedDeliverables();
-      const currency = currencySelect.value;
+        function updatePriceUI() {
+            const service = serviceSelectForPrice.value;
+            const delivery = deliveryTimeSelect.value;
+            const deliverables = getSelectedDeliverables();
+            const currency = currencySelectForPrice.value;
 
-      if (!service) {
-        totalPriceEl.textContent = "0.00";
-        upfrontPaymentEl.textContent = "0.00";
-        currencySymbolEl.textContent = "ETB";
-        upfrontSymbolEl.textContent = "ETB";
-        return;
-      }
+            if (!service) {
+                totalPriceEl.textContent = "0.00";
+                upfrontPaymentEl.textContent = "0.00";
+                currencySymbolEl.textContent = "ETB";
+                upfrontSymbolEl.textContent = "ETB";
+                return;
+            }
 
-      const totalETB = calculatePrice(service, delivery, deliverables);
-      const rate = exchangeRates[currency] || 1;
-      const total = (totalETB * rate).toFixed(2);
-      const upfront = (total * 0.3).toFixed(2);
+            const totalETB = calculatePrice(service, delivery, deliverables);
+            const rate = exchangeRates[currency] || 1;
+            const total = (totalETB * rate).toFixed(2);
+            const upfront = (total * 0.3).toFixed(2);
 
-      totalPriceEl.textContent = total;
-      upfrontPaymentEl.textContent = upfront;
-      currencySymbolEl.textContent = currency;
-      upfrontSymbolEl.textContent = currency;
-    }
+            totalPriceEl.textContent = total;
+            upfrontPaymentEl.textContent = upfront;
+            currencySymbolEl.textContent = currency;
+            upfrontSymbolEl.textContent = currency;
+        }
 
-    serviceSelect.addEventListener("change", updatePriceUI);
-    deliveryTimeSelect.addEventListener("change", updatePriceUI);
-    deliverablesContainer.addEventListener("change", updatePriceUI);
-    currencySelect.addEventListener("change", updatePriceUI);
-  </script>
+        serviceSelectForPrice.addEventListener("change", updatePriceUI);
+        deliveryTimeSelect.addEventListener("change", updatePriceUI);
+        deliverablesContainerForPrice.addEventListener("change", updatePriceUI);
+        currencySelectForPrice.addEventListener("change", updatePriceUI);
+    </script>
 </body>
+
 </html>
-
-
