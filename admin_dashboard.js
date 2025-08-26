@@ -32,7 +32,6 @@ import { openChat, sendSystemMessage } from './chat.js';
 
 /**
  * Main initialization function for the admin dashboard.
- * Sets up authentication, listeners, and event handlers.
  */
 function init() {
     // --- Configuration ---
@@ -67,6 +66,11 @@ function init() {
     const showUnauthorized = () => {
         stopListeners();
         hideAllViews();
+        // Update the unauthorized view text for clarity
+        const unauthorizedText = unauthorizedView?.querySelector('p');
+        if (unauthorizedText) {
+            unauthorizedText.textContent = "Access Denied. This page is for administrators only.";
+        }
         unauthorizedView?.classList.remove('hidden');
     };
 
@@ -95,21 +99,35 @@ function init() {
     };
 
     // --- Authentication ---
+    /**
+     * FINAL FIX: This is the core logic that runs on every page load.
+     * 1. It starts by hiding all views to prevent flashing the wrong content.
+     * 2. It waits for Firebase to report the current user's status.
+     * 3. It then makes a definitive choice on what to show.
+     */
+    hideAllViews(); // Hide everything first!
+
     onAuthStateChanged(auth, (user) => {
-        stopListeners();
+        stopListeners(); // Stop any old data listeners.
+
         if (user) {
+            // A user is logged in. Check if it's the admin.
             if (user.uid === ADMIN_UID) {
+                // It IS the admin. Show the dashboard immediately.
                 showDashboard();
                 listenForAllOrders();
                 listenForAllChats();
             } else {
+                // It is a different, non-admin user. Deny access and sign them out.
                 showUnauthorized();
-                signOut(auth);
+                signOut(auth); // Log out the unauthorized user for security.
             }
         } else {
+            // No user is logged in at all. Show the login form.
             showLogin();
         }
     });
+
 
     // Event handler for the admin login form.
     adminLoginForm?.addEventListener('submit', async (e) => {
@@ -120,38 +138,28 @@ function init() {
         const password = document.getElementById('admin-login-password')?.value || '';
 
         try {
-            /**
-             * DEEPER FIX for Login Persistence:
-             * To avoid modifying auth.js, we dynamically import the Firebase auth
-             * module here. This gives us access to 'setPersistence' and
-             * 'browserLocalPersistence' only when we need them for login.
-             */
             const { setPersistence, browserLocalPersistence } = await import('https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js');
-
-            // Set persistence to 'local' to ensure the session is saved across browser restarts.
             await setPersistence(auth, browserLocalPersistence);
-
-            // Now, sign in the user.
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-
-            // The onAuthStateChanged listener will handle showing the dashboard,
-            // but we add an extra check for non-admin users.
-            if (userCredential.user?.uid !== ADMIN_UID) {
-                await signOut(auth);
-                showUnauthorized();
-            }
+            await signInWithEmailAndPassword(auth, email, password);
+            // The onAuthStateChanged listener above will handle showing the dashboard automatically.
         } catch (error) {
             if (adminAuthError) {
-                adminAuthError.textContent = 'Login failed: ' + (error?.message || String(error));
+                adminAuthError.textContent = 'Login failed: Invalid credentials.';
                 adminAuthError.classList.remove('hidden');
             }
+            showUnauthorized(); // Also show the unauthorized message on failed login.
         }
     });
 
     // Event handler for the admin logout button.
     adminLogoutBtn?.addEventListener('click', async () => {
         await signOut(auth);
+        // onAuthStateChanged will automatically show the login page.
     });
+
+
+    // --- (The rest of the file remains the same) ---
+
 
     // --- Orders: Live Display ---
     function listenForAllOrders() {
