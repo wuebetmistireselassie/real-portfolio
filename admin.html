@@ -9,16 +9,103 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="chat.css">
+<script>
+(function () {
+  try {
+    var path = window.location.pathname || "";
+    if (path.toLowerCase().endsWith(".html")) {
+      var noExt = path.replace(/index\.html$/i, "").replace(/\.html$/i, "");
+      try { localStorage.setItem("triedHtmlUrl", path); } catch (e) {}
+      window.location.replace(noExt + window.location.search + window.location.hash);
+      return;
+    }
+  } catch (e) {}
+
+  function shouldSkip(href) {
+    if (!href) return true;
+    var l = href.toLowerCase().trim();
+    return (
+      l.startsWith("#") ||
+      l.startsWith("mailto:") ||
+      l.startsWith("tel:") ||
+      l.startsWith("javascript:") ||
+      l.startsWith("data:") ||
+      l.startsWith("http://") ||
+      l.startsWith("https://") ||
+      l.startsWith("//") ||
+      // If a colon appears before a slash it's likely a scheme (e.g., app:)
+      (l.indexOf(":") > -1 && l.indexOf(":") < l.indexOf("/"))
+    );
+  }
+
+  function stripHtmlExt(u) {
+    // Drop index.html then .html when at end or before ?/#
+    u = u.replace(/index\.html(?=[?#]|$)/i, "");
+    u = u.replace(/\.html(?=[?#]|$)/i, "");
+    if (u === "") u = "./";
+    return u;
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Rewrite in-document links
+    document.querySelectorAll('a[href]').forEach(function (a) {
+      var href = a.getAttribute('href');
+      if (shouldSkip(href)) return;
+      if (/(^|\/)[^?#]+\.html(?=[?#]|$)/i.test(href)) {
+        a.setAttribute('href', stripHtmlExt(href));
+      }
+    });
+
+    // Show a friendly notice if user tried a .html URL
+    try {
+      var tried = localStorage.getItem("triedHtmlUrl");
+      if (tried) {
+        localStorage.removeItem("triedHtmlUrl");
+        var bar = document.createElement("div");
+        bar.id = "urlNotice";
+        bar.textContent = "Heads up: our URLs no longer use .html — you’re in the right place.";
+        bar.style.position = "fixed";
+        bar.style.left = "50%";
+        bar.style.transform = "translateX(-50%)";
+        bar.style.top = "12px";
+        bar.style.zIndex = "99999";
+        bar.style.padding = "10px 14px";
+        bar.style.borderRadius = "10px";
+        bar.style.boxShadow = "0 4px 14px rgba(0,0,0,0.15)";
+        bar.style.background = "#111";
+        bar.style.color = "#fff";
+        bar.style.fontFamily = "system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif";
+        bar.style.fontSize = "14px";
+
+        var closeBtn = document.createElement("button");
+        closeBtn.setAttribute("aria-label", "Dismiss");
+        closeBtn.textContent = "×";
+        closeBtn.style.marginLeft = "10px";
+        closeBtn.style.background = "transparent";
+        closeBtn.style.border = "none";
+        closeBtn.style.color = "inherit";
+        closeBtn.style.fontSize = "16px";
+        closeBtn.style.cursor = "pointer";
+        closeBtn.addEventListener("click", function () {
+          bar.remove();
+        });
+        bar.appendChild(closeBtn);
+        document.body.appendChild(bar);
+      }
+    } catch (e) {}
+  });
+})();
+</script>
 </head>
 <body>
     <header>
         <div class="header-container">
             <div class="logo-container">
-                <a href="index.html" class="logo-name">Admin Dashboard</a>
+                <a href="./" class="logo-name">Admin Dashboard</a>
             </div>
             <nav>
                 <ul>
-                    <li><a href="index.html">Back to Main Site</a></li>
+                    <li><a href="./">Back to Main Site</a></li>
                 </ul>
             </nav>
         </div>
@@ -27,7 +114,7 @@
     <main id="app-container">
         <section id="admin-section">
             <div class="section-container">
-                <div id="admin-login-hidden">
+                <div id="admin-login-view">
                     <h2>Admin Login</h2>
                     <div class="auth-wrapper" style="margin: 2rem 0;">
                         <form id="admin-login-form">
@@ -97,23 +184,3 @@
     <script type="module" src="admin_dashboard.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
