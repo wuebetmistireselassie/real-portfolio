@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const ordersList = document.getElementById('orders-list');
   const serviceTypeSelect = document.getElementById('service-type');
   const deliveryTimeSelect = document.getElementById('delivery-time');
-  const deliverablesInput = document.getElementById('deliverables');
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
 
@@ -78,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
   ordersList.addEventListener('click', handleOrdersListClick);
   generalContactBtn.addEventListener('click', handleGeneralContactClick);
 
-  // New event listeners
   togglePlatformsBtn.addEventListener('click', () => {
     const isOrderFormVisible = !orderFormContainer.classList.contains('hidden');
     if (isOrderFormVisible) {
@@ -147,79 +145,125 @@ document.addEventListener('DOMContentLoaded', () => {
     const deliveryTime = deliveryTimeSelect.value;
     const deliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
 
-    if (!serviceType || !deliveryTime) return;
+    if (!serviceType) {
+        totalPriceEl.textContent = "0.00";
+        upfrontEl.textContent = "0.00";
+        return;
+    }
     const totalPrice = calculatePrice(serviceType, deliveryTime, deliverables);
     const upfrontPayment = totalPrice * 0.3;
     totalPriceEl.textContent = totalPrice.toFixed(2);
     upfrontEl.textContent = upfrontPayment.toFixed(2);
   }
 
+  /**
+   * Handles the entire order submission process.
+   * This function is triggered when the user clicks the "Submit Order" button.
+   */
   async function handleOrderSubmit(e) {
+    // 1. Prevent the default browser action of submitting the form, which would reload the page.
     e.preventDefault();
-    if (!currentUser) return;
+    
+    // 2. Ensure a user is logged in before proceeding.
+    if (!currentUser) {
+      alert("You must be logged in to place an order.");
+      return;
+    }
 
+    // 3. Get the submit button and disable it to prevent accidental multiple submissions.
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Verifying...';
 
-    const selectedCurrency = document.getElementById('currency-select').value;
-    let transactionNumberInput;
-
-    if (selectedCurrency === 'ETB') {
-      transactionNumberInput = document.getElementById('transaction-number');
-    } else if (selectedCurrency === 'USD') {
-      transactionNumberInput = document.getElementById('transaction-number-usd');
-    } else if (selectedCurrency === 'CNY') {
-      transactionNumberInput = document.getElementById('transaction-number-cny');
-    }
-
-    const transactionNumber = transactionNumberInput ? transactionNumberInput.value : '';
-
-    const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
-    const querySnapshot = await getDocs(q);
-
-    if (!querySnapshot.empty) {
-      alert("This Transaction ID has already been used.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit Order';
-      return;
-    }
-
-    const selectedDeliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
-
-    submitBtn.textContent = 'Submitting...';
     try {
+      // 4. Gather all the data from the form fields.
+      const clientName = document.getElementById('client-name').value;
+      const contactInfo = document.getElementById('contact-info').value;
+      const projectDescription = document.getElementById('project-description').value;
+      const serviceType = serviceTypeSelect.value;
+      const deliveryTime = deliveryTimeSelect.value;
+      const selectedDeliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
+      const currency = currencySelect.value;
+      const totalPrice = parseFloat(totalPriceEl.textContent);
+      const upfrontPayment = parseFloat(upfrontEl.textContent);
+
+      // 5. Determine which transaction number input to use based on the selected currency.
+      let transactionNumberInput;
+      if (currency === 'ETB') {
+        transactionNumberInput = document.getElementById('transaction-number');
+      } else if (currency === 'USD') {
+        transactionNumberInput = document.getElementById('transaction-number-usd');
+      } else if (currency === 'CNY') {
+        transactionNumberInput = document.getElementById('transaction-number-cny');
+      }
+
+      const transactionNumber = transactionNumberInput ? transactionNumberInput.value.trim() : '';
+
+      // 6. Validate the transaction number - it must not be empty.
+      if (!transactionNumber) {
+        alert("A valid Transaction ID is required. Please enter it to proceed.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Order';
+        return;
+      }
+
+      // 7. Check if this transaction ID has already been used for another order to prevent duplicates.
+      const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        alert("This Transaction ID has already been used. Please check the ID or contact support if you believe this is an error.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Order';
+        return;
+      }
+
+      // 8. If all checks pass, update the button text and proceed to create the order.
+      submitBtn.textContent = 'Submitting...';
       const orderId = `order_${Date.now()}`;
-      await setDoc(doc(db, 'orders', orderId), {
+
+      // 9. Create the order data object to be saved in Firestore.
+      const orderData = {
         orderId: orderId,
         userId: currentUser.uid,
         email: currentUser.email,
-        clientName: document.getElementById('client-name').value,
-        contactInfo: document.getElementById('contact-info').value,
-        projectDescription: document.getElementById('project-description').value,
-        serviceType: serviceTypeSelect.value,
-        deliveryTime: deliveryTimeSelect.value,
+        clientName: clientName,
+        contactInfo: contactInfo,
+        projectDescription: projectDescription,
+        serviceType: serviceType,
+        deliveryTime: deliveryTime,
         deliverables: selectedDeliverables,
-        totalPrice: parseFloat(totalPriceEl.textContent),
-        upfrontPayment: parseFloat(upfrontEl.textContent),
-        currency: selectedCurrency,
+        totalPrice: totalPrice,
+        upfrontPayment: upfrontPayment,
+        currency: currency,
         transactionNumber: transactionNumber,
+        // Set the initial status to 'Pending Confirmation' as required.
         status: 'Pending Confirmation',
         createdAt: serverTimestamp()
-      });
+      };
 
+      // 10. Save the new order to the 'orders' collection in Firestore.
+      await setDoc(doc(db, 'orders', orderId), orderData);
+
+      // 11. Create or update the conversation record for this user.
       await setDoc(doc(db, 'conversations', currentUser.uid), {
         userId: currentUser.uid,
         userEmail: currentUser.email,
         lastUpdate: serverTimestamp()
       }, { merge: true });
 
-      alert("Order placed successfully!");
+      // 12. Notify the user of success and reset the form for a new order.
+      alert("Order placed successfully! We will review it shortly. You can see its status in the 'My Orders' section.");
       orderForm.reset();
+      updatePrice(); // Reset the price display
+      currencySelect.dispatchEvent(new Event('change')); // Reset the payment details display
+
     } catch (error) {
+      // 13. If any error occurs during the process, log it and notify the user.
       console.error("Order submission error:", error);
-      alert("There was an error submitting your order.");
+      alert("Sorry, there was an error submitting your order. Please try again or contact support.");
     } finally {
+      // 14. No matter what happens (success or error), re-enable the submit button.
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit Order';
     }
@@ -234,14 +278,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       ordersContainer.innerHTML = '<h3>My Orders</h3>';
-      snapshot.forEach(docSnap => {
+      snapshot.docs.sort((a, b) => b.data().createdAt - a.data().createdAt).forEach(docSnap => {
         const order = docSnap.data();
         const orderElement = document.createElement('div');
         orderElement.className = 'order-history-item';
         orderElement.innerHTML = `
           <p><strong>Order ID:</strong> ${order.orderId}</p>
           <p><strong>Service:</strong> ${order.serviceType}</p>
-          <p><strong>Upfront Paid:</strong> ${order.upfrontPayment} ${order.currency || 'ETB'}</p>
+          <p><strong>Upfront Paid:</strong> ${order.upfrontPayment.toFixed(2)} ${order.currency || 'ETB'}</p>
           <p><strong>Status:</strong> <span class="status-${String(order.status || '').toLowerCase().replace(/ /g, '-')}">${order.status}</span></p>
           <button class="btn btn-contact-designer" data-order-id="${order.orderId}">Contact Designer</button>
         `;
