@@ -46,6 +46,7 @@ function initializeApp() {
     // --- State Management ---
     let ordersUnsubscribe = null;
     let chatsUnsubscribe = null;
+    let isLoggingIn = false; // **FIX for login loop**
 
     /**
      * Stops all active Firestore snapshot listeners.
@@ -78,22 +79,22 @@ function initializeApp() {
     };
 
     /**
-     * --- SEPARATE LOGIN LOGIC ---
-     * This logic ensures the dashboard has its own login state.
+     * --- SEPARATE LOGIN LOGIC (Corrected) ---
      */
     onAuthStateChanged(auth, (user) => {
-        // We only care if the *current* user is the admin.
-        // If they are not, we sign them out of the admin session and show the login page.
+        if (isLoggingIn) {
+            return; // Do nothing while a login attempt is in progress.
+        }
+
         if (user && user.uid === ADMIN_UID) {
             setVisibleView('admin-dashboard-view');
-            stopListeners(); // Ensure no duplicate listeners are running.
+            stopListeners();
             listenForAllOrders();
             listenForAllChats();
         } else {
-            // If any other user is signed in, or no one is,
-            // sign them out of this session and show the admin login form.
-            if (auth.currentUser) {
-                signOut(auth);
+            // If any other user is signed in, or no one is, show the login form.
+            if (user) {
+                signOut(auth); // Sign out non-admin users.
             }
             setVisibleView('admin-login-view');
             stopListeners();
@@ -111,12 +112,13 @@ function initializeApp() {
         const email = elements.loginForm.elements['admin-login-email'].value;
         const password = elements.loginForm.elements['admin-login-password'].value;
 
+        isLoggingIn = true; // **Set flag to prevent onAuthStateChanged from interfering**
+
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-            // CRITICAL CHECK: After login, verify if the UID matches the hardcoded admin UID.
             if (userCredential.user.uid === ADMIN_UID) {
-                // Success! onAuthStateChanged will handle showing the dashboard.
+                // Success! The onAuthStateChanged listener will now take over correctly.
             } else {
                 // Logged in with a NON-ADMIN account.
                 await signOut(auth); // Immediately sign them out.
@@ -126,12 +128,15 @@ function initializeApp() {
         } catch (error) {
             elements.authError.textContent = 'Login failed: Invalid credentials.';
             elements.authError.classList.remove('hidden');
+        } finally {
+            isLoggingIn = false; // **Reset flag after login attempt is complete**
+            // Manually trigger a check in case the user was already the admin
+            onAuthStateChanged(auth, auth.currentUser);
         }
     }
 
     /**
-     * Handles logout. Signs the user out, which triggers onAuthStateChanged
-     * to show the login screen again.
+     * Handles logout.
      */
     async function handleLogout() {
         await signOut(auth);
