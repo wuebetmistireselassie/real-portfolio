@@ -1,5 +1,5 @@
 // ===================================================================================
-// ORDERS PAGE LOGIC
+// ORDERS PAGE LOGIC (WITH AUTHENTICATION)
 // ===================================================================================
 import {
     getFirestore,
@@ -12,7 +12,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import {
     getAuth,
-    onAuthStateChanged
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import {
     app
@@ -22,7 +25,23 @@ import {
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// DOM Element References
+// --- DOM Element References ---
+// Views
+const loggedInView = document.getElementById('logged-in-view');
+const loggedOutView = document.getElementById('logged-out-view');
+
+// Auth elements
+const loginForm = document.getElementById('login-form');
+const signupForm = document.getElementById('signup-form');
+const authError = document.getElementById('auth-error');
+const showLoginTabBtn = document.getElementById('show-login-tab');
+const showSignupTabBtn = document.getElementById('show-signup-tab');
+const loginFormContainer = document.getElementById('login-form-container');
+const signupFormContainer = document.getElementById('signup-form-container');
+const logoutBtn = document.getElementById('logout-btn');
+const userName = document.getElementById('user-name');
+
+// Order form elements
 const orderForm = document.getElementById('order-form');
 const currencySelect = document.getElementById('currency-select');
 const paymentDetailsETB = document.getElementById('payment-details-ETB');
@@ -35,12 +54,89 @@ const togglePlatformsBtn = document.getElementById('toggle-platforms-btn');
 const platformOptions = document.getElementById('platform-options');
 const ordersListContainer = document.getElementById('orders-list');
 
+
+// --- AUTHENTICATION STATE LOGIC ---
+onAuthStateChanged(auth, user => {
+    if (user) {
+        // User is signed in
+        loggedOutView.classList.add('hidden');
+        loggedInView.classList.remove('hidden');
+        userName.textContent = user.email; // Display user's email
+        displayUserOrders(user.uid);
+    } else {
+        // User is signed out
+        loggedInView.classList.add('hidden');
+        loggedOutView.classList.remove('hidden');
+        if (ordersListContainer) {
+            ordersListContainer.innerHTML = ''; // Clear orders list
+        }
+    }
+});
+
+
+// --- AUTHENTICATION FUNCTIONS ---
+
+/**
+ * Switches between the login and signup tabs.
+ * @param {string} tabName The name of the tab to show ('login' or 'signup').
+ */
+function switchTab(tabName) {
+    if (tabName === 'login') {
+        loginFormContainer.classList.remove('hidden');
+        signupFormContainer.classList.add('hidden');
+        showLoginTabBtn.classList.add('active');
+        showSignupTabBtn.classList.remove('active');
+    } else {
+        signupFormContainer.classList.remove('hidden');
+        loginFormContainer.classList.add('hidden');
+        showSignupTabBtn.classList.add('active');
+        showLoginTabBtn.classList.remove('active');
+    }
+    authError.classList.add('hidden'); // Hide any previous errors
+}
+
+/**
+ * Handles the login form submission.
+ * @param {Event} e The form submission event.
+ */
+function handleLogin(e) {
+    e.preventDefault();
+    const email = loginForm['login-email'].value;
+    const password = loginForm['login-password'].value;
+    signInWithEmailAndPassword(auth, email, password)
+        .catch(error => showAuthError(error.message));
+}
+
+/**
+ * Handles the signup form submission.
+ * @param {Event} e The form submission event.
+ */
+function handleSignup(e) {
+    e.preventDefault();
+    const email = signupForm['signup-email'].value;
+    const password = signupForm['signup-password'].value;
+    createUserWithEmailAndPassword(auth, email, password)
+        .catch(error => showAuthError(error.message));
+}
+
+/**
+ * Displays an authentication error message to the user.
+ * @param {string} message The error message to display.
+ */
+function showAuthError(message) {
+    authError.textContent = message;
+    authError.classList.remove('hidden');
+}
+
+
+// --- ORDER HANDLING FUNCTIONS ---
+
 /**
  * Handles the submission of the new order form.
  * @param {Event} e The form submission event.
  */
 const handleOrderSubmit = async (e) => {
-    e.preventDefault(); // Prevent the form from reloading the page
+    e.preventDefault();
 
     const submitButton = orderForm.querySelector('button[type="submit"]');
     submitButton.disabled = true;
@@ -50,31 +146,20 @@ const handleOrderSubmit = async (e) => {
         const user = auth.currentUser;
         if (!user) {
             alert('Error: You must be logged in to place an order.');
-            submitButton.disabled = false;
-            submitButton.textContent = 'Submit Order';
-            return;
+            throw new Error('User not logged in');
         }
 
-        // --- 1. GATHER FORM DATA ---
         const currency = currencySelect.value;
         let transactionNumber = '';
+        if (currency === 'ETB') transactionNumber = transactionInputETB.value;
+        else if (currency === 'USD') transactionNumber = transactionInputUSD.value;
+        else if (currency === 'CNY') transactionNumber = transactionInputCNY.value;
 
-        // Get the correct transaction number based on the selected currency
-        if (currency === 'ETB') {
-            transactionNumber = transactionInputETB.value;
-        } else if (currency === 'USD') {
-            transactionNumber = transactionInputUSD.value;
-        } else if (currency === 'CNY') {
-            transactionNumber = transactionInputCNY.value;
-        }
-
-        // Simple validation
         if (!transactionNumber.trim()) {
             alert('Please enter a valid transaction number.');
             throw new Error('Transaction number is required.');
         }
 
-        // Collect all other form data
         const orderData = {
             userId: user.uid,
             userEmail: user.email,
@@ -88,28 +173,22 @@ const handleOrderSubmit = async (e) => {
             totalPrice: parseFloat(document.getElementById('total-price').textContent),
             upfrontPayment: parseFloat(document.getElementById('upfront-payment').textContent),
             transactionNumber: transactionNumber,
-            status: 'Pending Review', // Set the initial status for a new order
-            createdAt: serverTimestamp() // Use server's timestamp for consistency
+            status: 'Pending Review',
+            createdAt: serverTimestamp()
         };
 
-        // --- 2. SAVE TO FIRESTORE ---
-        const ordersCollection = collection(db, "orders");
-        const docRef = await addDoc(ordersCollection, orderData);
-
-        // --- 3. PROVIDE FEEDBACK ---
+        const docRef = await addDoc(collection(db, "orders"), orderData);
         alert(`Your order has been submitted successfully!\nYour Order ID is: ${docRef.id}`);
         orderForm.reset();
-
-        // Manually trigger change events to reset dependent fields (deliverables and price)
         document.getElementById('service-type').dispatchEvent(new Event('change'));
         currencySelect.dispatchEvent(new Event('change'));
 
-
     } catch (error) {
         console.error("Error submitting order:", error);
-        alert('An error occurred while submitting your order. Please check the console and try again.');
+        if (error.message !== 'User not logged in' && error.message !== 'Transaction number is required.') {
+            alert('An error occurred while submitting your order. Please try again.');
+        }
     } finally {
-        // Re-enable the submit button
         submitButton.disabled = false;
         submitButton.textContent = 'Submit Order';
     }
@@ -120,18 +199,13 @@ const handleOrderSubmit = async (e) => {
  */
 const handleCurrencyChange = () => {
     const selectedCurrency = currencySelect.value;
-
-    // Hide all payment sections first
     paymentDetailsETB.classList.add('hidden');
     paymentDetailsUSD.classList.add('hidden');
     paymentDetailsCNY.classList.add('hidden');
-
-    // Make all transaction inputs not required
     transactionInputETB.required = false;
     transactionInputUSD.required = false;
     transactionInputCNY.required = false;
 
-    // Show the correct section and make its transaction input required
     if (selectedCurrency === 'ETB') {
         paymentDetailsETB.classList.remove('hidden');
         transactionInputETB.required = true;
@@ -150,21 +224,15 @@ const handleCurrencyChange = () => {
  */
 const displayUserOrders = (userId) => {
     const ordersQuery = query(collection(db, "orders"), where("userId", "==", userId));
-
     onSnapshot(ordersQuery, (snapshot) => {
+        if (!ordersListContainer) return;
         if (snapshot.empty) {
             ordersListContainer.innerHTML = '<p>You have not placed any orders yet.</p>';
             return;
         }
 
+        const sortedDocs = snapshot.docs.sort((a, b) => (b.data().createdAt?.toMillis() || 0) - (a.data().createdAt?.toMillis() || 0));
         let ordersHTML = '';
-        // Sort documents by creation date, newest first
-        const sortedDocs = snapshot.docs.sort((a, b) => {
-            const timeA = a.data().createdAt?.toMillis() || 0;
-            const timeB = b.data().createdAt?.toMillis() || 0;
-            return timeB - timeA;
-        });
-
         sortedDocs.forEach(doc => {
             const order = doc.data();
             const orderDate = order.createdAt ? order.createdAt.toDate().toLocaleDateString() : 'N/A';
@@ -186,33 +254,21 @@ const displayUserOrders = (userId) => {
 };
 
 
-// --- EVENT LISTENERS ---
+// --- GLOBAL EVENT LISTENERS ---
 
-// Listen for authentication state changes to show user orders
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        displayUserOrders(user.uid);
-    } else {
-        // Clear orders if user logs out
-        if(ordersListContainer) {
-            ordersListContainer.innerHTML = '';
-        }
-    }
-});
+// Auth Listeners
+if (showLoginTabBtn) showLoginTabBtn.addEventListener('click', () => switchTab('login'));
+if (showSignupTabBtn) showSignupTabBtn.addEventListener('click', () => switchTab('signup'));
+if (loginForm) loginForm.addEventListener('submit', handleLogin);
+if (signupForm) signupForm.addEventListener('submit', handleSignup);
+if (logoutBtn) logoutBtn.addEventListener('click', () => signOut(auth));
 
-// Attach the submit handler to the form
-if (orderForm) {
-    orderForm.addEventListener('submit', handleOrderSubmit);
-}
-
-// Attach the currency change handler
+// Order Form Listeners
+if (orderForm) orderForm.addEventListener('submit', handleOrderSubmit);
 if (currencySelect) {
     currencySelect.addEventListener('change', handleCurrencyChange);
-    // Call it once on load to set the initial state
-    handleCurrencyChange();
+    handleCurrencyChange(); // Initial call
 }
-
-// Attach listener for the platform toggle button
 if (togglePlatformsBtn) {
     togglePlatformsBtn.addEventListener('click', () => {
         platformOptions.classList.toggle('hidden');
