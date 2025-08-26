@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loggedOutView = document.getElementById('logged-out-view');
   const loginForm = document.getElementById('login-form');
   const signupForm = document.getElementById('signup-form');
-  const authError = document.getElementById('auth-error'); // Re-used for order messages
+  const authError = document.getElementById('auth-error');
   const showLoginTabBtn = document.getElementById('show-login-tab');
   const showSignupTabBtn = document.getElementById('show-signup-tab');
   const loginFormContainer = document.getElementById('login-form-container');
@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const platformOptions = document.getElementById('platform-options');
   const currencySelect = document.getElementById('currency-select');
   const paymentDetailsContainer = document.getElementById('payment-details-container');
+  const orderFeedback = document.getElementById('order-feedback'); // ✅ new
 
   // --- Auth State Logic ---
   onAuthStateChanged(auth, user => {
@@ -65,9 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Event Listeners ---
   showLoginTabBtn.addEventListener('click', () => switchTab('login'));
   showSignupTabBtn.addEventListener('click', () => switchTab('signup'));
+
   loginForm.addEventListener('submit', handleLogin);
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
+
   orderForm.addEventListener('input', updatePrice);
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
@@ -96,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedPaymentDiv.classList.remove('hidden');
     }
   });
-
   currencySelect.dispatchEvent(new Event('change'));
 
   // --- Functions ---
@@ -133,31 +135,18 @@ document.addEventListener('DOMContentLoaded', () => {
     authError.textContent = message;
     authError.classList.remove('hidden');
   }
-  
-  // New function to show messages to the user instead of alert()
-  function showOrderMessage(message, isError = false) {
-      const messageEl = document.getElementById('auth-error'); // Reusing the auth error element for simplicity
-      messageEl.textContent = message;
-      messageEl.style.color = isError ? '#e74c3c' : '#2ecc71'; // Red for error, Green for success
-      messageEl.classList.remove('hidden');
 
-      // Hide the message after 5 seconds
-      setTimeout(() => {
-          messageEl.classList.add('hidden');
-      }, 5000);
+  function showFeedback(message, type = "success") {
+    orderFeedback.textContent = message;
+    orderFeedback.className = ""; // reset
+    orderFeedback.classList.add(type);
   }
-
 
   function updatePrice() {
     const serviceType = serviceTypeSelect.value;
     const deliveryTime = deliveryTimeSelect.value;
     const deliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
-
-    if (!serviceType) {
-        totalPriceEl.textContent = "0.00";
-        upfrontEl.textContent = "0.00";
-        return;
-    }
+    if (!serviceType || !deliveryTime) return;
     const totalPrice = calculatePrice(serviceType, deliveryTime, deliverables);
     const upfrontPayment = totalPrice * 0.3;
     totalPriceEl.textContent = totalPrice.toFixed(2);
@@ -166,86 +155,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function handleOrderSubmit(e) {
     e.preventDefault();
-    
     if (!currentUser) {
-      showOrderMessage("You must be logged in to place an order.", true);
+      showFeedback("You must be logged in to place an order.", "error");
+      return;
+    }
+
+    const clientName = document.getElementById('client-name').value.trim();
+    const contactInfo = document.getElementById('contact-info').value.trim();
+    const projectDescription = document.getElementById('project-description').value.trim();
+    const serviceType = serviceTypeSelect.value;
+    const deliveryTime = deliveryTimeSelect.value;
+    const selectedDeliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
+    const selectedCurrency = currencySelect.value;
+
+    let transactionNumberInput = null;
+    if (selectedCurrency === 'ETB') transactionNumberInput = document.getElementById('transaction-number');
+    if (selectedCurrency === 'USD') transactionNumberInput = document.getElementById('transaction-number-usd');
+    if (selectedCurrency === 'CNY') transactionNumberInput = document.getElementById('transaction-number-cny');
+    const transactionNumber = transactionNumberInput ? transactionNumberInput.value.trim() : "";
+
+    // ✅ Validation
+    if (!clientName || !contactInfo || !serviceType || !projectDescription || !deliveryTime || !transactionNumber) {
+      showFeedback("Please fill out all required fields.", "error");
       return;
     }
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Verifying...';
+    submitBtn.textContent = 'Submitting...';
 
     try {
-      const clientName = document.getElementById('client-name').value.trim();
-      const contactInfo = document.getElementById('contact-info').value.trim();
-      const projectDescription = document.getElementById('project-description').value.trim();
-      const serviceType = serviceTypeSelect.value;
-      
-      // --- FORM VALIDATION ---
-      if (!clientName || !contactInfo || !projectDescription || !serviceType) {
-          showOrderMessage("Please fill out all required fields before submitting.", true);
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Submit Order';
-          return;
-      }
-
-      const deliveryTime = deliveryTimeSelect.value;
-      const selectedDeliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
-      const currency = currencySelect.value;
-      const totalPrice = parseFloat(totalPriceEl.textContent);
-      const upfrontPayment = parseFloat(upfrontEl.textContent);
-
-      let transactionNumberInput;
-      if (currency === 'ETB') {
-        transactionNumberInput = document.getElementById('transaction-number');
-      } else if (currency === 'USD') {
-        transactionNumberInput = document.getElementById('transaction-number-usd');
-      } else if (currency === 'CNY') {
-        transactionNumberInput = document.getElementById('transaction-number-cny');
-      }
-
-      const transactionNumber = transactionNumberInput ? transactionNumberInput.value.trim() : '';
-
-      if (!transactionNumber) {
-        showOrderMessage("A valid Transaction ID is required. Please enter it to proceed.", true);
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Order';
-        return;
-      }
-
+      // Check for duplicate txn
       const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
       const querySnapshot = await getDocs(q);
-
       if (!querySnapshot.empty) {
-        showOrderMessage("This Transaction ID has already been used. Please check the ID.", true);
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Order';
+        showFeedback("This Transaction ID has already been used.", "error");
         return;
       }
 
-      submitBtn.textContent = 'Submitting...';
       const orderId = `order_${Date.now()}`;
-
-      const orderData = {
-        orderId: orderId,
+      await setDoc(doc(db, 'orders', orderId), {
+        orderId,
         userId: currentUser.uid,
         email: currentUser.email,
-        clientName: clientName,
-        contactInfo: contactInfo,
-        projectDescription: projectDescription,
-        serviceType: serviceType,
-        deliveryTime: deliveryTime,
+        clientName,
+        contactInfo,
+        projectDescription,
+        serviceType,
+        deliveryTime,
         deliverables: selectedDeliverables,
-        totalPrice: totalPrice,
-        upfrontPayment: upfrontPayment,
-        currency: currency,
-        transactionNumber: transactionNumber,
+        totalPrice: parseFloat(totalPriceEl.textContent),
+        upfrontPayment: parseFloat(upfrontEl.textContent),
+        currency: selectedCurrency,
+        transactionNumber,
         status: 'Pending Confirmation',
         createdAt: serverTimestamp()
-      };
-
-      await setDoc(doc(db, 'orders', orderId), orderData);
+      });
 
       await setDoc(doc(db, 'conversations', currentUser.uid), {
         userId: currentUser.uid,
@@ -253,14 +218,12 @@ document.addEventListener('DOMContentLoaded', () => {
         lastUpdate: serverTimestamp()
       }, { merge: true });
 
-      showOrderMessage("Order placed successfully! We will review it shortly.", false);
+      showFeedback("Order placed successfully!", "success");
       orderForm.reset();
       updatePrice();
-      currencySelect.dispatchEvent(new Event('change'));
-
     } catch (error) {
       console.error("Order submission error:", error);
-      showOrderMessage("Sorry, there was an error submitting your order. Please try again.", true);
+      showFeedback("There was an error submitting your order.", "error");
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit Order';
@@ -272,18 +235,18 @@ document.addEventListener('DOMContentLoaded', () => {
     ordersUnsubscribe = onSnapshot(q, (snapshot) => {
       const ordersContainer = document.getElementById('orders-list');
       if (snapshot.empty) {
-        ordersContainer.innerHTML = '<h3>My Orders</h3><p>You have no previous orders.</p>';
+        ordersContainer.innerHTML = '<p>You have no previous orders.</p>';
         return;
       }
-      ordersContainer.innerHTML = '<h3>My Orders</h3>';
-      snapshot.docs.sort((a, b) => b.data().createdAt - a.data().createdAt).forEach(docSnap => {
+      ordersContainer.innerHTML = '';
+      snapshot.forEach(docSnap => {
         const order = docSnap.data();
         const orderElement = document.createElement('div');
         orderElement.className = 'order-history-item';
         orderElement.innerHTML = `
           <p><strong>Order ID:</strong> ${order.orderId}</p>
           <p><strong>Service:</strong> ${order.serviceType}</p>
-          <p><strong>Upfront Paid:</strong> ${order.upfrontPayment.toFixed(2)} ${order.currency || 'ETB'}</p>
+          <p><strong>Upfront Paid:</strong> ${order.upfrontPayment} ${order.currency || 'ETB'}</p>
           <p><strong>Status:</strong> <span class="status-${String(order.status || '').toLowerCase().replace(/ /g, '-')}">${order.status}</span></p>
           <button class="btn btn-contact-designer" data-order-id="${order.orderId}">Contact Designer</button>
         `;
