@@ -17,6 +17,10 @@ import {
 import { calculatePrice } from './price.js';
 import { openChat, sendSystemMessage } from './chat.js';
 
+// IMPORTANT: some browsers block the submit event if hidden required inputs exist.
+// This file now toggles `required`/`disabled` on Txn ID fields based on the selected currency
+// and shows inline feedback messages for validation and success.
+
 document.addEventListener('DOMContentLoaded', () => {
   let currentUser = null;
   let ordersUnsubscribe = null;
@@ -40,68 +44,54 @@ document.addEventListener('DOMContentLoaded', () => {
   const deliveryTimeSelect = document.getElementById('delivery-time');
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
+
+  // New DOM elements for new features
   const togglePlatformsBtn = document.getElementById('toggle-platforms-btn');
   const orderFormContainer = document.getElementById('order-form-container');
   const platformOptions = document.getElementById('platform-options');
   const currencySelect = document.getElementById('currency-select');
   const paymentDetailsContainer = document.getElementById('payment-details-container');
-  const orderFeedback = document.getElementById('order-feedback'); // ✅ new
 
-  // --- Auth State Logic ---
-  onAuthStateChanged(auth, user => {
-    if (user) {
-      currentUser = user;
-      loggedOutView.classList.add('hidden');
-      loggedInView.classList.remove('hidden');
-      userName.textContent = user.displayName || user.email;
-      listenToClientOrders(user.uid);
-    } else {
-      currentUser = null;
-      loggedInView.classList.add('hidden');
-      loggedOutView.classList.remove('hidden');
-      if (ordersUnsubscribe) ordersUnsubscribe();
-    }
-  });
+  // Feedback element (created in HTML). If missing, we fallback to alert.
+  const feedbackEl = document.getElementById('order-feedback');
 
-  // --- Event Listeners ---
-  showLoginTabBtn.addEventListener('click', () => switchTab('login'));
-  showSignupTabBtn.addEventListener('click', () => switchTab('signup'));
+  // --- Helpers ---
+  function showFeedback(message, type = 'success') {
+    if (!feedbackEl) { alert(message); return; }
+    feedbackEl.textContent = message;
+    feedbackEl.classList.remove('hidden', 'success', 'error');
+    feedbackEl.classList.add(type === 'success' ? 'success' : 'error');
+    feedbackEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  function clearFeedback() {
+    if (!feedbackEl) return;
+    feedbackEl.classList.add('hidden');
+    feedbackEl.textContent = '';
+    feedbackEl.classList.remove('success', 'error');
+  }
 
-  loginForm.addEventListener('submit', handleLogin);
-  signupForm.addEventListener('submit', handleSignup);
-  logoutBtn.addEventListener('click', () => signOut(auth));
-
-  orderForm.addEventListener('input', updatePrice);
-  orderForm.addEventListener('submit', handleOrderSubmit);
-  ordersList.addEventListener('click', handleOrdersListClick);
-  generalContactBtn.addEventListener('click', handleGeneralContactClick);
-
-  togglePlatformsBtn.addEventListener('click', () => {
-    const isOrderFormVisible = !orderFormContainer.classList.contains('hidden');
-    if (isOrderFormVisible) {
-      orderFormContainer.classList.add('hidden');
-      platformOptions.classList.remove('hidden');
-      togglePlatformsBtn.textContent = 'Go back to direct order form';
-    } else {
-      orderFormContainer.classList.remove('hidden');
-      platformOptions.classList.add('hidden');
-      togglePlatformsBtn.textContent = 'Prefer to order on a platform?';
-    }
-  });
-
-  currencySelect.addEventListener('change', () => {
-    const selectedCurrency = currencySelect.value;
+  function toggleTxnFieldsForCurrency(selectedCurrency) {
+    // Hide all payment detail blocks first
     Array.from(paymentDetailsContainer.children).forEach(child => {
       child.classList.add('hidden');
+      const input = child.querySelector('input[type="text"]');
+      if (input) {
+        input.disabled = true;
+        input.required = false;
+      }
     });
+    // Show and enable the selected currency block
     const selectedPaymentDiv = document.getElementById(`payment-details-${selectedCurrency}`);
     if (selectedPaymentDiv) {
       selectedPaymentDiv.classList.remove('hidden');
+      const input = selectedPaymentDiv.querySelector('input[type="text"]');
+      if (input) {
+        input.disabled = false;
+        input.required = true; // only the visible one is required
+      }
     }
-  });
-  currencySelect.dispatchEvent(new Event('change'));
+  }
 
-  // --- Functions ---
   function switchTab(tabName) {
     if (tabName === 'login') {
       loginFormContainer.classList.remove('hidden');
@@ -136,16 +126,11 @@ document.addEventListener('DOMContentLoaded', () => {
     authError.classList.remove('hidden');
   }
 
-  function showFeedback(message, type = "success") {
-    orderFeedback.textContent = message;
-    orderFeedback.className = ""; // reset
-    orderFeedback.classList.add(type);
-  }
-
   function updatePrice() {
     const serviceType = serviceTypeSelect.value;
     const deliveryTime = deliveryTimeSelect.value;
     const deliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
+
     if (!serviceType || !deliveryTime) return;
     const totalPrice = calculatePrice(serviceType, deliveryTime, deliverables);
     const upfrontPayment = totalPrice * 0.3;
@@ -155,54 +140,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function handleOrderSubmit(e) {
     e.preventDefault();
+    clearFeedback();
+
     if (!currentUser) {
-      showFeedback("You must be logged in to place an order.", "error");
-      return;
-    }
-
-    const clientName = document.getElementById('client-name').value.trim();
-    const contactInfo = document.getElementById('contact-info').value.trim();
-    const projectDescription = document.getElementById('project-description').value.trim();
-    const serviceType = serviceTypeSelect.value;
-    const deliveryTime = deliveryTimeSelect.value;
-    const selectedDeliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
-    const selectedCurrency = currencySelect.value;
-
-    let transactionNumberInput = null;
-    if (selectedCurrency === 'ETB') transactionNumberInput = document.getElementById('transaction-number');
-    if (selectedCurrency === 'USD') transactionNumberInput = document.getElementById('transaction-number-usd');
-    if (selectedCurrency === 'CNY') transactionNumberInput = document.getElementById('transaction-number-cny');
-    const transactionNumber = transactionNumberInput ? transactionNumberInput.value.trim() : "";
-
-    // ✅ Validation
-    if (!clientName || !contactInfo || !serviceType || !projectDescription || !deliveryTime || !transactionNumber) {
-      showFeedback("Please fill out all required fields.", "error");
+      showFeedback('Please sign in to place an order.', 'error');
       return;
     }
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Submitting...';
+    submitBtn.textContent = 'Verifying...';
 
+    // Native form validation first (after we correctly toggled required/disabled below)
+    if (!orderForm.checkValidity()) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Order';
+      orderForm.reportValidity();
+      showFeedback('Please fill out all required fields.', 'error');
+      return;
+    }
+
+    const selectedCurrency = currencySelect.value;
+    let transactionNumberInput;
+    if (selectedCurrency === 'ETB') {
+      transactionNumberInput = document.getElementById('transaction-number');
+    } else if (selectedCurrency === 'USD') {
+      transactionNumberInput = document.getElementById('transaction-number-usd');
+    } else if (selectedCurrency === 'CNY') {
+      transactionNumberInput = document.getElementById('transaction-number-cny');
+    }
+
+    const transactionNumber = transactionNumberInput ? transactionNumberInput.value.trim() : '';
+
+    // Prevent accidental empty Txn ID
+    if (!transactionNumber) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Order';
+      showFeedback('Please enter the Transaction ID for your upfront payment.', 'error');
+      return;
+    }
+
+    // Check duplicate transaction numbers
     try {
-      // Check for duplicate txn
-      const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
-      const querySnapshot = await getDocs(q);
-      if (!querySnapshot.empty) {
-        showFeedback("This Transaction ID has already been used.", "error");
+      const qDup = query(collection(db, 'orders'), where('transactionNumber', '==', transactionNumber));
+      const dupSnap = await getDocs(qDup);
+      if (!dupSnap.empty) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Order';
+        showFeedback('This Transaction ID has already been used. Please double-check and try again.', 'error');
         return;
       }
+    } catch (err) {
+      // If this check fails for any reason, do not block the user—log and proceed
+      console.error('Duplicate check failed:', err);
+    }
 
+    const selectedDeliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
+
+    submitBtn.textContent = 'Submitting...';
+    try {
       const orderId = `order_${Date.now()}`;
       await setDoc(doc(db, 'orders', orderId), {
         orderId,
         userId: currentUser.uid,
         email: currentUser.email,
-        clientName,
-        contactInfo,
-        projectDescription,
-        serviceType,
-        deliveryTime,
+        clientName: document.getElementById('client-name').value.trim(),
+        contactInfo: document.getElementById('contact-info').value.trim(),
+        projectDescription: document.getElementById('project-description').value.trim(),
+        serviceType: serviceTypeSelect.value,
+        deliveryTime: deliveryTimeSelect.value,
         deliverables: selectedDeliverables,
         totalPrice: parseFloat(totalPriceEl.textContent),
         upfrontPayment: parseFloat(upfrontEl.textContent),
@@ -212,18 +218,20 @@ document.addEventListener('DOMContentLoaded', () => {
         createdAt: serverTimestamp()
       });
 
-      await setDoc(doc(db, 'conversations', currentUser.uid), {
-        userId: currentUser.uid,
-        userEmail: currentUser.email,
-        lastUpdate: serverTimestamp()
-      }, { merge: true });
+      // Ensure the user has a conversation document
+      await setDoc(
+        doc(db, 'conversations', currentUser.uid),
+        { userId: currentUser.uid, userEmail: currentUser.email, lastUpdate: serverTimestamp() },
+        { merge: true }
+      );
 
-      showFeedback("Order placed successfully!", "success");
+      showFeedback('Order placed successfully! You will get a confirmation shortly.', 'success');
       orderForm.reset();
-      updatePrice();
+      // Reset payment details + validity after form reset
+      toggleTxnFieldsForCurrency(currencySelect.value);
     } catch (error) {
-      console.error("Order submission error:", error);
-      showFeedback("There was an error submitting your order.", "error");
+      console.error('Order submission error:', error);
+      showFeedback('There was an error submitting your order. Please try again.', 'error');
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit Order';
@@ -231,14 +239,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function listenToClientOrders(userId) {
-    const q = query(collection(db, 'orders'), where('userId', '==', userId));
-    ordersUnsubscribe = onSnapshot(q, (snapshot) => {
+    const qOrders = query(collection(db, 'orders'), where('userId', '==', userId));
+    ordersUnsubscribe = onSnapshot(qOrders, (snapshot) => {
       const ordersContainer = document.getElementById('orders-list');
       if (snapshot.empty) {
-        ordersContainer.innerHTML = '<p>You have no previous orders.</p>';
+        ordersContainer.innerHTML = '<h3>My Orders</h3><p>You have no previous orders.</p>';
         return;
       }
-      ordersContainer.innerHTML = '';
+      ordersContainer.innerHTML = '<h3>My Orders</h3>';
       snapshot.forEach(docSnap => {
         const order = docSnap.data();
         const orderElement = document.createElement('div');
@@ -269,4 +277,56 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!currentUser) return;
     await openChat(currentUser.uid, `Chat with ${currentUser.email}`);
   }
+
+  // --- Auth State Logic ---
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      currentUser = user;
+      loggedOutView.classList.add('hidden');
+      loggedInView.classList.remove('hidden');
+      userName.textContent = user.displayName || user.email;
+      listenToClientOrders(user.uid);
+    } else {
+      currentUser = null;
+      loggedInView.classList.add('hidden');
+      loggedOutView.classList.remove('hidden');
+      if (ordersUnsubscribe) ordersUnsubscribe();
+    }
+  });
+
+  // --- Event Listeners ---
+  showLoginTabBtn.addEventListener('click', () => switchTab('login'));
+  showSignupTabBtn.addEventListener('click', () => switchTab('signup'));
+
+  loginForm.addEventListener('submit', handleLogin);
+  signupForm.addEventListener('submit', handleSignup);
+  logoutBtn.addEventListener('click', () => signOut(auth));
+
+  // Keep price reactive
+  orderForm.addEventListener('input', updatePrice);
+  orderForm.addEventListener('submit', handleOrderSubmit);
+  ordersList.addEventListener('click', handleOrdersListClick);
+  generalContactBtn.addEventListener('click', handleGeneralContactClick);
+
+  // Platform toggle visibility
+  togglePlatformsBtn.addEventListener('click', () => {
+    const isOrderFormVisible = !orderFormContainer.classList.contains('hidden');
+    if (isOrderFormVisible) {
+      orderFormContainer.classList.add('hidden');
+      platformOptions.classList.remove('hidden');
+      togglePlatformsBtn.textContent = 'Go back to direct order form';
+    } else {
+      orderFormContainer.classList.remove('hidden');
+      platformOptions.classList.add('hidden');
+      togglePlatformsBtn.textContent = 'Prefer to order on a platform?';
+    }
+  });
+
+  // Currency change: show right block + fix required/disabled to avoid blocked submits
+  currencySelect.addEventListener('change', () => {
+    toggleTxnFieldsForCurrency(currencySelect.value);
+  });
+
+  // Initialize payment UI on load
+  toggleTxnFieldsForCurrency(currencySelect.value);
 });
