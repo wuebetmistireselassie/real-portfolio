@@ -12,15 +12,14 @@ import {
     orderBy,
     where,
     getDocs,
-    getDoc
-} from './auth.js';
-import { openChat, sendSystemMessage } from './chat.js';
+    getDoc // Make sure getDoc is imported
+} from './auth.js?=v6';
+import { openChat, sendSystemMessage } from './chat.js?=v6';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Configuration ---
+    // ✅ Hardcoded Admin UID
     const ADMIN_UID = "mL8wfi0Bgvan5yh9yxCthmEDhJc2";
 
-    // --- DOM Elements ---
     const adminLoginView = document.getElementById('admin-login-view');
     const adminDashboardView = document.getElementById('admin-dashboard-view');
     const adminLoginForm = document.getElementById('admin-login-form');
@@ -28,25 +27,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const allOrdersList = document.getElementById('all-orders-list');
     const allChatsList = document.getElementById('all-chats-list');
     const unauthorizedView = document.getElementById('unauthorized-view');
-    const adminAuthError = document.getElementById('admin-auth-error');
 
     let chatsUnsubscribe = null;
     let ordersUnsubscribe = null;
 
-    // --- Authentication ---
-
-    // This function checks the user's login status when the page loads.
-    // It's the original logic that you confirmed was working correctly.
+    // 🔑 Watch authentication state
     onAuthStateChanged(auth, user => {
         if (user && user.uid === ADMIN_UID) {
-            // If the admin is already logged in, show the dashboard.
             adminLoginView.classList.add('hidden');
             unauthorizedView.classList.add('hidden');
             adminDashboardView.classList.remove('hidden');
             listenForAllOrders();
             listenForAllChats();
         } else {
-            // If anyone else is logged in, or no one is, show the appropriate view.
             adminDashboardView.classList.add('hidden');
             if (user) {
                 unauthorizedView.classList.remove('hidden');
@@ -58,37 +51,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // This handles the admin trying to log in through the form.
+    // Login form
     adminLoginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        adminAuthError.classList.add('hidden'); // Hide previous errors
         const email = document.getElementById('admin-login-email').value;
         const password = document.getElementById('admin-login-password').value;
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            // If login is successful but it's NOT the admin, sign them out immediately.
             if (userCredential.user.uid !== ADMIN_UID) {
                 signOut(auth);
                 unauthorizedView.classList.remove('hidden');
-                adminLoginView.classList.add('hidden');
             }
-            // If it IS the admin, the onAuthStateChanged listener above will automatically show the dashboard.
         } catch (error) {
-            adminAuthError.textContent = "Login failed: " + error.message;
-            adminAuthError.classList.remove('hidden');
+            document.getElementById('admin-auth-error').textContent = "Login failed: " + error.message;
+            document.getElementById('admin-auth-error').classList.remove('hidden');
         }
     });
 
-    // Handles admin logout.
     adminLogoutBtn.addEventListener('click', () => {
         if (ordersUnsubscribe) ordersUnsubscribe();
         if (chatsUnsubscribe) chatsUnsubscribe();
         signOut(auth);
     });
 
-    // --- Data Display ---
-
-    // Fetches and displays all orders.
     function listenForAllOrders() {
         const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
         ordersUnsubscribe = onSnapshot(q, (snapshot) => {
@@ -104,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 let actionButtons = '';
                 if (order.status === 'Pending Confirmation') {
+                    // ✅ FIXED: Added data-user-id to buttons
                     actionButtons = `
                         <button class="btn btn-approve" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Approve</button>
                         <button class="btn btn-reject" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Reject</button>
@@ -117,13 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p><strong>Client:</strong> ${order.clientName} (${order.email})</p>
                     <p><strong>Contact:</strong> ${order.contactInfo}</p>
                     <p><strong>Service:</strong> ${order.serviceType}</p>
-                    <p><strong>Deliverables:</strong> ${order.deliverables.join(', ')}</p>
-                    <p><strong>Total Price:</strong> ${order.totalPrice.toFixed(2)} ${order.currency}</p>
-                    <p><strong>Upfront Payment:</strong> ${order.upfrontPayment.toFixed(2)} ${order.currency}</p>
+                    <p><strong>Deliverables:</strong> ${order.deliverables}</p>
+                    <p><strong>Total Price:</strong> ${order.totalPrice.toFixed(2)} ETB</p>
+                    <p><strong>Upfront Payment:</strong> ${order.upfrontPayment.toFixed(2)} ETB</p>
                     <p><strong>Transaction ID:</strong> ${order.transactionNumber}</p>
                     <p><strong>Status:</strong> <span class="status-${order.status.toLowerCase().replace(/\s+/g, '-')}">${order.status}</span></p>
                     <p><strong>Description:</strong> ${order.projectDescription}</p>
-                    <div class="order-actions">${actionButtons}</div>
+                    <div class="order-actions">
+                        ${actionButtons}
+                    </div>
                     <hr>
                 `;
                 allOrdersList.appendChild(div);
@@ -131,40 +119,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Actions ---
-
-    // This is the fully corrected logic for all buttons on an order item.
+    // Event listener for the Approve/Reject buttons
     allOrdersList.addEventListener('click', async (e) => {
-        const target = e.target;
-        const userId = target.dataset.userId;
+        const orderId = e.target.dataset.orderId;
+        const userId = e.target.dataset.userId; // ✅ FIXED: Get userId here
+        if (!orderId) return;
 
-        // Handle the "Contact Client" button specifically.
-        if (target.classList.contains('btn-contact-client')) {
-            if (userId) {
-                const userEmail = target.dataset.userEmail;
-                openChat(userId, `Chat with ${userEmail}`);
-            }
-            return; // Stop the function here so it doesn't look for an orderId.
-        }
-
-        // Handle the "Approve" and "Reject" buttons.
-        const orderId = target.dataset.orderId;
-        if (!orderId || !userId) return;
-
-        if (target.classList.contains('btn-approve')) {
-            await updateOrderStatus(orderId, 'Paid', userId);
-        } else if (target.classList.contains('btn-reject')) {
-            await updateOrderStatus(orderId, 'Rejected', userId);
+        if (e.target.classList.contains('btn-approve')) {
+            await updateOrderStatus(orderId, 'Paid', userId); // ✅ FIXED: Pass userId
+        } else if (e.target.classList.contains('btn-reject')) {
+            await updateOrderStatus(orderId, 'Rejected', userId); // ✅ FIXED: Pass userId
+        } else if (e.target.classList.contains('btn-contact-client')) {
+            const userEmail = e.target.dataset.userEmail;
+            openChat(userId, `Chat with ${userEmail}`);
         }
     });
     
-    // This is the corrected function to update status and notify the client.
+    // ✅ FIXED: This function is now much simpler and more reliable.
     async function updateOrderStatus(orderId, newStatus, clientUserId) {
         const orderRef = doc(db, 'orders', orderId);
         try {
+            // This will now correctly update the status in Firestore
             await updateDoc(orderRef, { status: newStatus });
             console.log(`Order ${orderId} status updated to ${newStatus}.`);
             
+            // This will now correctly send the system message
             if (clientUserId) {
                 const orderSnap = await getDoc(orderRef);
                 const orderData = orderSnap.data();
@@ -175,9 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Chat Display ---
-
-    // Fetches and displays all client chats.
     function listenForAllChats() {
         const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
         chatsUnsubscribe = onSnapshot(q, (snapshot) => {
