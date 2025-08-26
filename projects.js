@@ -17,7 +17,7 @@ const designs = [
             solution: 'The brand identity centers around a clever and clean logo that integrates two coffee beans and a leaf into a stylized "B." The solution demonstrates the logo’s versatility by applying it consistently across an entire brand ecosystem, including packaging (coffee bags and paper bags), branded stationery (business cards and clipboards), and essential customer-facing items like coffee cups and mugs.'
         },
         // ADD THE LINK TO YOUR BRAND GUIDELINES PDF HERE
-        brandGuidelinesUrl: '#',
+        brandGuidelinesUrl: 'https://www.mwdashboard.com/#projects/beanbloom',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167320/Bean_and_Bloom_hfoasb.svg' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755344715/Bean_and_Bloom_White_version_fwd60r.png' }
@@ -232,3 +232,4 @@ const services = [
 ];
 
 const allProjects = [...designs, ...services];
+
