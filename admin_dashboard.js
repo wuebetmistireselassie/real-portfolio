@@ -4,17 +4,13 @@ import { openChat, sendSystemMessage } from './chat.js';
 
 const ADMIN_UID = "mL8wfi0Bgvan5yh9yxCthmEDhJc2";
 
-// DOM elements
 let el = {};
-
 let ordersUnsubscribe = null;
 let chatsUnsubscribe = null;
-
-// Track current user and admin status
 let currentUser = null;
 let isAdminUser = false;
 
-// DOM caching
+// Cache DOM elements
 function cacheDOM() {
     el.adminLoginView = document.getElementById('admin-login-view');
     el.adminDashboardView = document.getElementById('admin-dashboard-view');
@@ -28,15 +24,31 @@ function cacheDOM() {
     el.adminLoginPassword = document.getElementById('admin-login-password');
 }
 
-function clearUnsubscribes() {
-    if (ordersUnsubscribe) { ordersUnsubscribe(); ordersUnsubscribe = null; }
-    if (chatsUnsubscribe) { chatsUnsubscribe(); chatsUnsubscribe = null; }
+// Utility
+function sanitizeText(text) {
+    const temp = document.createElement('div');
+    temp.textContent = text;
+    return temp.innerHTML;
 }
 
+function money(value, currency) {
+    const n = Number(value);
+    return Number.isFinite(n) ? `${n.toFixed(2)} ${currency || ''}`.trim() : sanitizeText(value);
+}
+
+// ---------------------------
+// Show/hide views
+// ---------------------------
 function showLogin() {
     el.adminLoginView.classList.remove('hidden');
     el.adminDashboardView.classList.add('hidden');
     el.unauthorizedView.classList.add('hidden');
+}
+
+function showDashboard() {
+    el.adminLoginView.classList.add('hidden');
+    el.unauthorizedView.classList.add('hidden');
+    el.adminDashboardView.classList.remove('hidden');
 }
 
 function showUnauthorized() {
@@ -46,49 +58,18 @@ function showUnauthorized() {
     clearUnsubscribes();
 }
 
-function showDashboard() {
-    el.adminLoginView.classList.add('hidden');
-    el.unauthorizedView.classList.add('hidden');
-    el.adminDashboardView.classList.remove('hidden');
+function clearUnsubscribes() {
+    if (ordersUnsubscribe) { ordersUnsubscribe(); ordersUnsubscribe = null; }
+    if (chatsUnsubscribe) { chatsUnsubscribe(); chatsUnsubscribe = null; }
 }
 
-function safeText(v) {
-    if (v === undefined || v === null) return '';
-    return String(v);
-}
-
-function money(value, currency) {
-    const n = Number(value);
-    if (!Number.isFinite(n)) return safeText(value);
-    return `${n.toFixed(2)} ${currency || ''}`.trim();
-}
-
-// Admin auth check
+// ---------------------------
+// Auth state
+// ---------------------------
 async function checkAdmin(user) {
-    if (!user) return false;
-    return user.uid === ADMIN_UID;
+    return user && user.uid === ADMIN_UID;
 }
 
-// Render UI based on currentUser & admin status
-function renderUI() {
-    if (!currentUser) {
-        clearUnsubscribes();
-        showLogin();
-        return;
-    }
-    if (isAdminUser) {
-        showDashboard();
-        if (!ordersUnsubscribe) listenOrders();
-        if (!chatsUnsubscribe) listenChats();
-    } else {
-        clearUnsubscribes();
-        showUnauthorized();
-    }
-}
-
-// ---------------------------
-// Auth state handling
-// ---------------------------
 onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     isAdminUser = await checkAdmin(user);
@@ -96,13 +77,13 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // ---------------------------
-// DOM ready
+// DOM Ready
 // ---------------------------
 document.addEventListener('DOMContentLoaded', () => {
     cacheDOM();
     renderUI();
 
-    // Login form
+    // Login
     el.adminLoginForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         el.adminAuthError.classList.add('hidden');
@@ -110,8 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = el.adminLoginPassword.value;
 
         try {
-            const userCred = await signInWithEmailAndPassword(auth, email, password);
-            if (userCred.user.uid !== ADMIN_UID) {
+            const cred = await signInWithEmailAndPassword(auth, email, password);
+            if (cred.user.uid !== ADMIN_UID) {
                 await signOut(auth);
                 showUnauthorized();
             }
@@ -127,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await signOut(auth);
     });
 
-    // Delegated event listener for orders actions
+    // Delegated click listener for orders
     el.allOrdersList?.addEventListener('click', async (e) => {
         const btn = e.target.closest('button');
         if (!btn) return;
@@ -135,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const userId = btn.dataset.userId;
 
         if (btn.classList.contains('btn-contact-client')) {
-            if (userId) {
+            if (userId && orderId) {
                 await setDoc(doc(db, 'conversations', userId), { lastOrderId: orderId, lastUpdate: serverTimestamp() }, { merge: true });
                 openChat(userId, `Chat for Order ${orderId}`);
             }
@@ -160,7 +141,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ---------------------------
-// Orders listener
+// Render UI based on auth
+// ---------------------------
+function renderUI() {
+    if (!currentUser) { clearUnsubscribes(); showLogin(); return; }
+    if (isAdminUser) {
+        showDashboard();
+        if (!ordersUnsubscribe) listenOrders();
+        if (!chatsUnsubscribe) listenChats();
+    } else {
+        showUnauthorized();
+    }
+}
+
+// ---------------------------
+// Orders
 // ---------------------------
 function listenOrders() {
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
@@ -173,7 +168,7 @@ function listenOrders() {
             div.className = 'order-item';
             div.dataset.docId = docSnap.id;
 
-            const statusClass = safeText(order.status || 'Pending').toLowerCase().replace(/\s+/g, '-');
+            const statusClass = sanitizeText(order.status || 'Pending').toLowerCase().replace(/\s+/g, '-');
             let actions = '';
             if (order.status === 'Pending Confirmation') {
                 actions = `
@@ -184,9 +179,14 @@ function listenOrders() {
             actions += `<button class="btn btn-contact-client" data-order-id="${docSnap.id}" data-user-id="${order.userId}" data-user-email="${order.email}">Contact Client</button>`;
 
             div.innerHTML = `
-                <h4>Order ID: ${safeText(order.orderId)}</h4>
-                <p><strong>Client:</strong> ${safeText(order.clientName)} (${safeText(order.email)})</p>
-                <p><strong>Status:</strong> <span class="order-status status-${statusClass}">${safeText(order.status)}</span></p>
+                <h4>Order ID: ${sanitizeText(order.orderId)}</h4>
+                <p><strong>Client:</strong> ${sanitizeText(order.clientName)} (${sanitizeText(order.email)})</p>
+                <p><strong>Contact:</strong> ${sanitizeText(order.contactInfo || '')}</p>
+                <p><strong>Service:</strong> ${sanitizeText(order.serviceType || '')}</p>
+                <p><strong>Total:</strong> ${money(order.totalPrice, order.currency)}</p>
+                <p><strong>Upfront:</strong> ${money(order.upfrontPayment, order.currency)}</p>
+                <p><strong>Transaction:</strong> ${sanitizeText(order.transactionNumber)}</p>
+                <p><strong>Status:</strong> <span class="order-status status-${statusClass}">${sanitizeText(order.status)}</span></p>
                 <div class="order-actions">${actions}</div>
                 <hr>
             `;
@@ -196,7 +196,7 @@ function listenOrders() {
 }
 
 // ---------------------------
-// Update order status + send system message
+// Update order status
 // ---------------------------
 async function updateOrderStatus(orderId, newStatus, clientUserId) {
     try {
@@ -210,4 +210,37 @@ async function updateOrderStatus(orderId, newStatus, clientUserId) {
             await sendSystemMessage(clientUserId, `Your order (ID: ${friendlyId}) status updated to: "${newStatus}".`);
         }
     } catch (err) {
-        console.error('Failed updating order status
+        console.error('Failed updating order status', err);
+    }
+}
+
+// ---------------------------
+// Chats
+// ---------------------------
+function listenChats() {
+    const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
+    chatsUnsubscribe = onSnapshot(q, (snapshot) => {
+        el.allChatsList.innerHTML = '';
+        if (snapshot.empty) { el.allChatsList.innerHTML = '<p>No active chats.</p>'; return; }
+        snapshot.forEach(docSnap => {
+            const chat = docSnap.data();
+            if (!chat.userId || !chat.userEmail) return;
+            const div = document.createElement('div');
+            div.className = 'chat-list-item';
+            div.dataset.userId = chat.userId;
+            div.dataset.userEmail = chat.userEmail;
+            div.innerHTML = `
+                <p><strong>${sanitizeText(chat.userEmail)}</strong></p>
+                <p>Last update: ${chat.lastUpdate ? new Date(chat.lastUpdate.toDate()).toLocaleString() : 'N/A'}</p>
+            `;
+            div.addEventListener('click', async () => {
+                await setDoc(doc(db, 'conversations', chat.userId), { lastUpdate: serverTimestamp() }, { merge: true });
+                openChat(chat.userId, `Chat with ${chat.userEmail}`);
+            });
+            el.allChatsList.appendChild(div);
+        });
+    }, (err) => {
+        console.error('Chats listener error', err);
+        el.allChatsList.innerHTML = `<p class="error-message">Error loading chats.</p>`;
+    });
+}
