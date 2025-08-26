@@ -29,23 +29,34 @@ document.addEventListener('DOMContentLoaded', () => {
     let chatsUnsubscribe = null;
     let ordersUnsubscribe = null;
 
-    // 🔑 Watch authentication state
+    // 🔑 Watch authentication state with added logging
     onAuthStateChanged(auth, user => {
-        if (user && user.uid === ADMIN_UID) {
-            adminLoginView.classList.add('hidden');
-            unauthorizedView.classList.add('hidden');
-            adminDashboardView.classList.remove('hidden');
-            listenForAllOrders();
-            listenForAllChats();
-        } else {
-            adminDashboardView.classList.add('hidden');
-            if (user) {
+        console.log("Auth state changed. Checking user...");
+        if (user) {
+            // A user is signed in.
+            console.log("User is signed in with UID:", user.uid);
+            console.log("Admin UID to match:", ADMIN_UID);
+            if (user.uid === ADMIN_UID) {
+                // User is the admin.
+                console.log("Success: User is the admin. Showing dashboard.");
+                adminLoginView.classList.add('hidden');
+                unauthorizedView.classList.add('hidden');
+                adminDashboardView.classList.remove('hidden');
+                listenForAllOrders();
+                listenForAllChats();
+            } else {
+                // A different, non-admin user is signed in.
+                console.log("Failure: User is NOT the admin. Showing unauthorized view.");
+                adminDashboardView.classList.add('hidden');
                 unauthorizedView.classList.remove('hidden');
                 adminLoginView.classList.add('hidden');
-            } else {
-                adminLoginView.classList.remove('hidden');
-                unauthorizedView.classList.add('hidden');
             }
+        } else {
+            // No user is signed in.
+            console.log("No user is signed in. Showing login form.");
+            adminDashboardView.classList.add('hidden');
+            unauthorizedView.classList.add('hidden');
+            adminLoginView.classList.remove('hidden');
         }
     });
 
