@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <p><strong>Final Deliverables:</strong> ${order.deliverables}</p>
           <div class="admin-actions">
             ${actionButtons}
-            <button class="btn btn-chat" data-client-uid="${order.userId}" data-order-id="${order.orderId}">Contact Client / View Chat</button>
+            <button class="btn btn-chat" data-client-uid="${order.userId}" data-order-id="${order.orderId}">Contact Client</button>
           </div>
         `;
         ordersListDiv.appendChild(orderElement);
