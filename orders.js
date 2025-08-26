@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loggedOutView = document.getElementById('logged-out-view');
   const loginForm = document.getElementById('login-form');
   const signupForm = document.getElementById('signup-form');
-  const authError = document.getElementById('auth-error');
+  const authError = document.getElementById('auth-error'); // Re-used for order messages
   const showLoginTabBtn = document.getElementById('show-login-tab');
   const showSignupTabBtn = document.getElementById('show-signup-tab');
   const loginFormContainer = document.getElementById('login-form-container');
@@ -40,8 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const deliveryTimeSelect = document.getElementById('delivery-time');
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
-
-  // New DOM elements for new features
   const togglePlatformsBtn = document.getElementById('toggle-platforms-btn');
   const orderFormContainer = document.getElementById('order-form-container');
   const platformOptions = document.getElementById('platform-options');
@@ -67,11 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Event Listeners ---
   showLoginTabBtn.addEventListener('click', () => switchTab('login'));
   showSignupTabBtn.addEventListener('click', () => switchTab('signup'));
-
   loginForm.addEventListener('submit', handleLogin);
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
-
   orderForm.addEventListener('input', updatePrice);
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
@@ -95,14 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
     Array.from(paymentDetailsContainer.children).forEach(child => {
       child.classList.add('hidden');
     });
-
     const selectedPaymentDiv = document.getElementById(`payment-details-${selectedCurrency}`);
     if (selectedPaymentDiv) {
       selectedPaymentDiv.classList.remove('hidden');
     }
   });
 
-  // Initially trigger the currency change to set the correct payment details on page load
   currencySelect.dispatchEvent(new Event('change'));
 
   // --- Functions ---
@@ -139,6 +133,20 @@ document.addEventListener('DOMContentLoaded', () => {
     authError.textContent = message;
     authError.classList.remove('hidden');
   }
+  
+  // New function to show messages to the user instead of alert()
+  function showOrderMessage(message, isError = false) {
+      const messageEl = document.getElementById('auth-error'); // Reusing the auth error element for simplicity
+      messageEl.textContent = message;
+      messageEl.style.color = isError ? '#e74c3c' : '#2ecc71'; // Red for error, Green for success
+      messageEl.classList.remove('hidden');
+
+      // Hide the message after 5 seconds
+      setTimeout(() => {
+          messageEl.classList.add('hidden');
+      }, 5000);
+  }
+
 
   function updatePrice() {
     const serviceType = serviceTypeSelect.value;
@@ -156,38 +164,38 @@ document.addEventListener('DOMContentLoaded', () => {
     upfrontEl.textContent = upfrontPayment.toFixed(2);
   }
 
-  /**
-   * Handles the entire order submission process.
-   * This function is triggered when the user clicks the "Submit Order" button.
-   */
   async function handleOrderSubmit(e) {
-    // 1. Prevent the default browser action of submitting the form, which would reload the page.
     e.preventDefault();
     
-    // 2. Ensure a user is logged in before proceeding.
     if (!currentUser) {
-      alert("You must be logged in to place an order.");
+      showOrderMessage("You must be logged in to place an order.", true);
       return;
     }
 
-    // 3. Get the submit button and disable it to prevent accidental multiple submissions.
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Verifying...';
 
     try {
-      // 4. Gather all the data from the form fields.
-      const clientName = document.getElementById('client-name').value;
-      const contactInfo = document.getElementById('contact-info').value;
-      const projectDescription = document.getElementById('project-description').value;
+      const clientName = document.getElementById('client-name').value.trim();
+      const contactInfo = document.getElementById('contact-info').value.trim();
+      const projectDescription = document.getElementById('project-description').value.trim();
       const serviceType = serviceTypeSelect.value;
+      
+      // --- FORM VALIDATION ---
+      if (!clientName || !contactInfo || !projectDescription || !serviceType) {
+          showOrderMessage("Please fill out all required fields before submitting.", true);
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Order';
+          return;
+      }
+
       const deliveryTime = deliveryTimeSelect.value;
       const selectedDeliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
       const currency = currencySelect.value;
       const totalPrice = parseFloat(totalPriceEl.textContent);
       const upfrontPayment = parseFloat(upfrontEl.textContent);
 
-      // 5. Determine which transaction number input to use based on the selected currency.
       let transactionNumberInput;
       if (currency === 'ETB') {
         transactionNumberInput = document.getElementById('transaction-number');
@@ -199,30 +207,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const transactionNumber = transactionNumberInput ? transactionNumberInput.value.trim() : '';
 
-      // 6. Validate the transaction number - it must not be empty.
       if (!transactionNumber) {
-        alert("A valid Transaction ID is required. Please enter it to proceed.");
+        showOrderMessage("A valid Transaction ID is required. Please enter it to proceed.", true);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit Order';
         return;
       }
 
-      // 7. Check if this transaction ID has already been used for another order to prevent duplicates.
       const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        alert("This Transaction ID has already been used. Please check the ID or contact support if you believe this is an error.");
+        showOrderMessage("This Transaction ID has already been used. Please check the ID.", true);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit Order';
         return;
       }
 
-      // 8. If all checks pass, update the button text and proceed to create the order.
       submitBtn.textContent = 'Submitting...';
       const orderId = `order_${Date.now()}`;
 
-      // 9. Create the order data object to be saved in Firestore.
       const orderData = {
         orderId: orderId,
         userId: currentUser.uid,
@@ -237,33 +241,27 @@ document.addEventListener('DOMContentLoaded', () => {
         upfrontPayment: upfrontPayment,
         currency: currency,
         transactionNumber: transactionNumber,
-        // Set the initial status to 'Pending Confirmation' as required.
         status: 'Pending Confirmation',
         createdAt: serverTimestamp()
       };
 
-      // 10. Save the new order to the 'orders' collection in Firestore.
       await setDoc(doc(db, 'orders', orderId), orderData);
 
-      // 11. Create or update the conversation record for this user.
       await setDoc(doc(db, 'conversations', currentUser.uid), {
         userId: currentUser.uid,
         userEmail: currentUser.email,
         lastUpdate: serverTimestamp()
       }, { merge: true });
 
-      // 12. Notify the user of success and reset the form for a new order.
-      alert("Order placed successfully! We will review it shortly. You can see its status in the 'My Orders' section.");
+      showOrderMessage("Order placed successfully! We will review it shortly.", false);
       orderForm.reset();
-      updatePrice(); // Reset the price display
-      currencySelect.dispatchEvent(new Event('change')); // Reset the payment details display
+      updatePrice();
+      currencySelect.dispatchEvent(new Event('change'));
 
     } catch (error) {
-      // 13. If any error occurs during the process, log it and notify the user.
       console.error("Order submission error:", error);
-      alert("Sorry, there was an error submitting your order. Please try again or contact support.");
+      showOrderMessage("Sorry, there was an error submitting your order. Please try again.", true);
     } finally {
-      // 14. No matter what happens (success or error), re-enable the submit button.
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit Order';
     }
