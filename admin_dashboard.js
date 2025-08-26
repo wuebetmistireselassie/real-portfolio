@@ -13,8 +13,8 @@ import {
     where,
     getDocs,
     getDoc // Make sure getDoc is imported
-} from './auth.js';
-import { openChat, sendSystemMessage } from './chat.js';
+} from './auth.js?=v6';
+import { openChat, sendSystemMessage } from './chat.js?=v6';
 
 document.addEventListener('DOMContentLoaded', () => {
     // ✅ Hardcoded Admin UID
@@ -185,3 +185,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
