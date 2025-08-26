@@ -10,16 +10,17 @@ import {
     updateDoc,
     signInWithEmailAndPassword,
     orderBy,
-    where,
+    getDoc,
     getDocs,
-    getDoc // Make sure getDoc is imported
-} from './auth.js?=v6';
-import { openChat, sendSystemMessage } from './chat.js?=v6';
+    where
+} from './auth.js';
+import { openChat, sendSystemMessage } from './chat.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ✅ Hardcoded Admin UID
+    // --- Configuration ---
     const ADMIN_UID = "mL8wfi0Bgvan5yh9yxCthmEDhJc2";
 
+    // --- DOM Elements ---
     const adminLoginView = document.getElementById('admin-login-view');
     const adminDashboardView = document.getElementById('admin-dashboard-view');
     const adminLoginForm = document.getElementById('admin-login-form');
@@ -27,11 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const allOrdersList = document.getElementById('all-orders-list');
     const allChatsList = document.getElementById('all-chats-list');
     const unauthorizedView = document.getElementById('unauthorized-view');
+    const adminAuthError = document.getElementById('admin-auth-error');
 
     let chatsUnsubscribe = null;
     let ordersUnsubscribe = null;
 
-    // 🔑 Watch authentication state
+    // --- Authentication (Restored to original working version) ---
+
     onAuthStateChanged(auth, user => {
         if (user && user.uid === ADMIN_UID) {
             adminLoginView.classList.add('hidden');
@@ -51,9 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Login form
     adminLoginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        adminAuthError.classList.add('hidden');
         const email = document.getElementById('admin-login-email').value;
         const password = document.getElementById('admin-login-password').value;
         try {
@@ -63,8 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 unauthorizedView.classList.remove('hidden');
             }
         } catch (error) {
-            document.getElementById('admin-auth-error').textContent = "Login failed: " + error.message;
-            document.getElementById('admin-auth-error').classList.remove('hidden');
+            adminAuthError.textContent = "Login failed: " + error.message;
+            adminAuthError.classList.remove('hidden');
         }
     });
 
@@ -73,6 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (chatsUnsubscribe) chatsUnsubscribe();
         signOut(auth);
     });
+
+    // --- Data Display ---
 
     function listenForAllOrders() {
         const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
@@ -89,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 let actionButtons = '';
                 if (order.status === 'Pending Confirmation') {
-                    // ✅ FIXED: Added data-user-id to buttons
                     actionButtons = `
                         <button class="btn btn-approve" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Approve</button>
                         <button class="btn btn-reject" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Reject</button>
@@ -103,15 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p><strong>Client:</strong> ${order.clientName} (${order.email})</p>
                     <p><strong>Contact:</strong> ${order.contactInfo}</p>
                     <p><strong>Service:</strong> ${order.serviceType}</p>
-                    <p><strong>Deliverables:</strong> ${order.deliverables}</p>
-                    <p><strong>Total Price:</strong> ${order.totalPrice.toFixed(2)} ETB</p>
-                    <p><strong>Upfront Payment:</strong> ${order.upfrontPayment.toFixed(2)} ETB</p>
+                    <p><strong>Deliverables:</strong> ${order.deliverables.join(', ')}</p>
+                    <p><strong>Total Price:</strong> ${order.totalPrice.toFixed(2)} ${order.currency}</p>
+                    <p><strong>Upfront Payment:</strong> ${order.upfrontPayment.toFixed(2)} ${order.currency}</p>
                     <p><strong>Transaction ID:</strong> ${order.transactionNumber}</p>
                     <p><strong>Status:</strong> <span class="status-${order.status.toLowerCase().replace(/\s+/g, '-')}">${order.status}</span></p>
                     <p><strong>Description:</strong> ${order.projectDescription}</p>
-                    <div class="order-actions">
-                        ${actionButtons}
-                    </div>
+                    <div class="order-actions">${actionButtons}</div>
                     <hr>
                 `;
                 allOrdersList.appendChild(div);
@@ -119,31 +121,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Event listener for the Approve/Reject buttons
-    allOrdersList.addEventListener('click', async (e) => {
-        const orderId = e.target.dataset.orderId;
-        const userId = e.target.dataset.userId; // ✅ FIXED: Get userId here
-        if (!orderId) return;
+    // --- Actions (With fixes for Status and Contact button) ---
 
-        if (e.target.classList.contains('btn-approve')) {
-            await updateOrderStatus(orderId, 'Paid', userId); // ✅ FIXED: Pass userId
-        } else if (e.target.classList.contains('btn-reject')) {
-            await updateOrderStatus(orderId, 'Rejected', userId); // ✅ FIXED: Pass userId
-        } else if (e.target.classList.contains('btn-contact-client')) {
-            const userEmail = e.target.dataset.userEmail;
-            openChat(userId, `Chat with ${userEmail}`);
+    allOrdersList.addEventListener('click', async (e) => {
+        const target = e.target;
+        const userId = target.dataset.userId;
+
+        if (target.classList.contains('btn-contact-client')) {
+            if (userId) {
+                const userEmail = target.dataset.userEmail;
+                openChat(userId, `Chat with ${userEmail}`);
+            }
+            return;
+        }
+
+        const orderId = target.dataset.orderId;
+        if (!orderId || !userId) return;
+
+        if (target.classList.contains('btn-approve')) {
+            await updateOrderStatus(orderId, 'Paid', userId);
+        } else if (target.classList.contains('btn-reject')) {
+            await updateOrderStatus(orderId, 'Rejected', userId);
         }
     });
     
-    // ✅ FIXED: This function is now much simpler and more reliable.
     async function updateOrderStatus(orderId, newStatus, clientUserId) {
         const orderRef = doc(db, 'orders', orderId);
         try {
-            // This will now correctly update the status in Firestore
             await updateDoc(orderRef, { status: newStatus });
             console.log(`Order ${orderId} status updated to ${newStatus}.`);
             
-            // This will now correctly send the system message
             if (clientUserId) {
                 const orderSnap = await getDoc(orderRef);
                 const orderData = orderSnap.data();
@@ -153,6 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Error updating order status:", error);
         }
     }
+
+    // --- Chat Display ---
 
     function listenForAllChats() {
         const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
