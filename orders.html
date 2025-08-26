@@ -74,6 +74,8 @@
           </div>
           <div id="order-form-container">
             <h3>Place a New Order</h3>
+            <!-- The error message paragraph is now here, where it will always be visible -->
+            <p id="auth-error" class="error-message hidden" style="margin-bottom: 1rem; text-align: center;"></p>
             <form id="order-form">
               <label for="client-name">Full Name</label>
               <input type="text" id="client-name" name="client-name" placeholder="Please enter your full name" required>
@@ -185,7 +187,7 @@
                 </form>
               </div>
             </div>
-            <p id="auth-error" class="error-message hidden"></p>
+            <!-- The error message paragraph was moved from here -->
           </div>
         </div>
       </div>
@@ -212,11 +214,11 @@
     <p>&copy; 2025 Mistireselassie W. All rights reserved.</p>
   </footer>
 
-  <script type="module" src="auth.js?=v5"></script>
-  <script type="module" src="config.js?=v5"></script>
-  <script type="module" src="price.js?=v5"></script>
-  <script type="module" src="chat.js?=v5"></script>
-  <script type="module" src="orders.js?=v5"></script>
+  <script type="module" src="auth.js"></script>
+  <script type="module" src="config.js"></script>
+  <script type="module" src="price.js"></script>
+  <script type="module" src="chat.js"></script>
+  <script type="module" src="orders.js"></script>
 
   <script>
     const deliverables = {
@@ -255,7 +257,7 @@
   </script>
 
   <script type="module">
-    import { calculatePrice } from './price.js?=v5';
+    import { calculatePrice } from './price.js';
 
     const serviceSelect = document.getElementById("service-type");
     const deliveryTimeSelect = document.getElementById("delivery-time");
@@ -309,6 +311,3 @@
   </script>
 </body>
 </html>
-
-
-
