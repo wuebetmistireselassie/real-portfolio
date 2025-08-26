@@ -611,19 +611,27 @@ footer {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px var(--surface-shadow);
 }
-#order-feedback {
-  margin: 0.5rem 0;
-  padding: 0.5rem;
+.form-feedback {
+  margin-bottom: 1rem;
+  border-left: 5px solid;
+  padding: 12px;
   border-radius: 6px;
+  font-size: 0.95rem;
 }
-#order-feedback.success {
-  background: #e6ffed;
-  color: #046c4e;
+
+.form-feedback.success {
+  background: #e6f7f0; /* soft green background */
+  border-color: #00a86b; /* brand green accent */
+  color: #007a50;        /* darker green text */
 }
-#order-feedback.error {
-  background: #ffe6e6;
-  color: #a80000;
+
+.form-feedback.error {
+  background: #fdecea;  /* soft red background */
+  border-color: #d93025; /* brand red accent */
+  color: #a32015;        /* darker red text */
 }
+
+
 
 
 
