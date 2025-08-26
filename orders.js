@@ -48,6 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const paymentDetailsContainer = document.getElementById('payment-details-container');
   const feedbackEl = document.getElementById('order-feedback');
 
+  // ✅ Define currency conversion rates. Update these with your actual rates.
+  const CONVERSION_RATES = {
+    ETB: 1,
+    USD: 0.018, // Example rate: 1 ETB = 0.018 USD
+    CNY: 0.13,  // Example rate: 1 ETB = 0.13 CNY
+  };
+
   // --- Helpers ---
   function showFeedback(message, type = 'success') {
     if (!feedbackEl) { alert(message); return; }
@@ -117,17 +124,30 @@ document.addEventListener('DOMContentLoaded', () => {
     authError.classList.remove('hidden');
   }
 
+  // ✅ FIXED: This function now correctly calculates the price based on the selected currency.
   function updatePrice() {
     const serviceType = serviceTypeSelect.value;
     const deliveryTime = deliveryTimeSelect.value;
     const deliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
+    const selectedCurrency = currencySelect.value;
 
     if (!serviceType || !deliveryTime) return;
-    const totalPrice = calculatePrice(serviceType, deliveryTime, deliverables);
-    const upfrontPayment = totalPrice * 0.3;
-    totalPriceEl.textContent = totalPrice.toFixed(2);
-    upfrontEl.textContent = upfrontPayment.toFixed(2);
+
+    // 1. Calculate the base price (assuming calculatePrice returns ETB)
+    const basePriceETB = calculatePrice(serviceType, deliveryTime, deliverables);
+    
+    // 2. Get the conversion rate for the selected currency
+    const conversionRate = CONVERSION_RATES[selectedCurrency] || 1;
+
+    // 3. Convert the price
+    const convertedPrice = basePriceETB * conversionRate;
+    const upfrontPayment = convertedPrice * 0.3;
+
+    // 4. Update the display with the new price and currency
+    totalPriceEl.textContent = `${convertedPrice.toFixed(2)} ${selectedCurrency}`;
+    upfrontEl.textContent = `${upfrontPayment.toFixed(2)} ${selectedCurrency}`;
   }
+
 
   async function handleOrderSubmit(e) {
     e.preventDefault();
@@ -197,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         serviceType: serviceTypeSelect.value,
         deliveryTime: deliveryTimeSelect.value,
         deliverables: selectedDeliverables,
+        // ✅ FIXED: Parse the number from the text content, which now includes the currency symbol.
         totalPrice: parseFloat(totalPriceEl.textContent),
         upfrontPayment: parseFloat(upfrontEl.textContent),
         currency: selectedCurrency,
@@ -213,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       showFeedback('Order placed successfully! Scroll down to view it in "My Orders".', 'success');
       orderForm.reset();
+      updatePrice(); // Recalculate price after reset
       toggleTxnFieldsForCurrency(currencySelect.value);
     } catch (error) {
       console.error('Order submission error:', error);
@@ -224,7 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function listenToClientOrders(userId) {
-    // ✅ FIXED: Added orderBy to sort the orders by creation time, newest first.
     const qOrders = query(
         collection(db, 'orders'), 
         where('userId', '==', userId),
@@ -238,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
-      // We no longer need to manually sort, Firestore does it for us.
       const orderDocs = snapshot.docs;
 
       ordersContainer.innerHTML = '<h3>My Orders</h3>';
@@ -261,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ordersContainer.appendChild(orderElement);
       });
     }, (error) => {
-        // This error message will appear if the index is missing.
         console.error("Error fetching orders:", error);
         const ordersContainer = document.getElementById('orders-list');
         ordersContainer.innerHTML = '<h3>My Orders</h3><p class="error-message">Error loading orders. The required database index is likely missing.</p>';
@@ -303,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loginForm.addEventListener('submit', handleLogin);
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
-  orderForm.addEventListener('input', updatePrice);
+  orderForm.addEventListener('input', updatePrice); // This will now handle currency changes too
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
   generalContactBtn.addEventListener('click', handleGeneralContactClick);
@@ -321,6 +340,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   currencySelect.addEventListener('change', () => {
     toggleTxnFieldsForCurrency(currencySelect.value);
+    updatePrice(); // Recalculate price when currency changes
   });
   toggleTxnFieldsForCurrency(currencySelect.value);
+  updatePrice(); // Initial price calculation on page load
 });
