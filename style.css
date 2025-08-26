@@ -611,6 +611,21 @@ footer {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px var(--surface-shadow);
 }
+#order-feedback {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+#order-feedback.success {
+  background: #e6ffed;
+  color: #046c4e;
+}
+#order-feedback.error {
+  background: #ffe6e6;
+  color: #a80000;
+}
+
+
 
 
 
