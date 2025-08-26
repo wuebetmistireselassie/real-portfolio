@@ -10,7 +10,8 @@ import {
     updateDoc,
     signInWithEmailAndPassword,
     orderBy,
-    getDoc // Import getDoc
+    where,
+    getDocs
 } from './auth.js';
 import { openChat, sendSystemMessage } from './chat.js';
 
@@ -29,34 +30,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let chatsUnsubscribe = null;
     let ordersUnsubscribe = null;
 
-    // 🔑 Watch authentication state with added logging
+    // 🔑 Watch authentication state (Reverted to original working version)
     onAuthStateChanged(auth, user => {
-        console.log("Auth state changed. Checking user...");
-        if (user) {
-            // A user is signed in.
-            console.log("User is signed in with UID:", user.uid);
-            console.log("Admin UID to match:", ADMIN_UID);
-            if (user.uid === ADMIN_UID) {
-                // User is the admin.
-                console.log("Success: User is the admin. Showing dashboard.");
-                adminLoginView.classList.add('hidden');
-                unauthorizedView.classList.add('hidden');
-                adminDashboardView.classList.remove('hidden');
-                listenForAllOrders();
-                listenForAllChats();
-            } else {
-                // A different, non-admin user is signed in.
-                console.log("Failure: User is NOT the admin. Showing unauthorized view.");
-                adminDashboardView.classList.add('hidden');
+        if (user && user.uid === ADMIN_UID) {
+            adminLoginView.classList.add('hidden');
+            unauthorizedView.classList.add('hidden');
+            adminDashboardView.classList.remove('hidden');
+            listenForAllOrders();
+            listenForAllChats();
+        } else {
+            adminDashboardView.classList.add('hidden');
+            if (user) {
                 unauthorizedView.classList.remove('hidden');
                 adminLoginView.classList.add('hidden');
+            } else {
+                adminLoginView.classList.remove('hidden');
+                unauthorizedView.classList.add('hidden');
             }
-        } else {
-            // No user is signed in.
-            console.log("No user is signed in. Showing login form.");
-            adminDashboardView.classList.add('hidden');
-            unauthorizedView.classList.add('hidden');
-            adminLoginView.classList.remove('hidden');
         }
     });
 
@@ -103,10 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 let actionButtons = '';
                 if (order.status === 'Pending Confirmation') {
-                    // Pass the client's user ID to the buttons
                     actionButtons = `
-                        <button class="btn btn-approve" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Approve</button>
-                        <button class="btn btn-reject" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Reject</button>
+                        <button class="btn btn-approve" data-order-id="${docSnap.id}">Approve</button>
+                        <button class="btn btn-reject" data-order-id="${docSnap.id}">Reject</button>
                     `;
                 }
                 
@@ -136,30 +125,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener for the Approve/Reject buttons
     allOrdersList.addEventListener('click', async (e) => {
         const orderId = e.target.dataset.orderId;
-        const userId = e.target.dataset.userId; // Get the client's user ID
+        if (!orderId) return;
 
         if (e.target.classList.contains('btn-approve')) {
-            // ✅ CHANGED: Update status to 'Paid' instead of 'In Progress'
-            await updateOrderStatus(orderId, 'Paid', userId); 
+            // ✅ This is the corrected line
+            await updateOrderStatus(orderId, 'Paid');
         } else if (e.target.classList.contains('btn-reject')) {
-            await updateOrderStatus(orderId, 'Rejected', userId);
+            await updateOrderStatus(orderId, 'Rejected');
         } else if (e.target.classList.contains('btn-contact-client')) {
+            const userId = e.target.dataset.userId;
             const userEmail = e.target.dataset.userEmail;
             openChat(userId, `Chat with ${userEmail}`);
         }
     });
     
-    async function updateOrderStatus(orderId, newStatus, clientUserId) {
-        if (!orderId || !clientUserId) return; // Safety check
-
+    async function updateOrderStatus(orderId, newStatus) {
         const orderRef = doc(db, 'orders', orderId);
         try {
             await updateDoc(orderRef, { status: newStatus });
+            // Removed alert for better UX
             console.log(`Order ${orderId} status updated to ${newStatus}.`);
             
             // Send a system message to the client
-            sendSystemMessage(clientUserId, `Your order with ID ${orderId} has been updated to: "${newStatus}".`);
+            const orderDocQuery = query(collection(db, 'orders'), where('orderId', '==', orderId));
+            const orderDocSnapshot = await getDocs(orderDocQuery);
 
+            if (!orderDocSnapshot.empty) {
+                const clientUserId = orderDocSnapshot.docs[0].data().userId;
+                sendSystemMessage(clientUserId, `Your order with ID ${orderId} has been updated to: "${newStatus}".`);
+            }
         } catch (error) {
             console.error("Error updating order status:", error);
         }
@@ -167,9 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function listenForAllChats() {
-        // This query needs the composite index we discussed earlier.
-        // It assumes your conversation documents have a 'participants' array and a 'lastUpdatedAt' timestamp.
-        const q = query(collection(db, 'conversations'), orderBy('lastUpdatedAt', 'desc'));
+        // NOTE: This query will fail without the correct composite index.
+        const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
 
         chatsUnsubscribe = onSnapshot(q, (snapshot) => {
             allChatsList.innerHTML = '';
@@ -179,22 +172,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             snapshot.forEach(doc => {
                 const chat = doc.data();
-                // You'll need to adjust this part based on your final conversation data structure
-                // For example, finding the other participant's email to display.
-                const userEmail = chat.userEmail || 'Client Chat'; // Fallback
-                const userId = chat.userId;
-
-                if (userId && userEmail) {
+                if (chat.userId && chat.userEmail) {
                     const chatElement = document.createElement('div');
                     chatElement.className = 'chat-list-item';
-                    chatElement.dataset.userId = userId;
-                    chatElement.dataset.userEmail = userEmail;
+                    chatElement.dataset.userId = chat.userId;
+                    chatElement.dataset.userEmail = chat.userEmail;
                     chatElement.innerHTML = `
-                        <p><strong>${userEmail}</strong></p>
-                        <p>Last update: ${chat.lastUpdatedAt ? new Date(chat.lastUpdatedAt.toDate()).toLocaleString() : 'N/A'}</p>
+                        <p><strong>${chat.userEmail}</strong></p>
+                        <p>Last update: ${chat.lastUpdate ? new Date(chat.lastUpdate.toDate()).toLocaleString() : 'N/A'}</p>
                     `;
                     chatElement.addEventListener('click', () => {
-                        openChat(userId, `Chat with ${userEmail}`);
+                        openChat(chat.userId, `Chat with ${chat.userEmail}`);
                     });
                     allChatsList.appendChild(chatElement);
                 }
