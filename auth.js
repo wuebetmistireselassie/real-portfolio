@@ -17,6 +17,7 @@ import {
     query, 
     where, 
     getDocs,
+    getDoc,
     onSnapshot,
     serverTimestamp, // <-- ADDED THIS LINE
     addDoc,          // <-- ADDED THIS LINE
@@ -50,6 +51,7 @@ export {
     query, 
     where, 
     getDocs,
+     getDoc,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     onSnapshot,
@@ -57,3 +59,4 @@ export {
     addDoc,          // <-- AND ADDED THIS LINE
     orderBy          // <-- AND ADDED THIS LINE
 };
+
