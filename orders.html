@@ -233,11 +233,11 @@
     </footer>
 
     <!-- Firebase and App Logic Scripts -->
-    <script type="module" src="config.js?=v4"></script>
-    <script type="module" src="auth.js?=v4"></script>
-    <script type="module" src="price.js?=v4"></script>
-    <script type="module" src="chat.js?=v4"></script>
-    <script type="module" src="orders.js?=v4"></script> <!-- This script now handles the form -->
+    <script type="module" src="config.js?=v5"></script>
+    <script type="module" src="auth.js?=v5"></script>
+    <script type="module" src="price.js?=v5"></script>
+    <script type="module" src="chat.js?=v5"></script>
+    <script type="module" src="orders.js?=v5"></script> <!-- This script now handles the form -->
 
     <!-- Inline script for dynamically populating deliverables -->
     <script>
@@ -280,7 +280,7 @@
     <script type="module">
         import {
             calculatePrice
-        } from './price.js?=v4';
+        } from './price.js?=v5';
 
         const serviceSelectForPrice = document.getElementById("service-type");
         const deliveryTimeSelect = document.getElementById("delivery-time");
@@ -335,4 +335,5 @@
 </body>
 
 </html>
+
 
