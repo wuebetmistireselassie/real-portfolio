@@ -92,7 +92,7 @@ function init() {
 
     // --- Authentication ---
     // This is the single source of truth that runs on every page load.
-    // Because all views are hidden in the HTML, there is no flash of incorrect content.
+    // It guarantees one of the three views is shown.
     onAuthStateChanged(auth, (user) => {
         stopListeners();
 
