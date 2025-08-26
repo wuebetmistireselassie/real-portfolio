@@ -12,7 +12,8 @@ import {
   onSnapshot,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  serverTimestamp
+  serverTimestamp,
+  orderBy // ✅ Import orderBy
 } from './auth.js';
 import { calculatePrice } from './price.js';
 import { openChat, sendSystemMessage } from './chat.js';
@@ -223,15 +224,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function listenToClientOrders(userId) {
-    const qOrders = query(collection(db, 'orders'), where('userId', '==', userId));
+    // ✅ FIXED: Added orderBy to sort the orders by creation time, newest first.
+    const qOrders = query(
+        collection(db, 'orders'), 
+        where('userId', '==', userId),
+        orderBy('createdAt', 'desc') 
+    );
+
     ordersUnsubscribe = onSnapshot(qOrders, (snapshot) => {
       const ordersContainer = document.getElementById('orders-list');
       if (snapshot.empty) {
         ordersContainer.innerHTML = '<h3>My Orders</h3><p>You have no previous orders.</p>';
         return;
       }
+      
+      // We no longer need to manually sort, Firestore does it for us.
+      const orderDocs = snapshot.docs;
+
       ordersContainer.innerHTML = '<h3>My Orders</h3>';
-      snapshot.forEach(docSnap => {
+      orderDocs.forEach(docSnap => {
         const order = docSnap.data();
         const statusClass = String(order.status || '').toLowerCase().replace(/ /g, '-');
         const statusText = order.status === 'Pending Confirmation'
@@ -249,6 +260,11 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         ordersContainer.appendChild(orderElement);
       });
+    }, (error) => {
+        // This error message will appear if the index is missing.
+        console.error("Error fetching orders:", error);
+        const ordersContainer = document.getElementById('orders-list');
+        ordersContainer.innerHTML = '<h3>My Orders</h3><p class="error-message">Error loading orders. The required database index is likely missing.</p>';
     });
   }
 
