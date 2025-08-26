@@ -10,8 +10,7 @@ import {
     updateDoc,
     signInWithEmailAndPassword,
     orderBy,
-    serverTimestamp,
-    addDoc
+    getDoc // Import getDoc
 } from './auth.js';
 import { openChat, sendSystemMessage } from './chat.js';
 
@@ -93,9 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 let actionButtons = '';
                 if (order.status === 'Pending Confirmation') {
+                    // Pass the client's user ID to the buttons
                     actionButtons = `
-                        <button class="btn btn-approve" data-order-id="${docSnap.id}">Approve</button>
-                        <button class="btn btn-reject" data-order-id="${docSnap.id}">Reject</button>
+                        <button class="btn btn-approve" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Approve</button>
+                        <button class="btn btn-reject" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Reject</button>
                     `;
                 }
                 
@@ -125,39 +125,40 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener for the Approve/Reject buttons
     allOrdersList.addEventListener('click', async (e) => {
         const orderId = e.target.dataset.orderId;
-        if (!orderId) return;
+        const userId = e.target.dataset.userId; // Get the client's user ID
 
         if (e.target.classList.contains('btn-approve')) {
-            await updateOrderStatus(orderId, 'In Progress');
+            // ✅ CHANGED: Update status to 'Paid' instead of 'In Progress'
+            await updateOrderStatus(orderId, 'Paid', userId); 
         } else if (e.target.classList.contains('btn-reject')) {
-            await updateOrderStatus(orderId, 'Rejected');
+            await updateOrderStatus(orderId, 'Rejected', userId);
         } else if (e.target.classList.contains('btn-contact-client')) {
-            const userId = e.target.dataset.userId;
             const userEmail = e.target.dataset.userEmail;
             openChat(userId, `Chat with ${userEmail}`);
         }
     });
     
-    async function updateOrderStatus(orderId, newStatus) {
+    async function updateOrderStatus(orderId, newStatus, clientUserId) {
+        if (!orderId || !clientUserId) return; // Safety check
+
         const orderRef = doc(db, 'orders', orderId);
         try {
             await updateDoc(orderRef, { status: newStatus });
-            alert(`Order ${orderId} status updated to ${newStatus}.`);
-            // Optionally, send a system message to the client
-            const orderDoc = await getDocs(query(collection(db, 'orders'), where('orderId', '==', orderId)));
-            if (!orderDoc.empty) {
-                const clientUserId = orderDoc.docs[0].data().userId;
-                sendSystemMessage(clientUserId, `Your order with ID ${orderId} has been updated to: "${newStatus}".`);
-            }
+            console.log(`Order ${orderId} status updated to ${newStatus}.`);
+            
+            // Send a system message to the client
+            sendSystemMessage(clientUserId, `Your order with ID ${orderId} has been updated to: "${newStatus}".`);
+
         } catch (error) {
             console.error("Error updating order status:", error);
-            alert("Failed to update order status.");
         }
     }
 
 
     function listenForAllChats() {
-        const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
+        // This query needs the composite index we discussed earlier.
+        // It assumes your conversation documents have a 'participants' array and a 'lastUpdatedAt' timestamp.
+        const q = query(collection(db, 'conversations'), orderBy('lastUpdatedAt', 'desc'));
 
         chatsUnsubscribe = onSnapshot(q, (snapshot) => {
             allChatsList.innerHTML = '';
@@ -167,21 +168,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             snapshot.forEach(doc => {
                 const chat = doc.data();
-                if (chat.userId && chat.userEmail) {
+                // You'll need to adjust this part based on your final conversation data structure
+                // For example, finding the other participant's email to display.
+                const userEmail = chat.userEmail || 'Client Chat'; // Fallback
+                const userId = chat.userId;
+
+                if (userId && userEmail) {
                     const chatElement = document.createElement('div');
                     chatElement.className = 'chat-list-item';
-                    chatElement.dataset.userId = chat.userId;
-                    chatElement.dataset.userEmail = chat.userEmail;
+                    chatElement.dataset.userId = userId;
+                    chatElement.dataset.userEmail = userEmail;
                     chatElement.innerHTML = `
-                        <p><strong>${chat.userEmail}</strong></p>
-                        <p>Last update: ${chat.lastUpdate ? new Date(chat.lastUpdate.toDate()).toLocaleString() : 'N/A'}</p>
+                        <p><strong>${userEmail}</strong></p>
+                        <p>Last update: ${chat.lastUpdatedAt ? new Date(chat.lastUpdatedAt.toDate()).toLocaleString() : 'N/A'}</p>
                     `;
                     chatElement.addEventListener('click', () => {
-                        openChat(chat.userId, `Chat with ${chat.userEmail}`);
+                        openChat(userId, `Chat with ${userEmail}`);
                     });
                     allChatsList.appendChild(chatElement);
                 }
             });
+        }, (error) => {
+            console.error("Error listening to chats:", error);
+            allChatsList.innerHTML = `<p class="error-message">Error loading chats. You may need to create a Firestore index.</p>`;
         });
     }
 });
