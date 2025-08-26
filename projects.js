@@ -20,6 +20,11 @@ const designs = [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167320/Bean_and_Bloom_hfoasb.svg' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755344715/Bean_and_Bloom_White_version_fwd60r.png' }
         ],
+        mockupGallery: [
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755343786/Bean_and_Bloom_Coffee_Brand_Mockup_jedwwq.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755286184/bean-and-bloom-logo-mockup.jpg_nhrqkj.jpg' },
+            { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755344880/Bean_and_Bloom_coffee_shop_mockup_vuepvc.jpg' },
+        ],
         processGallery: [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755367015/Bean_and_Bloom_Design_Process_1_ntpmsz.png' },
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755367081/Bean_and_Bloom_Design_Process_2_rqgtq1.png' },
@@ -153,6 +158,7 @@ const designs = [
             { url: 'https://res.cloudinary.com/dreresany/image/upload/v1755543943/IronCore_Fitness_Gym_training_4_lztpl6.png' },
         ]
     },
+    // --- UNICOMBO OBJECT MOVED TO HERE (INSIDE THE ARRAY) & CASE STUDY CORRECTED ---
     {
         id: 'unicombo',
         title: 'UniCombo Gaming Website',
@@ -201,7 +207,15 @@ const services = [
         title: 'Data Entry & Administrative Support'
     },
     {
-        id: 'interactive-dashboard',
-        title: 'SkyPulse Interactive Dashboard (Sample)'
+        id: 'excel-sample',
+        title: 'SkyPulse Interactive Dashboard Sample (Excel)',
+        url: 'https://res.cloudinary.com/dreresany/raw/upload/v1755082552/Interactive_Dashboard_bzwcms.xlsx'
+    },
+    {
+        id: 'ppt-sample',
+        title: 'SkyPulse (PPTX)',
+        url: 'https://docs.google.com/presentation/d/1fGQv90tWiE67GIt3YMXQHENtppNDjnAQ/edit?usp=drive_link&ouid=106245665520969369871&rtpof=true&sd=true'
     }
 ];
+
+const allProjects = [...designs, ...services];
