@@ -1,278 +1,326 @@
-// admin_dashboard.js
-
 import {
-    auth,
-    onAuthStateChanged,
-    signOut,
-    db,
-    collection,
-    query,
-    onSnapshot,
-    doc,
-    updateDoc,
-    signInWithEmailAndPassword,
-    orderBy,
-    getDoc,
+  auth,
+  onAuthStateChanged,
+  signOut,
+  db,
+  collection,
+  query,
+  onSnapshot,
+  doc,
+  updateDoc,
+  signInWithEmailAndPassword,
+  orderBy,
+  getDoc,
 } from './auth.js';
 import { openChat, sendSystemMessage } from './chat.js';
 
-// Self-invoking function to ensure initialization runs after the DOM is ready.
 (function initWhenReady() {
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+  // Run immediately if DOM is already parsed; otherwise wait for DOMContentLoaded.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
 
 function init() {
-    // --- Configuration ---
-    // This should be your specific Firebase UID for the admin account.
-    const ADMIN_UID = 'mL8wfi0Bgvan5yh9yxCthmEDhJc2';
+  // --- Configuration ---
+  const ADMIN_UID = 'mL8wfi0Bgvan5yh9yxCthmEDhJc2'; // <- update if your admin UID changes
 
-    // --- DOM Elements ---
-    const adminLoginView = document.getElementById('admin-login-view');
-    const adminDashboardView = document.getElementById('admin-dashboard-view');
-    const adminLoginForm = document.getElementById('admin-login-form');
-    const adminLogoutBtn = document.getElementById('admin-logout-btn');
-    const allOrdersList = document.getElementById('all-orders-list');
-    const allChatsList = document.getElementById('all-chats-list');
-    const unauthorizedView = document.getElementById('unauthorized-view');
-    const adminAuthError = document.getElementById('admin-auth-error');
+  // --- DOM Elements ---
+  const adminLoginView = document.getElementById('admin-login-view');
+  const adminDashboardView = document.getElementById('admin-dashboard-view');
+  const adminLoginForm = document.getElementById('admin-login-form');
+  const adminLogoutBtn = document.getElementById('admin-logout-btn');
+  const allOrdersList = document.getElementById('all-orders-list');
+  const allChatsList = document.getElementById('all-chats-list');
+  const unauthorizedView = document.getElementById('unauthorized-view');
+  const adminAuthError = document.getElementById('admin-auth-error');
 
-    let chatsUnsubscribe = null;
-    let ordersUnsubscribe = null;
+  let chatsUnsubscribe = null;
+  let ordersUnsubscribe = null;
 
-    // --- Helper Functions ---
-    const stopListeners = () => {
-        if (ordersUnsubscribe) { ordersUnsubscribe(); ordersUnsubscribe = null; }
-        if (chatsUnsubscribe) { chatsUnsubscribe(); chatsUnsubscribe = null; }
-    };
+  // --- Helpers ---
+  const stopListeners = () => {
+    if (ordersUnsubscribe) { ordersUnsubscribe(); ordersUnsubscribe = null; }
+    if (chatsUnsubscribe) { chatsUnsubscribe(); chatsUnsubscribe = null; }
+  };
 
-    const showDashboard = () => {
-        adminLoginView?.classList.add('hidden');
-        unauthorizedView?.classList.add('hidden');
-        adminDashboardView?.classList.remove('hidden');
-    };
+  const showDashboard = () => {
+    adminLoginView?.classList.add('hidden');
+    unauthorizedView?.classList.add('hidden');
+    adminDashboardView?.classList.remove('hidden');
+  };
 
-    const showUnauthorized = () => {
-        stopListeners();
-        adminDashboardView?.classList.add('hidden');
-        adminLoginView?.classList.add('hidden');
-        unauthorizedView?.classList.remove('hidden');
-    };
+  const showUnauthorized = () => {
+    stopListeners();
+    adminDashboardView?.classList.add('hidden');
+    adminLoginView?.classList.add('hidden');
+    unauthorizedView?.classList.remove('hidden');
+  };
 
-    const showLogin = () => {
-        stopListeners();
-        adminDashboardView?.classList.add('hidden');
-        unauthorizedView?.classList.add('hidden');
-        adminLoginView?.classList.remove('hidden');
-    };
-    
-    // Formats a number as a currency string.
-    const toMoney = (value, currency) => {
-        const n = Number(value);
-        if (Number.isFinite(n)) return `${n.toFixed(2)} ${currency || ''}`.trim();
-        return value != null ? String(value) : '';
-    };
+  const showLogin = () => {
+    stopListeners();
+    adminDashboardView?.classList.add('hidden');
+    unauthorizedView?.classList.add('hidden');
+    adminLoginView?.classList.remove('hidden');
+  };
 
-    // --- Authentication: The Single Source of Truth ---
-    // This listener handles all auth state changes, fixing the primary login issue.
-    onAuthStateChanged(auth, (user) => {
-        // Always stop previous listeners when auth state changes.
-        stopListeners();
+  const toMoney = (value, currency) => {
+    const n = Number(value);
+    if (Number.isFinite(n)) return `${n.toFixed(2)} ${currency || ''}`.trim();
+    return value != null ? String(value) : '';
+  };
 
-        if (user) {
-            // A user is logged in. Check if they are the admin.
-            if (user.uid === ADMIN_UID) {
-                showDashboard();
-                // Start the real-time listeners for orders and chats.
-                listenForAllOrders();
-                listenForAllChats();
-            } else {
-                // User is logged in but is NOT an admin.
-                showUnauthorized();
-            }
-        } else {
-            // No user is logged in.
-            showLogin();
+  // --- Authentication fix (Bug #1) ---
+  // Hide login view until we know the auth state to avoid asking for credentials
+  // when an existing session already exists.
+  adminLoginView?.classList.add('hidden');
+  adminDashboardView?.classList.add('hidden');
+  unauthorizedView?.classList.add('hidden');
+
+  // If a persisted session is already loaded synchronously, render immediately.
+  if (auth.currentUser && auth.currentUser.uid) {
+    if (auth.currentUser.uid === ADMIN_UID) {
+      showDashboard();
+      listenForAllOrders();
+      listenForAllChats();
+    } else {
+      showUnauthorized();
+    }
+  }
+
+  // Always subscribe to auth changes (robust in case currentUser is initially null).
+  onAuthStateChanged(auth, (user) => {
+    // Clear any prior snapshot listeners if auth user changes
+    if (!user) {
+      showLogin();
+      return;
+    }
+
+    if (user.uid === ADMIN_UID) {
+      showDashboard();
+      // (Re)start listeners safely
+      stopListeners();
+      listenForAllOrders();
+      listenForAllChats();
+    } else {
+      showUnauthorized();
+    }
+  });
+
+  // --- Login form ---
+  adminLoginForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    adminAuthError?.classList.add('hidden');
+
+    const email = /** @type {HTMLInputElement} */ (document.getElementById('admin-login-email'))?.value || '';
+    const password = /** @type {HTMLInputElement} */ (document.getElementById('admin-login-password'))?.value || '';
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      if (userCredential.user?.uid !== ADMIN_UID) {
+        await signOut(auth);
+        showUnauthorized();
+      }
+      // If it *is* the admin, onAuthStateChanged will flip the UI to dashboard.
+    } catch (error) {
+      if (adminAuthError) {
+        adminAuthError.textContent = 'Login failed: ' + (error?.message || String(error));
+        adminAuthError.classList.remove('hidden');
+      }
+    }
+  });
+
+  // --- Logout ---
+  adminLogoutBtn?.addEventListener('click', async () => {
+    stopListeners();
+    await signOut(auth);
+    showLogin();
+  });
+
+  // --- Orders: Live Display ---
+  function listenForAllOrders() {
+    const qOrders = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+    ordersUnsubscribe = onSnapshot(
+      qOrders,
+      (snapshot) => {
+        allOrdersList.innerHTML = '';
+        if (snapshot.empty) {
+          allOrdersList.innerHTML = '<p>No orders found.</p>';
+          return;
         }
-    });
 
-    // --- Event Listeners ---
-    adminLoginForm?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        adminAuthError?.classList.add('hidden');
+        snapshot.forEach((docSnap) => {
+          const order = docSnap.data() || {};
+          const container = document.createElement('div');
+          container.className = 'order-item';
+          container.dataset.docId = docSnap.id;
 
-        const email = document.getElementById('admin-login-email')?.value || '';
-        const password = document.getElementById('admin-login-password')?.value || '';
+          // Action buttons
+          let actionButtons = '';
+          const userIdAttr = order.userId ? String(order.userId) : '';
+          const userEmailAttr = order.email ? String(order.email) : '';
 
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            // After login, the onAuthStateChanged listener above will automatically handle showing the correct view.
-            if (userCredential.user?.uid !== ADMIN_UID) {
-                // If a non-admin logs in here, sign them out immediately.
-                await signOut(auth);
+          if (order.status === 'Pending Confirmation') {
+            actionButtons = `
+              <button class="btn btn-approve" data-order-id="${docSnap.id}" data-user-id="${userIdAttr}">Approve</button>
+              <button class="btn btn-reject" data-order-id="${docSnap.id}" data-user-id="${userIdAttr}">Reject</button>
+            `;
+          }
+          actionButtons += `
+            <button class="btn btn-contact-client" data-user-id="${userIdAttr}" data-user-email="${userEmailAttr}">
+              Contact Client
+            </button>
+          `;
+
+          // Safe fields
+          const deliverables = Array.isArray(order.deliverables) ? order.deliverables.join(', ') : (order.deliverables || '');
+          const createdAtText = (() => {
+            try {
+              const ts = order.createdAt;
+              const d = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+              return d && !isNaN(d.getTime()) ? d.toLocaleString() : 'N/A';
+            } catch {
+              return 'N/A';
             }
-        } catch (error) {
-            if (adminAuthError) {
-                adminAuthError.textContent = 'Login failed: ' + (error?.message || String(error));
-                adminAuthError.classList.remove('hidden');
-            }
-        }
-    });
-    
-    adminLogoutBtn?.addEventListener('click', () => signOut(auth));
+          })();
 
-    // --- Real-time Firestore Listeners ---
+          const statusClass = String(order.status || '').toLowerCase().replace(/\s+/g, '-');
 
-    // Listens for all orders and renders them. This is the source of truth for the UI.
-    function listenForAllOrders() {
-        const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-        ordersUnsubscribe = onSnapshot(
-            q,
-            (snapshot) => {
-                allOrdersList.innerHTML = ''; // Clear previous list
-                if (snapshot.empty) {
-                    allOrdersList.innerHTML = '<p>No orders found.</p>';
-                    return;
-                }
+          container.innerHTML = `
+            <div class="order-summary">
+              <div><strong>Order ID:</strong> ${order.orderId || docSnap.id}</div>
+              <div><strong>Client:</strong> ${order.fullName || ''} ${order.email ? `(${order.email})` : ''}</div>
+              <div><strong>Phone:</strong> ${order.phone || ''}</div>
+              <div><strong>Deliverables:</strong> ${deliverables}</div>
+              <div><strong>Currency:</strong> ${order.currency || ''}</div>
+              <div><strong>Upfront Payment:</strong> ${toMoney(order.upfrontPayment, order.currency)}</div>
+              <div><strong>Total Price:</strong> ${toMoney(order.price, order.currency)}</div>
+              <div><strong>Created:</strong> ${createdAtText}</div>
+              <div><strong>Status:</strong> <span class="order-status status-${statusClass}">${order.status || ''}</span></div>
+            </div>
+            <div class="order-actions">
+              ${actionButtons}
+            </div>
+          `;
 
-                snapshot.forEach((docSnap) => {
-                    const order = docSnap.data() || {};
-                    const container = document.createElement('div');
-                    container.className = 'order-item';
-                    container.dataset.docId = docSnap.id;
-                    
-                    // Dynamically generate action buttons based on order status
-                    let actionButtons = '';
-                    if (order.status === 'Pending Confirmation') {
-                        actionButtons = `
-                            <button class="btn btn-approve" data-order-id="${docSnap.id}" data-user-id="${order.userId || ''}">Approve</button>
-                            <button class="btn btn-reject" data-order-id="${docSnap.id}" data-user-id="${order.userId || ''}">Reject</button>
-                        `;
-                    }
-                    
-                    // Always include the contact button. This resolves bug #3.
-                    actionButtons += `
-                        <button class="btn btn-contact-client" data-user-id="${order.userId || ''}" data-user-email="${order.email || ''}">
-                            Contact Client
-                        </button>
-                    `;
+          allOrdersList.appendChild(container);
+        });
+      },
+      (error) => {
+        console.error('Error listening to orders:', error);
+        allOrdersList.innerHTML = `<p class="error-message">Error loading orders.</p>`;
+      }
+    );
+  }
 
-                    const deliverables = Array.isArray(order.deliverables) ? order.deliverables.join(', ') : (order.deliverables || 'N/A');
-                    const statusClass = String(order.status || '').toLowerCase().replace(/\s+/g, '-');
+  // --- Orders: Actions (event delegation + optimistic UI) ---
+  allOrdersList.addEventListener('click', async (e) => {
+    const button = /** @type {HTMLElement|null} */ (e.target instanceof Element ? e.target.closest('button') : null);
+    if (!button) return;
 
-                    container.innerHTML = `
-                        <h4>Order ID: ${order.orderId || docSnap.id}</h4>
-                        <p><strong>Client:</strong> ${order.clientName || 'N/A'} (${order.email || 'N/A'})</p>
-                        <p><strong>Contact:</strong> ${order.contactInfo || 'N/A'}</p>
-                        <p><strong>Service:</strong> ${order.serviceType || 'N/A'}</p>
-                        <p><strong>Deliverables:</strong> ${deliverables}</p>
-                        <p><strong>Total Price:</strong> ${toMoney(order.totalPrice, order.currency)}</p>
-                        <p><strong>Upfront Payment:</strong> ${toMoney(order.upfrontPayment, order.currency)}</p>
-                        <p><strong>Transaction ID:</strong> ${order.transactionNumber || 'N/A'}</p>
-                        <p><strong>Status:</strong> <span class="order-status status-${statusClass}">${order.status || '—'}</span></p>
-                        <p><strong>Description:</strong> ${order.projectDescription || 'N/A'}</p>
-                        <div class="order-actions">${actionButtons}</div>
-                        <hr>
-                    `;
-                    allOrdersList.appendChild(container);
-                });
-            },
-            (error) => {
-                console.error('Error listening to orders:', error);
-                allOrdersList.innerHTML = `<p class="error-message">Error loading orders. Ensure the required Firestore index is created.</p>`;
-            }
+    // CONTACT CLIENT
+    if (button.classList.contains('btn-contact-client')) {
+      const userId = button.dataset.userId || '';
+      const userEmail = button.dataset.userEmail || '';
+      if (userId) {
+        openChat(userId, `Chat with ${userEmail || 'client'}`);
+      }
+      return;
+    }
+
+    // APPROVE / REJECT
+    const orderId = button.dataset.orderId || '';
+    const clientUserId = button.dataset.userId || '';
+    if (!orderId) return;
+
+    if (button.classList.contains('btn-approve') || button.classList.contains('btn-reject')) {
+      const newStatus = button.classList.contains('btn-approve') ? 'Paid' : 'Rejected';
+
+      // Optimistic UI update for instant feedback
+      const orderItem = button.closest('.order-item');
+      const statusSpan = orderItem?.querySelector('.order-status');
+      if (statusSpan) {
+        statusSpan.textContent = newStatus;
+        statusSpan.className = `order-status status-${newStatus.toLowerCase().replace(/\s+/g, '-')}`;
+      }
+
+      try {
+        await updateOrderStatus(orderId, newStatus, clientUserId);
+      } catch (err) {
+        console.error('Error updating order status:', err);
+        // Optional: Roll back optimistic UI change or surface an error toast.
+      }
+    }
+  });
+
+  async function updateOrderStatus(orderId, newStatus, clientUserId) {
+    // Update Firestore (this immediately syncs to client/orders view via its onSnapshot)
+    const orderRef = doc(db, 'orders', orderId);
+    await updateDoc(orderRef, { status: newStatus });
+
+    // Notify the client (if chat system is available)
+    if (clientUserId) {
+      try {
+        const orderSnap = await getDoc(orderRef);
+        const orderData = orderSnap.data() || {};
+        const friendlyId = orderData.orderId || orderId;
+        sendSystemMessage(
+          clientUserId,
+          `Your order with ID ${friendlyId} has been updated to: "${newStatus}".`
         );
+      } catch (err) {
+        console.warn('Status updated, but failed to notify client:', err);
+      }
     }
-    
-    // Centralized click handler for all buttons on the orders list.
-    allOrdersList.addEventListener('click', async (e) => {
-        const button = e.target.closest('button');
-        if (!button) return;
+  }
 
-        const orderId = button.dataset.orderId;
-        const clientUserId = button.dataset.userId;
-
-        // Handle Approve/Reject clicks
-        if (button.classList.contains('btn-approve') || button.classList.contains('btn-reject')) {
-            if (!orderId) return;
-            const newStatus = button.classList.contains('btn-approve') ? 'Paid' : 'Rejected';
-            button.disabled = true; // Prevent double-clicks
-            await updateOrderStatus(orderId, newStatus, clientUserId);
-            // The UI will update automatically via the onSnapshot listener, ensuring consistency.
+  // --- Chats: Live Display (sorted by lastUpdate) ---
+  function listenForAllChats() {
+    const qChats = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
+    chatsUnsubscribe = onSnapshot(
+      qChats,
+      (snapshot) => {
+        allChatsList.innerHTML = '';
+        if (snapshot.empty) {
+          allChatsList.innerHTML = '<p>No active chats.</p>';
+          return;
         }
 
-        // Handle Contact Client clicks
-        if (button.classList.contains('btn-contact-client')) {
-            const userEmail = button.dataset.userEmail;
-            if (clientUserId) {
-                openChat(clientUserId, `Chat with ${userEmail || 'client'}`);
-            }
-        }
-    });
+        snapshot.forEach((docSnap) => {
+          const chat = docSnap.data() || {};
+          if (chat.userId && chat.userEmail) {
+            const chatElement = document.createElement('div');
+            chatElement.className = 'chat-list-item';
+            chatElement.dataset.userId = chat.userId;
+            chatElement.dataset.userEmail = chat.userEmail;
 
-    // Updates an order's status in Firestore and notifies the client.
-    async function updateOrderStatus(orderId, newStatus, clientUserId) {
-        const orderRef = doc(db, 'orders', orderId);
-        try {
-            await updateDoc(orderRef, { status: newStatus });
-            // After a successful update, send a notification message to the client's chat.
-            if (clientUserId) {
-                const orderSnap = await getDoc(orderRef);
-                const orderData = orderSnap.data() || {};
-                const friendlyId = orderData.orderId || orderId;
-                sendSystemMessage(
-                    clientUserId,
-                    `Your order (${friendlyId}) status has been updated to: "${newStatus}".`
-                );
-            }
-        } catch (error) {
-            console.error('Failed to update order status:', error);
-            // Optionally, show an error to the admin here.
-        }
-    }
+            let lastUpdatedText = 'N/A';
+            try {
+              const ts = chat.lastUpdate;
+              const date = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+              if (date && !isNaN(date.getTime())) {
+                lastUpdatedText = date.toLocaleString();
+              }
+            } catch { /* noop */ }
 
-    // Listens for all client chat conversations.
-    function listenForAllChats() {
-        const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
-        chatsUnsubscribe = onSnapshot(
-            q,
-            (snapshot) => {
-                allChatsList.innerHTML = ''; // Clear previous list
-                if (snapshot.empty) {
-                    allChatsList.innerHTML = '<p>No active chats.</p>';
-                    return;
-                }
+            chatElement.innerHTML = `
+              <div><strong>${chat.userEmail}</strong></div>
+              <div class="subtle">Last updated: ${lastUpdatedText}</div>
+            `;
+            chatElement.addEventListener('click', () => {
+              openChat(chat.userId, `Chat with ${chat.userEmail}`);
+            });
 
-                snapshot.forEach((docSnap) => {
-                    const chat = docSnap.data() || {};
-                    if (chat.userId && chat.userEmail) {
-                        const chatElement = document.createElement('div');
-                        chatElement.className = 'chat-list-item';
-                        
-                        let lastUpdatedText = 'N/A';
-                        if (chat.lastUpdate?.toDate) {
-                           lastUpdatedText = chat.lastUpdate.toDate().toLocaleString();
-                        }
-                        
-                        chatElement.innerHTML = `
-                            <p><strong>${chat.userEmail}</strong></p>
-                            <p>Last update: ${lastUpdatedText}</p>
-                        `;
-
-                        chatElement.addEventListener('click', () => {
-                            openChat(chat.userId, `Chat with ${chat.userEmail}`);
-                        });
-                        allChatsList.appendChild(chatElement);
-                    }
-                });
-            },
-            (error) => {
-                console.error('Error listening to chats:', error);
-                allChatsList.innerHTML = `<p class="error-message">Error loading chats. You may need to create a Firestore index.</p>`;
-            }
-        );
-    }
+            allChatsList.appendChild(chatElement);
+          }
+        });
+      },
+      (error) => {
+        console.error('Error listening to chats:', error);
+        allChatsList.innerHTML = `<p class="error-message">Error loading chats. You may need to create a Firestore index.</p>`;
+      }
+    );
+  }
 }
