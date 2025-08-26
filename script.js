@@ -1,4 +1,29 @@
-
+/**
+ * NOTE: Add the following CSS to your stylesheet for the download button:
+ *
+ * .brand-guidelines-download {
+ * margin-top: 2rem;
+ * padding-top: 1.5rem;
+ * border-top: 1px solid #eee;
+ * }
+ *
+ * .download-button {
+ * display: inline-block;
+ * background-color: #007bff;
+ * color: #ffffff;
+ * padding: 10px 20px;
+ * border-radius: 5px;
+ * text-decoration: none;
+ * font-weight: bold;
+ * margin-top: 0.5rem;
+ * transition: background-color 0.3s ease;
+ * }
+ *
+ * .download-button:hover {
+ * background-color: #0056b3;
+ * }
+ *
+ */
 
 /**
  * Sets the profile picture in the header from a profileInfo object.
@@ -19,7 +44,7 @@ function renderHomePage() {
     const appContainer = document.getElementById('app-container');
     const homePage = document.getElementById('home-page');
     const projectPage = document.getElementById('project-page');
-    
+
     if (appContainer && homePage && projectPage) {
         homePage.classList.remove('hidden');
         projectPage.classList.add('hidden');
@@ -50,7 +75,7 @@ function renderHomePage() {
         services.forEach(item => {
             const itemElement = document.createElement('li');
             if (item.url) {
-                 itemElement.innerHTML = `
+                itemElement.innerHTML = `
                     <a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>
                 `;
             } else {
@@ -66,7 +91,6 @@ function renderHomePage() {
  * @param {string} projectId The ID of the project to render.
  */
 function renderProjectPage(projectId) {
-    const appContainer = document.getElementById('app-container');
     const homePage = document.getElementById('home-page');
     const projectPage = document.getElementById('project-page');
     const project = designs.find(item => item.id === projectId);
@@ -78,7 +102,7 @@ function renderProjectPage(projectId) {
         projectPage.classList.remove('hidden');
         return;
     }
-    
+
     // Dynamically build the logo variations
     const logoVariationsHTML = project.logoVariations.map(variation => {
         let classes = 'logo-system-item';
@@ -93,7 +117,6 @@ function renderProjectPage(projectId) {
         `;
     }).join('');
 
-    // --- NEW CODE BLOCK STARTS HERE ---
     // Dynamically build the design process gallery (if it exists)
     let processGalleryHTML = '';
     if (project.processGallery && project.processGallery.length > 0) {
@@ -110,7 +133,19 @@ function renderProjectPage(projectId) {
             </div>
         `;
     }
-    // --- NEW CODE BLOCK ENDS HERE ---
+
+    // --- NEW: Dynamically build the brand guidelines download section ---
+    let brandGuidelinesHTML = '';
+    // Check if the project object has a URL for brand guidelines
+    if (project.brandGuidelinesUrl && project.brandGuidelinesUrl !== '#') {
+        brandGuidelinesHTML = `
+            <div class="brand-guidelines-download">
+                <p>Download the official brand guidelines to see the complete visual identity system.</p>
+                <a href="${project.brandGuidelinesUrl}" class="download-button" target="_blank" download>Download Guidelines</a>
+            </div>
+        `;
+    }
+    // --- END OF NEW CODE BLOCK ---
 
     const projectContent = `
         <button id="back-to-home" class="back-button">← Back to All Projects</button>
@@ -122,7 +157,10 @@ function renderProjectPage(projectId) {
                     <p><strong>The Challenge:</strong> ${project.brief.challenge}</p>
                     <p><strong>The Solution:</strong> ${project.brief.solution}</p>
                 </div>
-                
+
+                <!-- The new download section will be injected here -->
+                ${brandGuidelinesHTML}
+
                 <div class="project-section">
                     <h3>Logo System</h3>
                     <div class="logo-system-grid">
@@ -181,8 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoEl = document.querySelector('.logo-name');
     if (logoEl) {
         logoEl.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.location.hash = '#home';
-            });
+            e.preventDefault();
+            window.location.hash = '#home';
+        });
     }
 });
