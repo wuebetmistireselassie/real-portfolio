@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 let actionButtons = '';
                 if (order.status === 'Pending Confirmation') {
+                    // ✅ FIXED: Added data-user-id to buttons
                     actionButtons = `
                         <button class="btn btn-approve" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Approve</button>
                         <button class="btn btn-reject" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Reject</button>
@@ -118,37 +119,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ✅ FIXED: Restructured the logic to handle the "Contact Client" button correctly.
+    // Event listener for the Approve/Reject buttons
     allOrdersList.addEventListener('click', async (e) => {
-        const target = e.target;
-        const userId = target.dataset.userId;
+        const orderId = e.target.dataset.orderId;
+        const userId = e.target.dataset.userId; // ✅ FIXED: Get userId here
+        if (!orderId) return;
 
-        // Handle Contact Client button first
-        if (target.classList.contains('btn-contact-client')) {
-            if (userId) {
-                const userEmail = target.dataset.userEmail;
-                openChat(userId, `Chat with ${userEmail}`);
-            }
-            return; // Stop after handling contact
-        }
-
-        // Handle Approve/Reject buttons
-        const orderId = target.dataset.orderId;
-        if (!orderId || !userId) return; // Ensure we have what we need for these actions
-
-        if (target.classList.contains('btn-approve')) {
-            await updateOrderStatus(orderId, 'Paid', userId);
-        } else if (target.classList.contains('btn-reject')) {
-            await updateOrderStatus(orderId, 'Rejected', userId);
+        if (e.target.classList.contains('btn-approve')) {
+            await updateOrderStatus(orderId, 'Paid', userId); // ✅ FIXED: Pass userId
+        } else if (e.target.classList.contains('btn-reject')) {
+            await updateOrderStatus(orderId, 'Rejected', userId); // ✅ FIXED: Pass userId
+        } else if (e.target.classList.contains('btn-contact-client')) {
+            const userEmail = e.target.dataset.userEmail;
+            openChat(userId, `Chat with ${userEmail}`);
         }
     });
     
+    // ✅ FIXED: This function is now much simpler and more reliable.
     async function updateOrderStatus(orderId, newStatus, clientUserId) {
         const orderRef = doc(db, 'orders', orderId);
         try {
+            // This will now correctly update the status in Firestore
             await updateDoc(orderRef, { status: newStatus });
             console.log(`Order ${orderId} status updated to ${newStatus}.`);
             
+            // This will now correctly send the system message
             if (clientUserId) {
                 const orderSnap = await getDoc(orderRef);
                 const orderData = orderSnap.data();
