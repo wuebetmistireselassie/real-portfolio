@@ -1,21 +1,3 @@
-// admin_dashboard.js — FIXED
-// Fixes implemented:
-// 1) Respect existing Firebase auth session so the admin dashboard does NOT ask to log in
-//    if the admin is already signed in elsewhere (e.g., orders.html). We hide the login
-//    view until auth state is known and then render the correct view. We also handle
-//    cross-tab/session persistence by checking onAuthStateChanged and auth.currentUser on init.
-// 2) Approve/Reject updates the order status in Firestore and reflects immediately
-//    in BOTH admin and client views (client listens to the same doc). We also send a
-//    system message through chat.js to notify the client.
-// 3) “Contact Client” always opens the chat modal (chat.js: openChat) for any order,
-//    regardless of status (Pending/Rejected/Paid).
-//
-// Dependencies: auth.js (Firebase), chat.js (chat modal + messaging).
-// HTML element IDs are from admin.html.
-//
-// NOTE: Keep the ADMIN_UID consistent with your real admin account.
-//
-
 import {
   auth,
   onAuthStateChanged,
