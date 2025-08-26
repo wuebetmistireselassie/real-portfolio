@@ -7,9 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?=v1">
-  <link rel="stylesheet" href="chat.css?=v1">
-  <link rel="stylesheet" href="orders.css?=v1">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="chat.css">
+  <link rel="stylesheet" href="orders.css">
   <style>
     /* Optional: make deliverables checkboxes look cleaner in 2 columns */
     #deliverables-container {
@@ -32,9 +32,18 @@
       gap: 1rem;
     }
     /* Add a class for elements that should be hidden */
-    .hidden {
-      display: none;
+    .hidden { display: none; }
+
+    /* Lightweight feedback styles */
+    .form-feedback { 
+      margin-bottom: 1rem; 
+      border-left: 4px solid; 
+      padding: 10px 12px; 
+      border-radius: 6px;
+      font-size: 0.95rem;
     }
+    .form-feedback.success { background: #e6ffed; border-color: #1a7f37; color: #1a7f37; }
+    .form-feedback.error   { background: #ffeef0; border-color: #d73a49; color: #d73a49; }
   </style>
 </head>
 <body>
@@ -73,16 +82,11 @@
             <button id="logout-btn" class="btn btn-secondary">Logout</button>
           </div>
           <div id="order-form-container">
-  <h3>Place a New Order</h3>
-  <!-- Feedback messages -->
-  <p id="order-feedback" class="hidden"></p>
-  <form id="order-form">
-    ...
-  </form>
-</div>
             <h3>Place a New Order</h3>
-            <!-- The error message paragraph is now here, where it will always be visible -->
-            <p id="auth-error" class="error-message hidden" style="margin-bottom: 1rem; text-align: center;"></p>
+
+            <!-- Feedback area for validation & success messages -->
+            <div id="order-feedback" class="form-feedback hidden" role="status" aria-live="polite"></div>
+
             <form id="order-form">
               <label for="client-name">Full Name</label>
               <input type="text" id="client-name" name="client-name" placeholder="Please enter your full name" required>
@@ -109,8 +113,7 @@
               <textarea id="project-description" name="project-description" rows="5" placeholder="Please describe your project requirements in detail..." required></textarea>
 
               <label>Final Deliverables Required</label>
-              <div id="deliverables-container">
-              </div>
+              <div id="deliverables-container"></div>
 
               <label for="delivery-time">Delivery Time</label>
               <select id="delivery-time" name="delivery-time" required>
@@ -138,7 +141,8 @@
                   <p><strong>Holder Name:</strong> Mistireselassie Taddese Wuebet</p>
                   <p><strong>Account:</strong> 0919981116</p>
                   <label for="transaction-number">Telebirr Transaction Number</label>
-                  <input type="text" id="transaction-number" name="transaction-number" placeholder="Enter the Txn ID here" required>
+                  <!-- Required is managed by JS so hidden fields never block submission -->
+                  <input type="text" id="transaction-number" name="transaction-number" placeholder="Enter the Txn ID here">
                 </div>
 
                 <div id="payment-details-USD" class="hidden">
@@ -146,7 +150,7 @@
                   <p>Please send the upfront payment via AirTM to the following email:</p>
                   <p><strong>Payment Email:</strong> changesat2021@gmail.com</p>
                   <label for="transaction-number-usd">AirTM Transaction Number</label>
-                  <input type="text" id="transaction-number-usd" name="transaction-number-usd" placeholder="Enter the Txn ID here" required>
+                  <input type="text" id="transaction-number-usd" name="transaction-number-usd" placeholder="Enter the Txn ID here">
                 </div>
 
                 <div id="payment-details-CNY" class="hidden">
@@ -154,7 +158,7 @@
                   <p>Please send the upfront payment via Alipay to the following email:</p>
                   <p><strong>Payment Email:</strong> changesat2021@gmail.com</p>
                   <label for="transaction-number-cny">Alipay Transaction Number</label>
-                  <input type="text" id="transaction-number-cny" name="transaction-number-cny" placeholder="Enter the Txn ID here" required>
+                  <input type="text" id="transaction-number-cny" name="transaction-number-cny" placeholder="Enter the Txn ID here">
                 </div>
               </div>
 
@@ -194,7 +198,7 @@
                 </form>
               </div>
             </div>
-            <!-- The error message paragraph was moved from here -->
+            <p id="auth-error" class="error-message hidden"></p>
           </div>
         </div>
       </div>
@@ -221,11 +225,11 @@
     <p>&copy; 2025 Mistireselassie W. All rights reserved.</p>
   </footer>
 
-  <script type="module" src="auth.js?=v1"></script>
-  <script type="module" src="config.js?=v1"></script>
-  <script type="module" src="price.js?=v1"></script>
-  <script type="module" src="chat.js?=v1"></script>
-  <script type="module" src="orders.js?=v1"></script>
+  <script type="module" src="auth.js"></script>
+  <script type="module" src="config.js"></script>
+  <script type="module" src="price.js"></script>
+  <script type="module" src="chat.js"></script>
+  <script type="module" src="orders.js"></script>
 
   <script>
     const deliverables = {
@@ -264,7 +268,7 @@
   </script>
 
   <script type="module">
-    import { calculatePrice } from './price.js?=v1';
+    import { calculatePrice } from './price.js';
 
     const serviceSelect = document.getElementById("service-type");
     const deliveryTimeSelect = document.getElementById("delivery-time");
@@ -318,5 +322,3 @@
   </script>
 </body>
 </html>
-
-
