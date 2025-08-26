@@ -212,11 +212,11 @@
     <p>&copy; 2025 Mistireselassie W. All rights reserved.</p>
   </footer>
 
-  <script type="module" src="auth.js"></script>
-  <script type="module" src="config.js"></script>
-  <script type="module" src="price.js"></script>
-  <script type="module" src="chat.js"></script>
-  <script type="module" src="orders.js"></script>
+  <script type="module" src="auth.js?=v4"></script>
+  <script type="module" src="config.js?=v4"></script>
+  <script type="module" src="price.js?=v4"></script>
+  <script type="module" src="chat.js?=v4"></script>
+  <script type="module" src="orders.js?=v4"></script>
 
   <script>
     const deliverables = {
@@ -255,7 +255,7 @@
   </script>
 
   <script type="module">
-    import { calculatePrice } from './price.js';
+    import { calculatePrice } from './price.js?=v4';
 
     const serviceSelect = document.getElementById("service-type");
     const deliveryTimeSelect = document.getElementById("delivery-time");
@@ -309,4 +309,5 @@
   </script>
 </body>
 </html>
+
 
