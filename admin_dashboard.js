@@ -1,5 +1,12 @@
-// admin_dashboard.js
+/**
+ * @file Admin dashboard logic for managing orders and chats.
+ * @author [Your Name]
+ * @version 7.0
+ */
 
+// ------------------------
+// --- IMPORTS & CONFIG ---
+// ------------------------
 import {
     auth,
     onAuthStateChanged,
@@ -12,277 +19,274 @@ import {
     updateDoc,
     signInWithEmailAndPassword,
     orderBy,
-    getDoc,
-} from './auth.js';
-import { openChat, sendSystemMessage } from './chat.js';
+    getDoc
+} from './auth.js?=v7';
+import { openChat, sendSystemMessage } from './chat.js?=v7';
 
+// Hardcoded Admin User ID
+const ADMIN_UID = "mL8wfi0Bgvan5yh9yxCthmEDhJc2";
+
+// ------------------------
+// --- DOM ELEMENTS ---
+// ------------------------
+const ui = {
+    views: {
+        login: document.getElementById('admin-login-view'),
+        dashboard: document.getElementById('admin-dashboard-view'),
+        unauthorized: document.getElementById('unauthorized-view'),
+    },
+    loginForm: document.getElementById('admin-login-form'),
+    logoutBtn: document.getElementById('admin-logout-btn'),
+    orderList: document.getElementById('all-orders-list'),
+    chatList: document.getElementById('all-chats-list'),
+    loginEmailInput: document.getElementById('admin-login-email'),
+    loginPasswordInput: document.getElementById('admin-login-password'),
+    loginError: document.getElementById('admin-auth-error'),
+};
+
+// ------------------------
+// --- STATE MANAGEMENT ---
+// ------------------------
+// Use a state object to hold dynamic data and unsubscribe functions.
+const state = {
+    listeners: {
+        orders: null,
+        chats: null,
+    },
+    currentUser: null,
+};
+
+// ------------------------
+// --- VIEW MANAGEMENT ---
+// ------------------------
 /**
- * This function waits for the DOM to be fully loaded before initializing the script.
- * This is a standard practice to prevent script errors from trying to access
- * elements that haven't been rendered yet.
+ * Manages which view is visible on the page.
+ * @param {('login'|'dashboard'|'unauthorized'|'none')} viewName - The name of the view to display.
  */
-(function initWhenReady() {
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeApp);
-    } else {
-        initializeApp();
-    }
-})();
-
-/**
- * Main application initializer.
- * It sets up the core authentication listener that controls the entire UI.
- */
-function initializeApp() {
-    // --- Configuration ---
-    // The unique identifier for the administrator account.
-    const ADMIN_UID = 'mL8wfi0Bgvan5yh9yxCthmEDhJc2';
-
-    // --- DOM Element Cache ---
-    // Caching elements improves performance by reducing repeated lookups.
-    const elements = {
-        loginView: document.getElementById('admin-login-view'),
-        dashboardView: document.getElementById('admin-dashboard-view'),
-        unauthorizedView: document.getElementById('unauthorized-view'),
-        loginForm: document.getElementById('admin-login-form'),
-        logoutBtn: document.getElementById('admin-logout-btn'),
-        ordersList: document.getElementById('all-orders-list'),
-        chatsList: document.getElementById('all-chats-list'),
-        authError: document.getElementById('admin-auth-error'),
-    };
-
-    // --- State Management ---
-    // These variables will hold the unsubscribe functions for our Firestore listeners.
-    let ordersUnsubscribe = null;
-    let chatsUnsubscribe = null;
-
-    /**
-     * Stops all active Firestore snapshot listeners.
-     * This is crucial to prevent memory leaks and unnecessary data fetching when
-     * the user logs out or is no longer authorized to see the data.
-     */
-    const stopListeners = () => {
-        if (ordersUnsubscribe) {
-            ordersUnsubscribe();
-            ordersUnsubscribe = null;
-        }
-        if (chatsUnsubscribe) {
-            chatsUnsubscribe();
-            chatsUnsubscribe = null;
-        }
-    };
-
-    /**
-     * --- DEFINITIVE FIX for Blank Screen ---
-     * This robust view controller directly manipulates the `display` style property.
-     * This bypasses any potential conflicts with CSS classes like '.hidden' and
-     * guarantees that the correct view is shown without fail.
-     * @param {string | null} viewId The ID of the element to make visible.
-     */
-    const setVisibleView = (viewId) => {
-        const views = [elements.loginView, elements.dashboardView, elements.unauthorizedView];
-        views.forEach(view => {
-            if (view) {
-                // Hide all views by default.
-                view.style.display = 'none';
-            }
-        });
-
-        // Show only the requested view.
-        if (viewId) {
-            const viewToShow = document.getElementById(viewId);
-            if (viewToShow) {
-                viewToShow.style.display = 'block'; // 'block' is a safe default for sections.
-            }
-        }
-    };
-
-    // Hide all views as soon as the script loads to prevent any content flash.
-    setVisibleView(null);
-
-    /**
-     * --- CORE AUTHENTICATION LOGIC ---
-     * This is the single source of truth for the UI. It runs when the page loads
-     * and any time the user's login state changes. It now uses the robust
-     * setVisibleView function to guarantee the correct UI is displayed.
-     */
-    onAuthStateChanged(auth, (user) => {
-        stopListeners(); // Always stop old listeners on auth change.
-        if (user) {
-            // A user is signed in. Check if it's the admin.
-            if (user.uid === ADMIN_UID) {
-                setVisibleView('admin-dashboard-view');
-                // Start fresh listeners for the admin's data.
-                listenForAllOrders();
-                listenForAllChats();
-            } else {
-                // A non-admin user is signed in. Show access denied.
-                setVisibleView('unauthorized-view');
-            }
-        } else {
-            // No user is signed in. Show the login form.
-            setVisibleView('admin-login-view');
-        }
-    });
-
-    // --- Event Listener Setup ---
-
-    elements.loginForm?.addEventListener('submit', handleAdminLogin);
-    elements.logoutBtn?.addEventListener('click', () => signOut(auth));
-    elements.ordersList?.addEventListener('click', handleOrderActionClick);
-
-    /**
-     * Handles the admin login form submission.
-     * @param {Event} e The form submission event.
-     */
-    async function handleAdminLogin(e) {
-        e.preventDefault();
-        elements.authError?.classList.add('hidden');
-        const email = elements.loginForm.elements['admin-login-email'].value;
-        const password = elements.loginForm.elements['admin-login-password'].value;
-
-        try {
-            const { setPersistence, browserLocalPersistence } = await import('https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js');
-            await setPersistence(auth, browserLocalPersistence);
-            await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            elements.authError.textContent = 'Login failed: Invalid credentials.';
-            elements.authError.classList.remove('hidden');
-        }
-    }
-
-    /**
-     * Uses event delegation to handle clicks on action buttons within the orders list.
-     * @param {Event} e The click event.
-     */
-    async function handleOrderActionClick(e) {
-        const button = e.target.closest('button');
-        if (!button) return;
-
-        const { orderId, userId, userEmail, orderFriendlyId } = button.dataset;
-
-        if (button.classList.contains('btn-contact-client')) {
-            if (userId && orderId) {
-                const chatTitle = `Chat with ${userEmail || 'client'} (Order: ${orderFriendlyId})`;
-                openChat(userId, chatTitle);
-                sendSystemMessage(userId, `--- Admin started chat regarding Order: ${orderFriendlyId} ---`);
-            }
-            return;
-        }
-
-        if (button.classList.contains('btn-approve') || button.classList.contains('btn-reject')) {
-            if (!orderId) return;
-            const newStatus = button.classList.contains('btn-approve') ? 'Paid' : 'Rejected';
-            button.disabled = true;
-            const sibling = button.nextElementSibling || button.previousElementSibling;
-            if (sibling) sibling.disabled = true;
-
-            const orderItem = button.closest('.order-item');
-            if (orderItem) {
-                const statusSpan = orderItem.querySelector('.order-status');
-                if (statusSpan) {
-                    statusSpan.textContent = newStatus;
-                }
-                orderItem.querySelector('.btn-approve')?.remove();
-                orderItem.querySelector('.btn-reject')?.remove();
-            }
-            await updateOrderStatusInFirestore(orderId, newStatus, userId, orderFriendlyId);
-        }
-    }
-
-    /**
-     * Updates an order's status in Firestore and notifies the client.
-     */
-    async function updateOrderStatusInFirestore(orderId, newStatus, clientUserId, friendlyOrderId) {
-        const orderRef = doc(db, 'orders', orderId);
-        await updateDoc(orderRef, { status: newStatus });
-        if (clientUserId) {
-            sendSystemMessage(clientUserId, `Your order (${friendlyOrderId}) has been ${newStatus}.`);
-        }
-    }
-
-    /**
-     * Sets up a real-time listener for the 'orders' collection.
-     */
-    function listenForAllOrders() {
-        const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-        ordersUnsubscribe = onSnapshot(q, (snapshot) => {
-            elements.ordersList.innerHTML = '';
-            if (snapshot.empty) {
-                elements.ordersList.innerHTML = '<p>No orders found.</p>';
-                return;
-            }
-            snapshot.forEach(docSnap => {
-                elements.ordersList.appendChild(createOrderElement(docSnap));
-            });
-        }, (error) => {
-            console.error('Error listening to orders:', error);
-            elements.ordersList.innerHTML = `<p class="error-message">Error loading orders.</p>`;
-        });
-    }
-
-    /**
-     * Creates an HTML element for a single order.
-     */
-    function createOrderElement(docSnap) {
-        const order = docSnap.data() || {};
-        const orderId = docSnap.id;
-        const friendlyOrderId = order.orderId || orderId;
-        const container = document.createElement('div');
-        container.className = 'order-item';
-
-        let actionButtons = '';
-        if (order.status === 'Pending Confirmation') {
-            actionButtons = `
-                <button class="btn btn-approve" data-order-id="${orderId}" data-user-id="${order.userId}" data-order-friendly-id="${friendlyOrderId}">Approve</button>
-                <button class="btn btn-reject" data-order-id="${orderId}" data-user-id="${order.userId}" data-order-friendly-id="${friendlyOrderId}">Reject</button>
-            `;
-        }
-        actionButtons += `
-            <button class="btn btn-contact-client"
-                data-user-id="${order.userId}"
-                data-user-email="${order.email}"
-                data-order-id="${orderId}"
-                data-order-friendly-id="${friendlyOrderId}">
-                Contact Client
-            </button>
-        `;
-
-        container.innerHTML = `
-            <h4>Order ID: ${friendlyOrderId}</h4>
-            <p><strong>Client:</strong> ${order.clientName || ''} (${order.email || ''})</p>
-            <p><strong>Status:</strong> <span class="order-status">${order.status || '—'}</span></p>
-            <p><strong>Description:</strong> ${order.projectDescription || ''}</p>
-            <div class="order-actions">${actionButtons}</div>
-            <hr>
-        `;
-        return container;
-    }
-
-    /**
-     * Sets up a real-time listener for all chat conversations.
-     */
-    function listenForAllChats() {
-        const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
-        chatsUnsubscribe = onSnapshot(q, (snapshot) => {
-            elements.chatsList.innerHTML = '';
-            if (snapshot.empty) {
-                elements.chatsList.innerHTML = '<p>No active chats.</p>';
-                return;
-            }
-            snapshot.forEach(docSnap => {
-                const chat = docSnap.data() || {};
-                if (chat.userId && chat.userEmail) {
-                    const chatElement = document.createElement('div');
-                    chatElement.className = 'chat-list-item';
-                    chatElement.innerHTML = `<p><strong>${chat.userEmail}</strong></p>`;
-                    chatElement.addEventListener('click', () => openChat(chat.userId, `Chat with ${chat.userEmail}`));
-                    elements.chatsList.appendChild(chatElement);
-                }
-            });
-        }, (error) => {
-            console.error('Error listening to chats:', error);
-            elements.chatsList.innerHTML = `<p class="error-message">Error loading chats.</p>`;
-        });
+function showView(viewName) {
+    Object.values(ui.views).forEach(view => view.classList.add('hidden'));
+    if (ui.views[viewName]) {
+        ui.views[viewName].classList.remove('hidden');
     }
 }
+
+// ---------------------------------
+// --- DATA RENDERING FUNCTIONS ---
+// ---------------------------------
+/**
+ * Creates the HTML for a single order item.
+ * @param {object} order - The order data from Firestore.
+ * @param {string} orderId - The Firestore document ID for the order.
+ * @returns {string} The HTML string for the order item.
+ */
+function createOrderHTML(order, orderId) {
+    let actionButtons = '';
+    if (order.status === 'Pending Confirmation') {
+        actionButtons = `
+            <button class="btn btn-approve" data-order-id="${orderId}" data-user-id="${order.userId}">Approve</button>
+            <button class="btn btn-reject" data-order-id="${orderId}" data-user-id="${order.userId}">Reject</button>
+        `;
+    }
+    actionButtons += `<button class="btn btn-contact-client" data-user-id="${order.userId}" data-user-email="${order.email}">Contact Client</button>`;
+
+    return `
+        <div class="order-item">
+            <h4>Order ID: ${order.orderId}</h4>
+            <p><strong>Client:</strong> ${order.clientName} (${order.email})</p>
+            <p><strong>Contact:</strong> ${order.contactInfo}</p>
+            <p><strong>Service:</strong> ${order.serviceType}</p>
+            <p><strong>Deliverables:</strong> ${order.deliverables}</p>
+            <p><strong>Total Price:</strong> ${order.totalPrice.toFixed(2)} ETB</p>
+            <p><strong>Upfront Payment:</strong> ${order.upfrontPayment.toFixed(2)} ETB</p>
+            <p><strong>Transaction ID:</strong> ${order.transactionNumber}</p>
+            <p><strong>Status:</strong> <span class="status-${order.status.toLowerCase().replace(/\s+/g, '-')}">${order.status}</span></p>
+            <p><strong>Description:</strong> ${order.projectDescription}</p>
+            <div class="order-actions">${actionButtons}</div>
+            <hr>
+        </div>
+    `;
+}
+
+/**
+ * Creates the HTML for a single chat list item.
+ * @param {object} chat - The chat data from Firestore.
+ * @returns {HTMLElement} The created DOM element for the chat item.
+ */
+function createChatItemElement(chat) {
+    const element = document.createElement('div');
+    element.className = 'chat-list-item';
+    element.dataset.userId = chat.userId;
+    element.dataset.userEmail = chat.userEmail;
+    element.innerHTML = `
+        <p><strong>${chat.userEmail}</strong></p>
+        <p>Last update: ${chat.lastUpdate ? new Date(chat.lastUpdate.toDate()).toLocaleString() : 'N/A'}</p>
+    `;
+    element.addEventListener('click', () => {
+        openChat(chat.userId, `Chat with ${chat.userEmail}`);
+    });
+    return element;
+}
+
+// ------------------------------
+// --- FIREBASE INTERACTIONS ---
+// ------------------------------
+/**
+ * Sets up a real-time listener for all orders.
+ */
+function listenForAllOrders() {
+    const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+    state.listeners.orders = onSnapshot(q, (snapshot) => {
+        ui.orderList.innerHTML = "";
+        if (snapshot.empty) {
+            ui.orderList.innerHTML = '<p>No orders found.</p>';
+            return;
+        }
+        snapshot.forEach(docSnap => {
+            const orderHTML = createOrderHTML(docSnap.data(), docSnap.id);
+            ui.orderList.insertAdjacentHTML('beforeend', orderHTML);
+        });
+    });
+}
+
+/**
+ * Sets up a real-time listener for all conversations.
+ */
+function listenForAllChats() {
+    const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
+    state.listeners.chats = onSnapshot(q, (snapshot) => {
+        ui.chatList.innerHTML = '';
+        if (snapshot.empty) {
+            ui.chatList.innerHTML = '<p>No active chats.</p>';
+            return;
+        }
+        snapshot.forEach(docSnap => {
+            const chat = docSnap.data();
+            if (chat.userId && chat.userEmail) {
+                const chatElement = createChatItemElement(chat);
+                ui.chatList.appendChild(chatElement);
+            }
+        });
+    }, (error) => {
+        console.error("Error listening to chats:", error);
+        ui.chatList.innerHTML = `<p class="error-message">Error loading chats. You may need to create a Firestore index.</p>`;
+    });
+}
+
+/**
+ * Updates the status of an order and sends a system message to the client.
+ * @param {string} orderId - The Firestore document ID of the order.
+ * @param {('Paid'|'Rejected')} newStatus - The new status for the order.
+ * @param {string} clientUserId - The UID of the client associated with the order.
+ */
+async function updateOrderStatus(orderId, newStatus, clientUserId) {
+    const orderRef = doc(db, 'orders', orderId);
+    try {
+        await updateDoc(orderRef, { status: newStatus });
+        console.log(`Order ${orderId} status updated to ${newStatus}.`);
+
+        if (clientUserId) {
+            const orderSnap = await getDoc(orderRef);
+            if (orderSnap.exists()) {
+                const orderData = orderSnap.data();
+                const message = `Your order with ID ${orderData.orderId} has been updated to: "${newStatus}".`;
+                await sendSystemMessage(clientUserId, message);
+            }
+        }
+    } catch (error) {
+        console.error("Error updating order status:", error);
+        alert("Failed to update order status. Please check the console.");
+    }
+}
+
+// ------------------------
+// --- EVENT HANDLERS ---
+// ------------------------
+/**
+ * Handles the admin login form submission.
+ * @param {Event} e - The form submission event.
+ */
+async function handleAdminLogin(e) {
+    e.preventDefault();
+    ui.loginError.classList.add('hidden');
+    const email = ui.loginEmailInput.value;
+    const password = ui.loginPasswordInput.value;
+
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        if (userCredential.user.uid !== ADMIN_UID) {
+            await signOut(auth); // Sign out non-admin users immediately.
+            showView('unauthorized');
+        }
+    } catch (error) {
+        ui.loginError.textContent = `Login failed: ${error.message}`;
+        ui.loginError.classList.remove('hidden');
+    }
+}
+
+/**
+ * Handles clicks within the orders list for approving, rejecting, or contacting clients.
+ * @param {Event} e - The click event.
+ */
+async function handleOrderActions(e) {
+    const target = e.target;
+    const orderId = target.dataset.orderId;
+    const userId = target.dataset.userId;
+    const userEmail = target.dataset.userEmail;
+
+    if (target.classList.contains('btn-approve') && orderId && userId) {
+        await updateOrderStatus(orderId, 'Paid', userId);
+    } else if (target.classList.contains('btn-reject') && orderId && userId) {
+        await updateOrderStatus(orderId, 'Rejected', userId);
+    } else if (target.classList.contains('btn-contact-client') && userId && userEmail) {
+        openChat(userId, `Chat with ${userEmail}`);
+    }
+}
+
+/**
+ * Logs out the admin user and cleans up listeners.
+ */
+function handleAdminLogout() {
+    // Unsubscribe from Firestore listeners to prevent memory leaks.
+    if (state.listeners.orders) state.listeners.orders();
+    if (state.listeners.chats) state.listeners.chats();
+    signOut(auth);
+}
+
+/**
+ * Main handler for authentication state changes.
+ * @param {object|null} user - The Firebase user object, or null if logged out.
+ */
+function onAuthChange(user) {
+    state.currentUser = user;
+    if (user && user.uid === ADMIN_UID) {
+        showView('dashboard');
+        listenForAllOrders();
+        listenForAllChats();
+    } else if (user) {
+        showView('unauthorized');
+    } else {
+        showView('login');
+    }
+}
+
+// ------------------------
+// --- INITIALIZATION ---
+// ------------------------
+/**
+ * Sets up all necessary event listeners for the application.
+ */
+function initializeEventListeners() {
+    ui.loginForm.addEventListener('submit', handleAdminLogin);
+    ui.logoutBtn.addEventListener('click', handleAdminLogout);
+    ui.orderList.addEventListener('click', handleOrderActions);
+}
+
+/**
+ * Initializes the application once the DOM is fully loaded.
+ */
+function main() {
+    initializeEventListeners();
+    onAuthStateChanged(auth, onAuthChange);
+}
+
+document.addEventListener('DOMContentLoaded', main);
