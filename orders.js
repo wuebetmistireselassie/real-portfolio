@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const ordersList = document.getElementById('orders-list');
   const serviceTypeSelect = document.getElementById('service-type');
   const deliveryTimeSelect = document.getElementById('delivery-time');
+  const deliverablesContainer = document.getElementById("deliverables-container");
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
   const togglePlatformsBtn = document.getElementById('toggle-platforms-btn');
@@ -47,6 +48,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const currencySelect = document.getElementById('currency-select');
   const paymentDetailsContainer = document.getElementById('payment-details-container');
   const feedbackEl = document.getElementById('order-feedback');
+  const currencySymbolEl = document.getElementById("currency-symbol");
+  const upfrontSymbolEl = document.getElementById("upfront-symbol");
+
+  // ✅ Using the currency rates you provided.
+  const exchangeRates = {
+      ETB: 1,
+      USD: 0.007,
+      CNY: 0.05
+  };
 
   // --- Helpers ---
   function showFeedback(message, type = 'success') {
@@ -81,6 +91,32 @@ document.addEventListener('DOMContentLoaded', () => {
         input.required = true;
       }
     }
+  }
+
+  // ✅ This function is now the single source of truth for price updates.
+  function updatePriceUI() {
+    const service = serviceTypeSelect.value;
+    const delivery = deliveryTimeSelect.value;
+    const deliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
+    const currency = currencySelect.value;
+
+    if (!service) {
+      totalPriceEl.textContent = "0.00";
+      upfrontEl.textContent = "0.00";
+      currencySymbolEl.textContent = "ETB";
+      upfrontSymbolEl.textContent = "ETB";
+      return;
+    }
+
+    const totalETB = calculatePrice(service, delivery, deliverables);
+    const rate = exchangeRates[currency] || 1;
+    const total = (totalETB * rate).toFixed(2);
+    const upfront = (total * 0.3).toFixed(2);
+
+    totalPriceEl.textContent = total;
+    upfrontEl.textContent = upfront;
+    currencySymbolEl.textContent = currency;
+    upfrontSymbolEl.textContent = currency;
   }
 
   function switchTab(tabName) {
@@ -201,9 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       showFeedback('Order placed successfully! Scroll down to view it in "My Orders".', 'success');
       orderForm.reset();
-      // The inline script will handle resetting the price display after the form is cleared.
-      // Manually trigger a change event to be safe.
-      currencySelect.dispatchEvent(new Event('change'));
+      updatePriceUI(); // Reset the price display
       toggleTxnFieldsForCurrency(currencySelect.value);
     } catch (error) {
       console.error('Order submission error:', error);
@@ -308,12 +342,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   
-  // ✅ FIXED: This listener now only handles switching the transaction input fields.
-  // The inline script in orders.html handles the price UI updates.
+  // ✅ These listeners now correctly call the single updatePriceUI function.
+  serviceTypeSelect.addEventListener("change", updatePriceUI);
+  deliveryTimeSelect.addEventListener("change", updatePriceUI);
+  deliverablesContainer.addEventListener("change", updatePriceUI);
   currencySelect.addEventListener('change', () => {
     toggleTxnFieldsForCurrency(currencySelect.value);
+    updatePriceUI(); // Also update price when currency changes
   });
 
   // Initial setup on page load
   toggleTxnFieldsForCurrency(currencySelect.value);
+  updatePriceUI();
 });
