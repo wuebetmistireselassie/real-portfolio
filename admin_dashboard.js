@@ -1,3 +1,4 @@
+// admin_dashboard.js
 import {
   auth,
   onAuthStateChanged,
@@ -15,7 +16,6 @@ import {
 import { openChat, sendSystemMessage } from './chat.js';
 
 (function initWhenReady() {
-  // Run immediately if DOM is already parsed; otherwise wait for DOMContentLoaded.
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
@@ -24,26 +24,22 @@ import { openChat, sendSystemMessage } from './chat.js';
 })();
 
 function init() {
-  // --- Configuration ---
-  const ADMIN_UID = 'mL8wfi0Bgvan5yh9yxCthmEDhJc2'; // <- update if your admin UID changes
+  const ADMIN_UID = 'mL8wfi0Bgvan5yh9yxCthmEDhJc2';
 
-  // --- DOM Elements ---
+  // DOM elements
   const adminLoginView = document.getElementById('admin-login-view');
   const adminDashboardView = document.getElementById('admin-dashboard-view');
   const adminLoginForm = document.getElementById('admin-login-form');
   const adminLogoutBtn = document.getElementById('admin-logout-btn');
   const allOrdersList = document.getElementById('all-orders-list');
-  const allChatsList = document.getElementById('all-chats-list');
   const unauthorizedView = document.getElementById('unauthorized-view');
   const adminAuthError = document.getElementById('admin-auth-error');
 
-  let chatsUnsubscribe = null;
   let ordersUnsubscribe = null;
 
-  // --- Helpers ---
+  // Helpers to show/hide views
   const stopListeners = () => {
     if (ordersUnsubscribe) { ordersUnsubscribe(); ordersUnsubscribe = null; }
-    if (chatsUnsubscribe) { chatsUnsubscribe(); chatsUnsubscribe = null; }
   };
 
   const showDashboard = () => {
@@ -72,38 +68,29 @@ function init() {
     return value != null ? String(value) : '';
   };
 
-  // --- Authentication fix (Bug #1) ---
-  // Hide login view until we know the auth state to avoid asking for credentials
-  // when an existing session already exists.
+  // --- Authentication: login persistence (Bug #1 fixed) ---
   adminLoginView?.classList.add('hidden');
   adminDashboardView?.classList.add('hidden');
   unauthorizedView?.classList.add('hidden');
 
-  // If a persisted session is already loaded synchronously, render immediately.
   if (auth.currentUser && auth.currentUser.uid) {
     if (auth.currentUser.uid === ADMIN_UID) {
       showDashboard();
       listenForAllOrders();
-      listenForAllChats();
     } else {
       showUnauthorized();
     }
   }
 
-  // Always subscribe to auth changes (robust in case currentUser is initially null).
   onAuthStateChanged(auth, (user) => {
-    // Clear any prior snapshot listeners if auth user changes
     if (!user) {
       showLogin();
       return;
     }
-
     if (user.uid === ADMIN_UID) {
       showDashboard();
-      // (Re)start listeners safely
       stopListeners();
       listenForAllOrders();
-      listenForAllChats();
     } else {
       showUnauthorized();
     }
@@ -113,9 +100,8 @@ function init() {
   adminLoginForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     adminAuthError?.classList.add('hidden');
-
-    const email = /** @type {HTMLInputElement} */ (document.getElementById('admin-login-email'))?.value || '';
-    const password = /** @type {HTMLInputElement} */ (document.getElementById('admin-login-password'))?.value || '';
+    const email = document.getElementById('admin-login-email')?.value || '';
+    const password = document.getElementById('admin-login-password')?.value || '';
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -123,7 +109,6 @@ function init() {
         await signOut(auth);
         showUnauthorized();
       }
-      // If it *is* the admin, onAuthStateChanged will flip the UI to dashboard.
     } catch (error) {
       if (adminAuthError) {
         adminAuthError.textContent = 'Login failed: ' + (error?.message || String(error));
@@ -139,7 +124,7 @@ function init() {
     showLogin();
   });
 
-  // --- Orders: Live Display ---
+  // --- Orders listener (real-time display) ---
   function listenForAllOrders() {
     const qOrders = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
     ordersUnsubscribe = onSnapshot(
@@ -157,10 +142,9 @@ function init() {
           container.className = 'order-item';
           container.dataset.docId = docSnap.id;
 
-          // Action buttons
           let actionButtons = '';
-          const userIdAttr = order.userId ? String(order.userId) : '';
-          const userEmailAttr = order.email ? String(order.email) : '';
+          const userIdAttr = order.userId || '';
+          const userEmailAttr = order.email || '';
 
           if (order.status === 'Pending Confirmation') {
             actionButtons = `
@@ -168,24 +152,13 @@ function init() {
               <button class="btn btn-reject" data-order-id="${docSnap.id}" data-user-id="${userIdAttr}">Reject</button>
             `;
           }
+
           actionButtons += `
-            <button class="btn btn-contact-client" data-user-id="${userIdAttr}" data-user-email="${userEmailAttr}">
-              Contact Client
-            </button>
+            <button class="btn btn-contact-client" data-user-id="${userIdAttr}" data-user-email="${userEmailAttr}">Contact Client</button>
           `;
 
-          // Safe fields
           const deliverables = Array.isArray(order.deliverables) ? order.deliverables.join(', ') : (order.deliverables || '');
-          const createdAtText = (() => {
-            try {
-              const ts = order.createdAt;
-              const d = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
-              return d && !isNaN(d.getTime()) ? d.toLocaleString() : 'N/A';
-            } catch {
-              return 'N/A';
-            }
-          })();
-
+          const createdAtText = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString() : 'N/A';
           const statusClass = String(order.status || '').toLowerCase().replace(/\s+/g, '-');
 
           container.innerHTML = `
@@ -200,9 +173,7 @@ function init() {
               <div><strong>Created:</strong> ${createdAtText}</div>
               <div><strong>Status:</strong> <span class="order-status status-${statusClass}">${order.status || ''}</span></div>
             </div>
-            <div class="order-actions">
-              ${actionButtons}
-            </div>
+            <div class="order-actions">${actionButtons}</div>
           `;
 
           allOrdersList.appendChild(container);
@@ -215,112 +186,65 @@ function init() {
     );
   }
 
-  // --- Orders: Actions (event delegation + optimistic UI) ---
+  // --- Orders actions (Approve/Reject + Contact Client) ---
   allOrdersList.addEventListener('click', async (e) => {
-    const button = /** @type {HTMLElement|null} */ (e.target instanceof Element ? e.target.closest('button') : null);
+    const button = e.target.closest('button');
     if (!button) return;
 
-    // CONTACT CLIENT
+    // Contact Client
     if (button.classList.contains('btn-contact-client')) {
       const userId = button.dataset.userId || '';
       const userEmail = button.dataset.userEmail || '';
-      if (userId) {
-        openChat(userId, `Chat with ${userEmail || 'client'}`);
-      }
+      if (userId) openChat(userId, `Chat with ${userEmail || 'client'}`);
       return;
     }
 
-    // APPROVE / REJECT
+    // Approve / Reject
     const orderId = button.dataset.orderId || '';
     const clientUserId = button.dataset.userId || '';
     if (!orderId) return;
 
-    if (button.classList.contains('btn-approve') || button.classList.contains('btn-reject')) {
-      const newStatus = button.classList.contains('btn-approve') ? 'Paid' : 'Rejected';
+    let newStatus = '';
+    if (button.classList.contains('btn-approve')) newStatus = 'Paid';
+    if (button.classList.contains('btn-reject')) newStatus = 'Rejected';
+    if (!newStatus) return;
 
-      // Optimistic UI update for instant feedback
-      const orderItem = button.closest('.order-item');
-      const statusSpan = orderItem?.querySelector('.order-status');
-      if (statusSpan) {
-        statusSpan.textContent = newStatus;
-        statusSpan.className = `order-status status-${newStatus.toLowerCase().replace(/\s+/g, '-')}`;
-      }
+    // Optimistic UI update
+    const orderItem = button.closest('.order-item');
+    const statusSpan = orderItem?.querySelector('.order-status');
+    if (statusSpan) {
+      statusSpan.textContent = newStatus;
+      statusSpan.className = `order-status status-${newStatus.toLowerCase().replace(/\s+/g, '-')}`;
+    }
 
-      try {
-        await updateOrderStatus(orderId, newStatus, clientUserId);
-      } catch (err) {
-        console.error('Error updating order status:', err);
-        // Optional: Roll back optimistic UI change or surface an error toast.
-      }
+    try {
+      await updateOrderStatus(orderId, newStatus, clientUserId);
+    } catch (err) {
+      console.error('Error updating order status:', err);
+      alert('Failed to update order. Please refresh and try again.');
     }
   });
 
+  // --- Update order in Firestore and notify client ---
   async function updateOrderStatus(orderId, newStatus, clientUserId) {
-    // Update Firestore (this immediately syncs to client/orders view via its onSnapshot)
-    const orderRef = doc(db, 'orders', orderId);
-    await updateDoc(orderRef, { status: newStatus });
+    const currentUser = auth.currentUser;
+    if (!currentUser || currentUser.uid !== ADMIN_UID) {
+      throw new Error('Unauthorized: Only admin can update order status.');
+    }
 
-    // Notify the client (if chat system is available)
+    const orderRef = doc(db, 'orders', orderId);
+    await updateDoc(orderRef, { status: newStatus, updatedAt: new Date() });
+
+    // Notify client via chat system
     if (clientUserId) {
       try {
         const orderSnap = await getDoc(orderRef);
         const orderData = orderSnap.data() || {};
         const friendlyId = orderData.orderId || orderId;
-        sendSystemMessage(
-          clientUserId,
-          `Your order with ID ${friendlyId} has been updated to: "${newStatus}".`
-        );
+        sendSystemMessage(clientUserId, `Your order ${friendlyId} status updated to "${newStatus}".`);
       } catch (err) {
         console.warn('Status updated, but failed to notify client:', err);
       }
     }
-  }
-
-  // --- Chats: Live Display (sorted by lastUpdate) ---
-  function listenForAllChats() {
-    const qChats = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
-    chatsUnsubscribe = onSnapshot(
-      qChats,
-      (snapshot) => {
-        allChatsList.innerHTML = '';
-        if (snapshot.empty) {
-          allChatsList.innerHTML = '<p>No active chats.</p>';
-          return;
-        }
-
-        snapshot.forEach((docSnap) => {
-          const chat = docSnap.data() || {};
-          if (chat.userId && chat.userEmail) {
-            const chatElement = document.createElement('div');
-            chatElement.className = 'chat-list-item';
-            chatElement.dataset.userId = chat.userId;
-            chatElement.dataset.userEmail = chat.userEmail;
-
-            let lastUpdatedText = 'N/A';
-            try {
-              const ts = chat.lastUpdate;
-              const date = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
-              if (date && !isNaN(date.getTime())) {
-                lastUpdatedText = date.toLocaleString();
-              }
-            } catch { /* noop */ }
-
-            chatElement.innerHTML = `
-              <div><strong>${chat.userEmail}</strong></div>
-              <div class="subtle">Last updated: ${lastUpdatedText}</div>
-            `;
-            chatElement.addEventListener('click', () => {
-              openChat(chat.userId, `Chat with ${chat.userEmail}`);
-            });
-
-            allChatsList.appendChild(chatElement);
-          }
-        });
-      },
-      (error) => {
-        console.error('Error listening to chats:', error);
-        allChatsList.innerHTML = `<p class="error-message">Error loading chats. You may need to create a Firestore index.</p>`;
-      }
-    );
   }
 }
