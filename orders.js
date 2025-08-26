@@ -1,267 +1,220 @@
+// ===================================================================================
+// ORDERS PAGE LOGIC
+// ===================================================================================
 import {
-  auth,
-  onAuthStateChanged,
-  signOut,
-  db,
-  doc,
-  setDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  onSnapshot,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  serverTimestamp
-} from './auth.js';
-import { calculatePrice } from './price.js';
-import { openChat, sendSystemMessage } from './chat.js';
+    getFirestore,
+    collection,
+    addDoc,
+    query,
+    where,
+    onSnapshot,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import {
+    app
+} from './config.js'; // Assuming config.js exports the initialized firebase app
 
-document.addEventListener('DOMContentLoaded', () => {
-  let currentUser = null;
-  let ordersUnsubscribe = null;
+// Initialize Firebase Services
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-  // --- DOM Elements ---
-  const loggedInView = document.getElementById('logged-in-view');
-  const loggedOutView = document.getElementById('logged-out-view');
-  const loginForm = document.getElementById('login-form');
-  const signupForm = document.getElementById('signup-form');
-  const authError = document.getElementById('auth-error');
-  const showLoginTabBtn = document.getElementById('show-login-tab');
-  const showSignupTabBtn = document.getElementById('show-signup-tab');
-  const loginFormContainer = document.getElementById('login-form-container');
-  const signupFormContainer = document.getElementById('signup-form-container');
-  const logoutBtn = document.getElementById('logout-btn');
-  const userName = document.getElementById('user-name');
-  const orderForm = document.getElementById('order-form');
-  const generalContactBtn = document.getElementById('general-contact-btn');
-  const ordersList = document.getElementById('orders-list');
-  const serviceTypeSelect = document.getElementById('service-type');
-  const deliveryTimeSelect = document.getElementById('delivery-time');
-  const deliverablesInput = document.getElementById('deliverables');
-  const totalPriceEl = document.getElementById('total-price');
-  const upfrontEl = document.getElementById('upfront-payment');
+// DOM Element References
+const orderForm = document.getElementById('order-form');
+const currencySelect = document.getElementById('currency-select');
+const paymentDetailsETB = document.getElementById('payment-details-ETB');
+const paymentDetailsUSD = document.getElementById('payment-details-USD');
+const paymentDetailsCNY = document.getElementById('payment-details-CNY');
+const transactionInputETB = document.getElementById('transaction-number');
+const transactionInputUSD = document.getElementById('transaction-number-usd');
+const transactionInputCNY = document.getElementById('transaction-number-cny');
+const togglePlatformsBtn = document.getElementById('toggle-platforms-btn');
+const platformOptions = document.getElementById('platform-options');
+const ordersListContainer = document.getElementById('orders-list');
 
-  // New DOM elements for new features
-  const togglePlatformsBtn = document.getElementById('toggle-platforms-btn');
-  const orderFormContainer = document.getElementById('order-form-container');
-  const platformOptions = document.getElementById('platform-options');
-  const currencySelect = document.getElementById('currency-select');
-  const paymentDetailsContainer = document.getElementById('payment-details-container');
+/**
+ * Handles the submission of the new order form.
+ * @param {Event} e The form submission event.
+ */
+const handleOrderSubmit = async (e) => {
+    e.preventDefault(); // Prevent the form from reloading the page
 
-  // --- Auth State Logic ---
-  onAuthStateChanged(auth, user => {
-    if (user) {
-      currentUser = user;
-      loggedOutView.classList.add('hidden');
-      loggedInView.classList.remove('hidden');
-      userName.textContent = user.displayName || user.email;
-      listenToClientOrders(user.uid);
-    } else {
-      currentUser = null;
-      loggedInView.classList.add('hidden');
-      loggedOutView.classList.remove('hidden');
-      if (ordersUnsubscribe) ordersUnsubscribe();
-    }
-  });
+    const submitButton = orderForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Submitting...';
 
-  // --- Event Listeners ---
-  showLoginTabBtn.addEventListener('click', () => switchTab('login'));
-  showSignupTabBtn.addEventListener('click', () => switchTab('signup'));
-
-  loginForm.addEventListener('submit', handleLogin);
-  signupForm.addEventListener('submit', handleSignup);
-  logoutBtn.addEventListener('click', () => signOut(auth));
-
-  orderForm.addEventListener('input', updatePrice);
-  orderForm.addEventListener('submit', handleOrderSubmit);
-  ordersList.addEventListener('click', handleOrdersListClick);
-  generalContactBtn.addEventListener('click', handleGeneralContactClick);
-
-  // New event listeners
-  togglePlatformsBtn.addEventListener('click', () => {
-    const isOrderFormVisible = !orderFormContainer.classList.contains('hidden');
-    if (isOrderFormVisible) {
-      orderFormContainer.classList.add('hidden');
-      platformOptions.classList.remove('hidden');
-      togglePlatformsBtn.textContent = 'Go back to direct order form';
-    } else {
-      orderFormContainer.classList.remove('hidden');
-      platformOptions.classList.add('hidden');
-      togglePlatformsBtn.textContent = 'Prefer to order on a platform?';
-    }
-  });
-
-  currencySelect.addEventListener('change', () => {
-    const selectedCurrency = currencySelect.value;
-    Array.from(paymentDetailsContainer.children).forEach(child => {
-      child.classList.add('hidden');
-    });
-
-    const selectedPaymentDiv = document.getElementById(`payment-details-${selectedCurrency}`);
-    if (selectedPaymentDiv) {
-      selectedPaymentDiv.classList.remove('hidden');
-    }
-  });
-
-  // Initially trigger the currency change to set the correct payment details on page load
-  currencySelect.dispatchEvent(new Event('change'));
-
-  // --- Functions ---
-  function switchTab(tabName) {
-    if (tabName === 'login') {
-      loginFormContainer.classList.remove('hidden');
-      signupFormContainer.classList.add('hidden');
-      showLoginTabBtn.classList.add('active');
-      showSignupTabBtn.classList.remove('active');
-    } else {
-      signupFormContainer.classList.remove('hidden');
-      loginFormContainer.classList.add('hidden');
-      showSignupTabBtn.classList.add('active');
-      showLoginTabBtn.classList.remove('active');
-    }
-    authError.classList.add('hidden');
-  }
-
-  function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    signInWithEmailAndPassword(auth, email, password).catch(error => showAuthError(error.message));
-  }
-
-  function handleSignup(e) {
-    e.preventDefault();
-    const email = document.getElementById('signup-email').value;
-    const password = document.getElementById('signup-password').value;
-    createUserWithEmailAndPassword(auth, email, password).catch(error => showAuthError(error.message));
-  }
-
-  function showAuthError(message) {
-    authError.textContent = message;
-    authError.classList.remove('hidden');
-  }
-
-  function updatePrice() {
-    const serviceType = serviceTypeSelect.value;
-    const deliveryTime = deliveryTimeSelect.value;
-    const deliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
-
-    if (!serviceType || !deliveryTime) return;
-    const totalPrice = calculatePrice(serviceType, deliveryTime, deliverables);
-    const upfrontPayment = totalPrice * 0.3;
-    totalPriceEl.textContent = totalPrice.toFixed(2);
-    upfrontEl.textContent = upfrontPayment.toFixed(2);
-  }
-
-  async function handleOrderSubmit(e) {
-    e.preventDefault();
-    if (!currentUser) return;
-
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Verifying...';
-
-    const selectedCurrency = document.getElementById('currency-select').value;
-    let transactionNumberInput;
-
-    if (selectedCurrency === 'ETB') {
-      transactionNumberInput = document.getElementById('transaction-number');
-    } else if (selectedCurrency === 'USD') {
-      transactionNumberInput = document.getElementById('transaction-number-usd');
-    } else if (selectedCurrency === 'CNY') {
-      transactionNumberInput = document.getElementById('transaction-number-cny');
-    }
-
-    const transactionNumber = transactionNumberInput ? transactionNumberInput.value : '';
-
-    const q = query(collection(db, "orders"), where("transactionNumber", "==", transactionNumber));
-    const querySnapshot = await getDocs(q);
-
-    if (!querySnapshot.empty) {
-      alert("This Transaction ID has already been used.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit Order';
-      return;
-    }
-
-    const selectedDeliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
-
-    submitBtn.textContent = 'Submitting...';
     try {
-      const orderId = `order_${Date.now()}`;
-      await setDoc(doc(db, 'orders', orderId), {
-        orderId: orderId,
-        userId: currentUser.uid,
-        email: currentUser.email,
-        clientName: document.getElementById('client-name').value,
-        contactInfo: document.getElementById('contact-info').value,
-        projectDescription: document.getElementById('project-description').value,
-        serviceType: serviceTypeSelect.value,
-        deliveryTime: deliveryTimeSelect.value,
-        deliverables: selectedDeliverables,
-        totalPrice: parseFloat(totalPriceEl.textContent),
-        upfrontPayment: parseFloat(upfrontEl.textContent),
-        currency: selectedCurrency,
-        transactionNumber: transactionNumber,
-        status: 'Pending Confirmation',
-        createdAt: serverTimestamp()
-      });
+        const user = auth.currentUser;
+        if (!user) {
+            alert('Error: You must be logged in to place an order.');
+            submitButton.disabled = false;
+            submitButton.textContent = 'Submit Order';
+            return;
+        }
 
-      await setDoc(doc(db, 'conversations', currentUser.uid), {
-        userId: currentUser.uid,
-        userEmail: currentUser.email,
-        lastUpdate: serverTimestamp()
-      }, { merge: true });
+        // --- 1. GATHER FORM DATA ---
+        const currency = currencySelect.value;
+        let transactionNumber = '';
 
-      alert("Order placed successfully!");
-      orderForm.reset();
+        // Get the correct transaction number based on the selected currency
+        if (currency === 'ETB') {
+            transactionNumber = transactionInputETB.value;
+        } else if (currency === 'USD') {
+            transactionNumber = transactionInputUSD.value;
+        } else if (currency === 'CNY') {
+            transactionNumber = transactionInputCNY.value;
+        }
+
+        // Simple validation
+        if (!transactionNumber.trim()) {
+            alert('Please enter a valid transaction number.');
+            throw new Error('Transaction number is required.');
+        }
+
+        // Collect all other form data
+        const orderData = {
+            userId: user.uid,
+            userEmail: user.email,
+            clientName: document.getElementById('client-name').value,
+            contactInfo: document.getElementById('contact-info').value,
+            serviceType: document.getElementById('service-type').value,
+            projectDescription: document.getElementById('project-description').value,
+            deliveryTime: document.getElementById('delivery-time').value,
+            deliverables: Array.from(document.querySelectorAll('input[name="deliverables"]:checked')).map(cb => cb.value),
+            currency: currency,
+            totalPrice: parseFloat(document.getElementById('total-price').textContent),
+            upfrontPayment: parseFloat(document.getElementById('upfront-payment').textContent),
+            transactionNumber: transactionNumber,
+            status: 'Pending Review', // Set the initial status for a new order
+            createdAt: serverTimestamp() // Use server's timestamp for consistency
+        };
+
+        // --- 2. SAVE TO FIRESTORE ---
+        const ordersCollection = collection(db, "orders");
+        const docRef = await addDoc(ordersCollection, orderData);
+
+        // --- 3. PROVIDE FEEDBACK ---
+        alert(`Your order has been submitted successfully!\nYour Order ID is: ${docRef.id}`);
+        orderForm.reset();
+
+        // Manually trigger change events to reset dependent fields (deliverables and price)
+        document.getElementById('service-type').dispatchEvent(new Event('change'));
+        currencySelect.dispatchEvent(new Event('change'));
+
+
     } catch (error) {
-      console.error("Order submission error:", error);
-      alert("There was an error submitting your order.");
+        console.error("Error submitting order:", error);
+        alert('An error occurred while submitting your order. Please check the console and try again.');
     } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit Order';
+        // Re-enable the submit button
+        submitButton.disabled = false;
+        submitButton.textContent = 'Submit Order';
     }
-  }
+};
 
-  function listenToClientOrders(userId) {
-    const q = query(collection(db, 'orders'), where('userId', '==', userId));
-    ordersUnsubscribe = onSnapshot(q, (snapshot) => {
-      const ordersContainer = document.getElementById('orders-list');
-      if (snapshot.empty) {
-        ordersContainer.innerHTML = '<h3>My Orders</h3><p>You have no previous orders.</p>';
-        return;
-      }
-      ordersContainer.innerHTML = '<h3>My Orders</h3>';
-      snapshot.forEach(docSnap => {
-        const order = docSnap.data();
-        const orderElement = document.createElement('div');
-        orderElement.className = 'order-history-item';
-        orderElement.innerHTML = `
-          <p><strong>Order ID:</strong> ${order.orderId}</p>
-          <p><strong>Service:</strong> ${order.serviceType}</p>
-          <p><strong>Upfront Paid:</strong> ${order.upfrontPayment} ${order.currency || 'ETB'}</p>
-          <p><strong>Status:</strong> <span class="status-${String(order.status || '').toLowerCase().replace(/ /g, '-')}">${order.status}</span></p>
-          <button class="btn btn-contact-designer" data-order-id="${order.orderId}">Contact Designer</button>
-        `;
-        ordersContainer.appendChild(orderElement);
-      });
+/**
+ * Toggles the visibility of payment details based on the selected currency.
+ */
+const handleCurrencyChange = () => {
+    const selectedCurrency = currencySelect.value;
+
+    // Hide all payment sections first
+    paymentDetailsETB.classList.add('hidden');
+    paymentDetailsUSD.classList.add('hidden');
+    paymentDetailsCNY.classList.add('hidden');
+
+    // Make all transaction inputs not required
+    transactionInputETB.required = false;
+    transactionInputUSD.required = false;
+    transactionInputCNY.required = false;
+
+    // Show the correct section and make its transaction input required
+    if (selectedCurrency === 'ETB') {
+        paymentDetailsETB.classList.remove('hidden');
+        transactionInputETB.required = true;
+    } else if (selectedCurrency === 'USD') {
+        paymentDetailsUSD.classList.remove('hidden');
+        transactionInputUSD.required = true;
+    } else if (selectedCurrency === 'CNY') {
+        paymentDetailsCNY.classList.remove('hidden');
+        transactionInputCNY.required = true;
+    }
+};
+
+/**
+ * Fetches and displays the current user's order history in real-time.
+ * @param {string} userId The UID of the currently logged-in user.
+ */
+const displayUserOrders = (userId) => {
+    const ordersQuery = query(collection(db, "orders"), where("userId", "==", userId));
+
+    onSnapshot(ordersQuery, (snapshot) => {
+        if (snapshot.empty) {
+            ordersListContainer.innerHTML = '<p>You have not placed any orders yet.</p>';
+            return;
+        }
+
+        let ordersHTML = '';
+        // Sort documents by creation date, newest first
+        const sortedDocs = snapshot.docs.sort((a, b) => {
+            const timeA = a.data().createdAt?.toMillis() || 0;
+            const timeB = b.data().createdAt?.toMillis() || 0;
+            return timeB - timeA;
+        });
+
+        sortedDocs.forEach(doc => {
+            const order = doc.data();
+            const orderDate = order.createdAt ? order.createdAt.toDate().toLocaleDateString() : 'N/A';
+            ordersHTML += `
+                <div class="order-item">
+                    <p><strong>Order ID:</strong> ${doc.id}</p>
+                    <p><strong>Service:</strong> ${order.serviceType}</p>
+                    <p><strong>Date:</strong> ${orderDate}</p>
+                    <p><strong>Total:</strong> ${order.totalPrice.toFixed(2)} ${order.currency}</p>
+                    <p><strong>Status:</strong> <span class="status-${order.status.toLowerCase().replace(/ /g, '-')}">${order.status}</span></p>
+                </div>
+            `;
+        });
+        ordersListContainer.innerHTML = ordersHTML;
+    }, (error) => {
+        console.error("Error fetching orders:", error);
+        ordersListContainer.innerHTML = '<p class="error-message">Could not load order history.</p>';
     });
-  }
+};
 
-  async function handleOrdersListClick(e) {
-    if (e.target.classList.contains('btn-contact-designer')) {
-      if (!currentUser) return;
-      const orderId = e.target.dataset.orderId;
-      const chatTitle = `Regarding Order: ${orderId}`;
-      await openChat(currentUser.uid, chatTitle);
-      await sendSystemMessage(currentUser.uid, `--- Regarding Order: ${orderId} ---`);
+
+// --- EVENT LISTENERS ---
+
+// Listen for authentication state changes to show user orders
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        displayUserOrders(user.uid);
+    } else {
+        // Clear orders if user logs out
+        if(ordersListContainer) {
+            ordersListContainer.innerHTML = '';
+        }
     }
-  }
-
-  async function handleGeneralContactClick() {
-    if (!currentUser) return;
-    await openChat(currentUser.uid, `Chat with ${currentUser.email}`);
-  }
 });
+
+// Attach the submit handler to the form
+if (orderForm) {
+    orderForm.addEventListener('submit', handleOrderSubmit);
+}
+
+// Attach the currency change handler
+if (currencySelect) {
+    currencySelect.addEventListener('change', handleCurrencyChange);
+    // Call it once on load to set the initial state
+    handleCurrencyChange();
+}
+
+// Attach listener for the platform toggle button
+if (togglePlatformsBtn) {
+    togglePlatformsBtn.addEventListener('click', () => {
+        platformOptions.classList.toggle('hidden');
+    });
+}
