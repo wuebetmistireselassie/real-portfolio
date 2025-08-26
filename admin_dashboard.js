@@ -72,52 +72,56 @@ function initializeApp() {
         }
     };
 
-    // --- View Controllers ---
-    // These functions ensure only one main view is visible at a time.
+    /**
+     * --- DEFINITIVE FIX for Blank Screen ---
+     * This robust view controller directly manipulates the `display` style property.
+     * This bypasses any potential conflicts with CSS classes like '.hidden' and
+     * guarantees that the correct view is shown without fail.
+     * @param {string | null} viewId The ID of the element to make visible.
+     */
+    const setVisibleView = (viewId) => {
+        const views = [elements.loginView, elements.dashboardView, elements.unauthorizedView];
+        views.forEach(view => {
+            if (view) {
+                // Hide all views by default.
+                view.style.display = 'none';
+            }
+        });
 
-    const showDashboard = () => {
-        elements.loginView?.classList.add('hidden');
-        elements.unauthorizedView?.classList.add('hidden');
-        elements.dashboardView?.classList.remove('hidden');
+        // Show only the requested view.
+        if (viewId) {
+            const viewToShow = document.getElementById(viewId);
+            if (viewToShow) {
+                viewToShow.style.display = 'block'; // 'block' is a safe default for sections.
+            }
+        }
     };
 
-    const showUnauthorized = () => {
-        stopListeners(); // Stop listening to data if unauthorized.
-        elements.loginView?.classList.add('hidden');
-        elements.dashboardView?.classList.add('hidden');
-        elements.unauthorizedView?.classList.remove('hidden');
-    };
-
-    const showLogin = () => {
-        stopListeners(); // Stop listening to data on the login screen.
-        elements.dashboardView?.classList.add('hidden');
-        elements.unauthorizedView?.classList.add('hidden');
-        elements.loginView?.classList.remove('hidden');
-    };
+    // Hide all views as soon as the script loads to prevent any content flash.
+    setVisibleView(null);
 
     /**
      * --- CORE AUTHENTICATION LOGIC ---
      * This is the single source of truth for the UI. It runs when the page loads
-     * and any time the user's login state changes. Because the views are hidden
-     * by default in the HTML, this logic correctly decides which view to show
-     * without any flickering.
+     * and any time the user's login state changes. It now uses the robust
+     * setVisibleView function to guarantee the correct UI is displayed.
      */
     onAuthStateChanged(auth, (user) => {
+        stopListeners(); // Always stop old listeners on auth change.
         if (user) {
             // A user is signed in. Check if it's the admin.
             if (user.uid === ADMIN_UID) {
-                showDashboard();
+                setVisibleView('admin-dashboard-view');
                 // Start fresh listeners for the admin's data.
-                stopListeners();
                 listenForAllOrders();
                 listenForAllChats();
             } else {
                 // A non-admin user is signed in. Show access denied.
-                showUnauthorized();
+                setVisibleView('unauthorized-view');
             }
         } else {
             // No user is signed in. Show the login form.
-            showLogin();
+            setVisibleView('admin-login-view');
         }
     });
 
@@ -138,12 +142,9 @@ function initializeApp() {
         const password = elements.loginForm.elements['admin-login-password'].value;
 
         try {
-            // Dynamically import persistence functions to avoid modifying auth.js
             const { setPersistence, browserLocalPersistence } = await import('https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js');
-            // Ensure the login session is saved locally and persists across browser restarts.
             await setPersistence(auth, browserLocalPersistence);
             await signInWithEmailAndPassword(auth, email, password);
-            // The onAuthStateChanged listener will automatically show the dashboard.
         } catch (error) {
             elements.authError.textContent = 'Login failed: Invalid credentials.';
             elements.authError.classList.remove('hidden');
@@ -156,75 +157,47 @@ function initializeApp() {
      */
     async function handleOrderActionClick(e) {
         const button = e.target.closest('button');
-        if (!button) return; // Exit if the click wasn't on a button.
+        if (!button) return;
 
         const { orderId, userId, userEmail, orderFriendlyId } = button.dataset;
 
-        // --- FIX #3: Contact Client Button ---
         if (button.classList.contains('btn-contact-client')) {
             if (userId && orderId) {
                 const chatTitle = `Chat with ${userEmail || 'client'} (Order: ${orderFriendlyId})`;
                 openChat(userId, chatTitle);
-                // This system message provides the necessary context for the chat.
                 sendSystemMessage(userId, `--- Admin started chat regarding Order: ${orderFriendlyId} ---`);
             }
             return;
         }
 
-        // --- FIX #2: Order Status Update ---
         if (button.classList.contains('btn-approve') || button.classList.contains('btn-reject')) {
             if (!orderId) return;
-
-            const isApprove = button.classList.contains('btn-approve');
-            const newStatus = isApprove ? 'Paid' : 'Rejected';
-
-            // Disable buttons to prevent multiple clicks.
+            const newStatus = button.classList.contains('btn-approve') ? 'Paid' : 'Rejected';
             button.disabled = true;
-            const sibling = isApprove ? button.nextElementSibling : button.previousElementSibling;
+            const sibling = button.nextElementSibling || button.previousElementSibling;
             if (sibling) sibling.disabled = true;
 
-            // Optimistic UI Update: Change the UI immediately for a responsive feel.
             const orderItem = button.closest('.order-item');
             if (orderItem) {
                 const statusSpan = orderItem.querySelector('.order-status');
                 if (statusSpan) {
                     statusSpan.textContent = newStatus;
-                    statusSpan.className = `order-status status-${newStatus.toLowerCase().replace(/\s+/g, '-')}`;
                 }
-                // Remove the action buttons as they are no longer needed.
                 orderItem.querySelector('.btn-approve')?.remove();
                 orderItem.querySelector('.btn-reject')?.remove();
             }
-
-            // Asynchronously update the database.
-            try {
-                await updateOrderStatusInFirestore(orderId, newStatus, userId, orderFriendlyId);
-            } catch (err) {
-                console.error('Failed to update order status in Firestore:', err);
-                // Optional: Add UI to inform the admin the update failed.
-                // The onSnapshot listener will eventually correct the UI if there's an error.
-            }
+            await updateOrderStatusInFirestore(orderId, newStatus, userId, orderFriendlyId);
         }
     }
 
     /**
      * Updates an order's status in Firestore and notifies the client.
-     * @param {string} orderId The Firestore document ID.
-     * @param {string} newStatus The new status string ('Paid' or 'Rejected').
-     * @param {string} clientUserId The client's UID for notification.
-     * @param {string} friendlyOrderId The human-readable order ID.
      */
     async function updateOrderStatusInFirestore(orderId, newStatus, clientUserId, friendlyOrderId) {
         const orderRef = doc(db, 'orders', orderId);
         await updateDoc(orderRef, { status: newStatus });
-
         if (clientUserId) {
-            try {
-                const message = `Your order (${friendlyOrderId}) has been ${newStatus}.`;
-                sendSystemMessage(clientUserId, message);
-            } catch (err) {
-                console.warn('Status updated, but failed to notify client via chat:', err);
-            }
+            sendSystemMessage(clientUserId, `Your order (${friendlyOrderId}) has been ${newStatus}.`);
         }
     }
 
@@ -234,7 +207,7 @@ function initializeApp() {
     function listenForAllOrders() {
         const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
         ordersUnsubscribe = onSnapshot(q, (snapshot) => {
-            elements.ordersList.innerHTML = ''; // Clear previous list.
+            elements.ordersList.innerHTML = '';
             if (snapshot.empty) {
                 elements.ordersList.innerHTML = '<p>No orders found.</p>';
                 return;
@@ -250,41 +223,35 @@ function initializeApp() {
 
     /**
      * Creates an HTML element for a single order.
-     * @param {object} docSnap The Firestore document snapshot for the order.
-     * @returns {HTMLElement} The created div element for the order.
      */
     function createOrderElement(docSnap) {
         const order = docSnap.data() || {};
         const orderId = docSnap.id;
         const friendlyOrderId = order.orderId || orderId;
-
         const container = document.createElement('div');
         container.className = 'order-item';
-        container.dataset.docId = orderId;
 
         let actionButtons = '';
         if (order.status === 'Pending Confirmation') {
             actionButtons = `
-                <button class="btn btn-approve" data-order-id="${orderId}" data-user-id="${order.userId || ''}" data-order-friendly-id="${friendlyOrderId}">Approve</button>
-                <button class="btn btn-reject" data-order-id="${orderId}" data-user-id="${order.userId || ''}" data-order-friendly-id="${friendlyOrderId}">Reject</button>
+                <button class="btn btn-approve" data-order-id="${orderId}" data-user-id="${order.userId}" data-order-friendly-id="${friendlyOrderId}">Approve</button>
+                <button class="btn btn-reject" data-order-id="${orderId}" data-user-id="${order.userId}" data-order-friendly-id="${friendlyOrderId}">Reject</button>
             `;
         }
-        // Add the contact button with all necessary data attributes.
         actionButtons += `
             <button class="btn btn-contact-client"
-                data-user-id="${order.userId || ''}"
-                data-user-email="${order.email || ''}"
+                data-user-id="${order.userId}"
+                data-user-email="${order.email}"
                 data-order-id="${orderId}"
                 data-order-friendly-id="${friendlyOrderId}">
                 Contact Client
             </button>
         `;
 
-        const statusClass = String(order.status || '').toLowerCase().replace(/\s+/g, '-');
         container.innerHTML = `
             <h4>Order ID: ${friendlyOrderId}</h4>
             <p><strong>Client:</strong> ${order.clientName || ''} (${order.email || ''})</p>
-            <p><strong>Status:</strong> <span class="order-status status-${statusClass}">${order.status || '—'}</span></p>
+            <p><strong>Status:</strong> <span class="order-status">${order.status || '—'}</span></p>
             <p><strong>Description:</strong> ${order.projectDescription || ''}</p>
             <div class="order-actions">${actionButtons}</div>
             <hr>
@@ -298,7 +265,7 @@ function initializeApp() {
     function listenForAllChats() {
         const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
         chatsUnsubscribe = onSnapshot(q, (snapshot) => {
-            elements.chatsList.innerHTML = ''; // Clear previous list.
+            elements.chatsList.innerHTML = '';
             if (snapshot.empty) {
                 elements.chatsList.innerHTML = '<p>No active chats.</p>';
                 return;
