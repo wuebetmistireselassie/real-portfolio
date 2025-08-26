@@ -17,10 +17,11 @@ import {
     query, 
     where, 
     getDocs,
+    getDoc, // <-- FIXED: Added getDoc to the import list
     onSnapshot,
-    serverTimestamp, // <-- ADDED THIS LINE
-    addDoc,          // <-- ADDED THIS LINE
-    orderBy          // <-- ADDED THIS LINE
+    serverTimestamp,
+    addDoc,
+    orderBy
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Your web app's Firebase configuration
@@ -50,10 +51,11 @@ export {
     query, 
     where, 
     getDocs,
+    getDoc, // <-- FIXED: Added getDoc to the export list
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     onSnapshot,
-    serverTimestamp, // <-- AND ADDED THIS LINE
-    addDoc,          // <-- AND ADDED THIS LINE
-    orderBy          // <-- AND ADDED THIS LINE
+    serverTimestamp,
+    addDoc,
+    orderBy
 };
