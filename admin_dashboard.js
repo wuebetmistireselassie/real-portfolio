@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function listenForClientChats() {
-    const chatsListDiv = document.getElementById('client-chats-list');
+    const chatsListDiv = document.getElementById('all-chats-list');
     const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
     
     chatsUnsubscribe = onSnapshot(q, (snapshot) => {
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.getElementById('client-chats-list').addEventListener('click', async (e) => {
+  document.getElementById('all-chats-list').addEventListener('click', async (e) => {
     const clientUid = e.target.dataset.clientUid;
     if (e.target.classList.contains('btn-chat-summary') && clientUid) {
       const chatTitle = `Chat with client: ${clientUid}`; // You might want to get the user's email here instead
