@@ -17,10 +17,6 @@ import {
 import { calculatePrice } from './price.js';
 import { openChat, sendSystemMessage } from './chat.js';
 
-// IMPORTANT: some browsers block the submit event if hidden required inputs exist.
-// This file now toggles `required`/`disabled` on Txn ID fields based on the selected currency
-// and shows inline feedback messages for validation and success.
-
 document.addEventListener('DOMContentLoaded', () => {
   let currentUser = null;
   let ordersUnsubscribe = null;
@@ -44,15 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const deliveryTimeSelect = document.getElementById('delivery-time');
   const totalPriceEl = document.getElementById('total-price');
   const upfrontEl = document.getElementById('upfront-payment');
-
-  // New DOM elements for new features
   const togglePlatformsBtn = document.getElementById('toggle-platforms-btn');
   const orderFormContainer = document.getElementById('order-form-container');
   const platformOptions = document.getElementById('platform-options');
   const currencySelect = document.getElementById('currency-select');
   const paymentDetailsContainer = document.getElementById('payment-details-container');
-
-  // Feedback element (created in HTML). If missing, we fallback to alert.
   const feedbackEl = document.getElementById('order-feedback');
 
   // --- Helpers ---
@@ -71,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function toggleTxnFieldsForCurrency(selectedCurrency) {
-    // Hide all payment detail blocks first
     Array.from(paymentDetailsContainer.children).forEach(child => {
       child.classList.add('hidden');
       const input = child.querySelector('input[type="text"]');
@@ -80,14 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
         input.required = false;
       }
     });
-    // Show and enable the selected currency block
     const selectedPaymentDiv = document.getElementById(`payment-details-${selectedCurrency}`);
     if (selectedPaymentDiv) {
       selectedPaymentDiv.classList.remove('hidden');
       const input = selectedPaymentDiv.querySelector('input[type="text"]');
       if (input) {
         input.disabled = false;
-        input.required = true; // only the visible one is required
+        input.required = true;
       }
     }
   }
@@ -151,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Verifying...';
 
-    // Native form validation first (after we correctly toggled required/disabled below)
     if (!orderForm.checkValidity()) {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit Order';
@@ -172,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const transactionNumber = transactionNumberInput ? transactionNumberInput.value.trim() : '';
 
-    // Prevent accidental empty Txn ID
     if (!transactionNumber) {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit Order';
@@ -180,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Check duplicate transaction numbers
     try {
       const qDup = query(collection(db, 'orders'), where('transactionNumber', '==', transactionNumber));
       const dupSnap = await getDocs(qDup);
@@ -191,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
     } catch (err) {
-      // If this check fails for any reason, do not block the user—log and proceed
       console.error('Duplicate check failed:', err);
     }
 
@@ -218,16 +204,14 @@ document.addEventListener('DOMContentLoaded', () => {
         createdAt: serverTimestamp()
       });
 
-      // Ensure the user has a conversation document
       await setDoc(
         doc(db, 'conversations', currentUser.uid),
         { userId: currentUser.uid, userEmail: currentUser.email, lastUpdate: serverTimestamp() },
         { merge: true }
       );
 
-      showFeedback('Order placed successfully! You will get a confirmation shortly.', 'success');
+      showFeedback('Order placed successfully! Scroll down to view it in "My Orders".', 'success');
       orderForm.reset();
-      // Reset payment details + validity after form reset
       toggleTxnFieldsForCurrency(currencySelect.value);
     } catch (error) {
       console.error('Order submission error:', error);
@@ -249,13 +233,18 @@ document.addEventListener('DOMContentLoaded', () => {
       ordersContainer.innerHTML = '<h3>My Orders</h3>';
       snapshot.forEach(docSnap => {
         const order = docSnap.data();
+        const statusClass = String(order.status || '').toLowerCase().replace(/ /g, '-');
+        const statusText = order.status === 'Pending Confirmation'
+          ? '<span style="color:#d97706;font-weight:600;">Pending Confirmation</span>'
+          : `<span class="status-${statusClass}">${order.status}</span>`;
+
         const orderElement = document.createElement('div');
         orderElement.className = 'order-history-item';
         orderElement.innerHTML = `
           <p><strong>Order ID:</strong> ${order.orderId}</p>
           <p><strong>Service:</strong> ${order.serviceType}</p>
           <p><strong>Upfront Paid:</strong> ${order.upfrontPayment} ${order.currency || 'ETB'}</p>
-          <p><strong>Status:</strong> <span class="status-${String(order.status || '').toLowerCase().replace(/ /g, '-')}">${order.status}</span></p>
+          <p><strong>Status:</strong> ${statusText}</p>
           <button class="btn btn-contact-designer" data-order-id="${order.orderId}">Contact Designer</button>
         `;
         ordersContainer.appendChild(orderElement);
@@ -278,7 +267,6 @@ document.addEventListener('DOMContentLoaded', () => {
     await openChat(currentUser.uid, `Chat with ${currentUser.email}`);
   }
 
-  // --- Auth State Logic ---
   onAuthStateChanged(auth, user => {
     if (user) {
       currentUser = user;
@@ -294,21 +282,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- Event Listeners ---
   showLoginTabBtn.addEventListener('click', () => switchTab('login'));
   showSignupTabBtn.addEventListener('click', () => switchTab('signup'));
-
   loginForm.addEventListener('submit', handleLogin);
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
-
-  // Keep price reactive
   orderForm.addEventListener('input', updatePrice);
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
   generalContactBtn.addEventListener('click', handleGeneralContactClick);
-
-  // Platform toggle visibility
   togglePlatformsBtn.addEventListener('click', () => {
     const isOrderFormVisible = !orderFormContainer.classList.contains('hidden');
     if (isOrderFormVisible) {
@@ -321,12 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
       togglePlatformsBtn.textContent = 'Prefer to order on a platform?';
     }
   });
-
-  // Currency change: show right block + fix required/disabled to avoid blocked submits
   currencySelect.addEventListener('change', () => {
     toggleTxnFieldsForCurrency(currencySelect.value);
   });
-
-  // Initialize payment UI on load
   toggleTxnFieldsForCurrency(currencySelect.value);
 });
