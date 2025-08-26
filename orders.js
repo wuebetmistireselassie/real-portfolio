@@ -13,7 +13,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   serverTimestamp,
-  orderBy // ✅ Import orderBy
+  orderBy
 } from './auth.js';
 import { calculatePrice } from './price.js';
 import { openChat, sendSystemMessage } from './chat.js';
@@ -47,13 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const currencySelect = document.getElementById('currency-select');
   const paymentDetailsContainer = document.getElementById('payment-details-container');
   const feedbackEl = document.getElementById('order-feedback');
-
-  // ✅ Define currency conversion rates. Update these with your actual rates.
-  const CONVERSION_RATES = {
-    ETB: 1,
-    USD: 0.018, // Example rate: 1 ETB = 0.018 USD
-    CNY: 0.13,  // Example rate: 1 ETB = 0.13 CNY
-  };
 
   // --- Helpers ---
   function showFeedback(message, type = 'success') {
@@ -124,31 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
     authError.classList.remove('hidden');
   }
 
-  // ✅ FIXED: This function now correctly calculates the price based on the selected currency.
-  function updatePrice() {
-    const serviceType = serviceTypeSelect.value;
-    const deliveryTime = deliveryTimeSelect.value;
-    const deliverables = Array.from(document.querySelectorAll("input[name='deliverables']:checked")).map(cb => cb.value);
-    const selectedCurrency = currencySelect.value;
-
-    if (!serviceType || !deliveryTime) return;
-
-    // 1. Calculate the base price (assuming calculatePrice returns ETB)
-    const basePriceETB = calculatePrice(serviceType, deliveryTime, deliverables);
-    
-    // 2. Get the conversion rate for the selected currency
-    const conversionRate = CONVERSION_RATES[selectedCurrency] || 1;
-
-    // 3. Convert the price
-    const convertedPrice = basePriceETB * conversionRate;
-    const upfrontPayment = convertedPrice * 0.3;
-
-    // 4. Update the display with the new price and currency
-    totalPriceEl.textContent = `${convertedPrice.toFixed(2)} ${selectedCurrency}`;
-    upfrontEl.textContent = `${upfrontPayment.toFixed(2)} ${selectedCurrency}`;
-  }
-
-
   async function handleOrderSubmit(e) {
     e.preventDefault();
     clearFeedback();
@@ -217,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
         serviceType: serviceTypeSelect.value,
         deliveryTime: deliveryTimeSelect.value,
         deliverables: selectedDeliverables,
-        // ✅ FIXED: Parse the number from the text content, which now includes the currency symbol.
         totalPrice: parseFloat(totalPriceEl.textContent),
         upfrontPayment: parseFloat(upfrontEl.textContent),
         currency: selectedCurrency,
@@ -234,7 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       showFeedback('Order placed successfully! Scroll down to view it in "My Orders".', 'success');
       orderForm.reset();
-      updatePrice(); // Recalculate price after reset
+      // The inline script will handle resetting the price display after the form is cleared.
+      // Manually trigger a change event to be safe.
+      currencySelect.dispatchEvent(new Event('change'));
       toggleTxnFieldsForCurrency(currencySelect.value);
     } catch (error) {
       console.error('Order submission error:', error);
@@ -317,12 +286,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // --- Event Listeners ---
   showLoginTabBtn.addEventListener('click', () => switchTab('login'));
   showSignupTabBtn.addEventListener('click', () => switchTab('signup'));
   loginForm.addEventListener('submit', handleLogin);
   signupForm.addEventListener('submit', handleSignup);
   logoutBtn.addEventListener('click', () => signOut(auth));
-  orderForm.addEventListener('input', updatePrice); // This will now handle currency changes too
   orderForm.addEventListener('submit', handleOrderSubmit);
   ordersList.addEventListener('click', handleOrdersListClick);
   generalContactBtn.addEventListener('click', handleGeneralContactClick);
@@ -338,10 +307,13 @@ document.addEventListener('DOMContentLoaded', () => {
       togglePlatformsBtn.textContent = 'Prefer to order on a platform?';
     }
   });
+  
+  // ✅ FIXED: This listener now only handles switching the transaction input fields.
+  // The inline script in orders.html handles the price UI updates.
   currencySelect.addEventListener('change', () => {
     toggleTxnFieldsForCurrency(currencySelect.value);
-    updatePrice(); // Recalculate price when currency changes
   });
+
+  // Initial setup on page load
   toggleTxnFieldsForCurrency(currencySelect.value);
-  updatePrice(); // Initial price calculation on page load
 });
