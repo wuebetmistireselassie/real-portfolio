@@ -11,7 +11,8 @@ import {
     signInWithEmailAndPassword,
     orderBy,
     where,
-    getDocs
+    getDocs,
+    getDoc // Make sure getDoc is imported
 } from './auth.js';
 import { openChat, sendSystemMessage } from './chat.js';
 
@@ -30,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let chatsUnsubscribe = null;
     let ordersUnsubscribe = null;
 
-    // 🔑 Watch authentication state (Reverted to original working version)
+    // 🔑 Watch authentication state
     onAuthStateChanged(auth, user => {
         if (user && user.uid === ADMIN_UID) {
             adminLoginView.classList.add('hidden');
@@ -50,18 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Login form (for first-time or not logged-in admin access)
+    // Login form
     adminLoginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('admin-login-email').value;
         const password = document.getElementById('admin-login-password').value;
-
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            if (userCredential.user.uid === ADMIN_UID) {
-                // The onAuthStateChanged listener will handle the view switch
-            } else {
-                // Log out unauthorized user immediately
+            if (userCredential.user.uid !== ADMIN_UID) {
                 signOut(auth);
                 unauthorizedView.classList.remove('hidden');
             }
@@ -79,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function listenForAllOrders() {
         const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-
         ordersUnsubscribe = onSnapshot(q, (snapshot) => {
             allOrdersList.innerHTML = "";
             if (snapshot.empty) {
@@ -93,9 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 let actionButtons = '';
                 if (order.status === 'Pending Confirmation') {
+                    // ✅ FIXED: Added data-user-id to buttons
                     actionButtons = `
-                        <button class="btn btn-approve" data-order-id="${docSnap.id}">Approve</button>
-                        <button class="btn btn-reject" data-order-id="${docSnap.id}">Reject</button>
+                        <button class="btn btn-approve" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Approve</button>
+                        <button class="btn btn-reject" data-order-id="${docSnap.id}" data-user-id="${order.userId}">Reject</button>
                     `;
                 }
                 
@@ -125,45 +122,40 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener for the Approve/Reject buttons
     allOrdersList.addEventListener('click', async (e) => {
         const orderId = e.target.dataset.orderId;
+        const userId = e.target.dataset.userId; // ✅ FIXED: Get userId here
         if (!orderId) return;
 
         if (e.target.classList.contains('btn-approve')) {
-            // ✅ This is the corrected line
-            await updateOrderStatus(orderId, 'Paid');
+            await updateOrderStatus(orderId, 'Paid', userId); // ✅ FIXED: Pass userId
         } else if (e.target.classList.contains('btn-reject')) {
-            await updateOrderStatus(orderId, 'Rejected');
+            await updateOrderStatus(orderId, 'Rejected', userId); // ✅ FIXED: Pass userId
         } else if (e.target.classList.contains('btn-contact-client')) {
-            const userId = e.target.dataset.userId;
             const userEmail = e.target.dataset.userEmail;
             openChat(userId, `Chat with ${userEmail}`);
         }
     });
     
-    async function updateOrderStatus(orderId, newStatus) {
+    // ✅ FIXED: This function is now much simpler and more reliable.
+    async function updateOrderStatus(orderId, newStatus, clientUserId) {
         const orderRef = doc(db, 'orders', orderId);
         try {
+            // This will now correctly update the status in Firestore
             await updateDoc(orderRef, { status: newStatus });
-            // Removed alert for better UX
             console.log(`Order ${orderId} status updated to ${newStatus}.`);
             
-            // Send a system message to the client
-            const orderDocQuery = query(collection(db, 'orders'), where('orderId', '==', orderId));
-            const orderDocSnapshot = await getDocs(orderDocQuery);
-
-            if (!orderDocSnapshot.empty) {
-                const clientUserId = orderDocSnapshot.docs[0].data().userId;
-                sendSystemMessage(clientUserId, `Your order with ID ${orderId} has been updated to: "${newStatus}".`);
+            // This will now correctly send the system message
+            if (clientUserId) {
+                const orderSnap = await getDoc(orderRef);
+                const orderData = orderSnap.data();
+                sendSystemMessage(clientUserId, `Your order with ID ${orderData.orderId} has been updated to: "${newStatus}".`);
             }
         } catch (error) {
             console.error("Error updating order status:", error);
         }
     }
 
-
     function listenForAllChats() {
-        // NOTE: This query will fail without the correct composite index.
         const q = query(collection(db, 'conversations'), orderBy('lastUpdate', 'desc'));
-
         chatsUnsubscribe = onSnapshot(q, (snapshot) => {
             allChatsList.innerHTML = '';
             if (snapshot.empty) {
