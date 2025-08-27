@@ -16,8 +16,8 @@ const designs = [
             challenge: 'To create a complete and cohesive brand identity for a modern coffee shop, ensuring the logo and its elements are versatile enough to work seamlessly across a wide range of real-world applications.',
             solution: 'The brand identity centers around a clever and clean logo that integrates two coffee beans and a leaf into a stylized "B." The solution demonstrates the logo’s versatility by applying it consistently across an entire brand ecosystem, including packaging (coffee bags and paper bags), branded stationery (business cards and clipboards), and essential customer-facing items like coffee cups and mugs.'
         },
-        // ADD THE LINK TO YOUR BRAND GUIDELINES PDF HERE
-        brandGuidelinesUrl: '#',
+        
+        brandGuidelinesUrl: 'https://drive.google.com/file/d/1PZXeITu7ANsyOWJyh37QZe0BuGoykJWw/view?usp=drive_link',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755167320/Bean_and_Bloom_hfoasb.svg' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755344715/Bean_and_Bloom_White_version_fwd60r.png' }
@@ -43,7 +43,7 @@ const designs = [
             challenge: 'To select a powerful and impactful hero image for the SkyPulse Drones website that effectively communicates the brand\'s professional and high-tech identity and makes a memorable first impression.',
             solution: 'The strategic selection of a hero image that transcends a simple product photo. The chosen image, a high-end corporate lobby, positions the brand not just as a drone company, but as a leading, established technology firm. This image serves as the website\'s welcoming \'front door,\' immediately conveying a message of quality and trust, and creating a strong \'wow\' factor that is both aspirational and professional.'
         },
-        // ADD THE LINK TO YOUR BRAND GUIDELINES PDF HERE
+        
         brandGuidelinesUrl: '#',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755082552/SkyPulse_z1vkr9.svg' },
@@ -73,7 +73,7 @@ const designs = [
             challenge: 'To select a powerful hero image for the TechWave Electronics website that communicates a modern, high-tech brand identity.',
             solution: 'The strategic selection of a high-tech mockup that positions the brand as a leader in innovation. The chosen image, a minimalist clay smartphone, serves as a digital touchpoint, conveying a message of quality and trust in the digital age.'
         },
-        // ADD THE LINK TO YOUR BRAND GUIDELINES PDF HERE
+        
         brandGuidelinesUrl: '#',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346880/TechWave_Electronics_c6lf2v.png' },
@@ -99,7 +99,7 @@ const designs = [
             challenge: 'To create a minimalist and elegant brand identity for a sustainable goods company that not only conveys a message of environmental consciousness, but also positions the brand as a premium and artistic lifestyle choice.',
             solution: 'The logo skillfully merges a leaf with the infinity symbol to create a single, cohesive mark. The brand\'s visual identity successfully showcases this logo in a clean, artistic context, using a simple wooden frame and natural lighting to convey a message of authenticity and high quality. The chosen hero image positions the brand as an aspirational, eco-conscious statement, rather than just a product line.'
         },
-        // ADD THE LINK TO YOUR BRAND GUIDELINES PDF HERE
+        
         brandGuidelinesUrl: '#',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348325/Leafinity_Eco-Goods_ufcvkm.png' },
@@ -126,7 +126,7 @@ const designs = [
             challenge: 'To design a professional logo and establish a credible brand presence for a fictional professional services firm, ensuring the visual identity conveys trust, partnership, and excellence.',
             solution: 'The logo creatively merges a stylized "A" and "R" with a separate, impactful star icon, directly referencing the firm\'s name. The final brand application is showcased on a large-scale sign in a high-end corporate interior, effectively communicating the firm’s authority and prestige, and giving clients immediate confidence in its professional stature.'
         },
-        // ADD THE LINK TO YOUR BRAND GUIDELINES PDF HERE
+        
         brandGuidelinesUrl: '#',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png' },
@@ -153,7 +153,7 @@ const designs = [
             challenge: 'The challenge was to launch a new, premium fitness brand in a competitive market. IronCore needed a powerful and modern logo that conveyed strength and professionalism, and was versatile enough for both gym apparel and corporate branding.',
             solution: 'The solution is a bold and minimalist brand identity. A simplified weight plate icon inside a modern hexagonal shield, paired with a powerful, solid font, creates a mark that communicates core strength and professionalism. The final design successfully positions IronCore Fitness as a premium leader in the industry.'
         },
-        // ADD THE LINK TO YOUR BRAND GUIDELINES PDF HERE
+        
         brandGuidelinesUrl: '#',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542139/IronCore_Fitness_Gym_training_black_d1ex3p.png' },
@@ -179,7 +179,7 @@ const designs = [
             challenge: 'The challenge was to design a unique and memorable brand identity for "UniCombo," a new, all-in-one entertainment web app. The logo needed to be modern, vibrant, and instantly communicate the idea of "unlimited combinations" of entertainment, all available at the click of a button.',
             solution: 'The solution is a clever and dynamic logomark that visually fuses a "power on" symbol with an "infinity" loop, creating a unique shape that communicates "always-on, endless entertainment." A vibrant purple-to-blue gradient gives the brand a modern, digital-first feel that is energetic and trustworthy.'
         },
-        // ADD THE LINK TO YOUR BRAND GUIDELINES PDF HERE
+        
         brandGuidelinesUrl: '#',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755554178/UniCombo_mobile_App_cjzwyr.png' },
@@ -232,5 +232,6 @@ const services = [
 ];
 
 const allProjects = [...designs, ...services];
+
 
 
