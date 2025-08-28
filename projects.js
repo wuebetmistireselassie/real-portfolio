@@ -180,7 +180,7 @@ const designs = [
             solution: 'The solution is a clever and dynamic logomark that visually fuses a "power on" symbol with an "infinity" loop, creating a unique shape that communicates "always-on, endless entertainment." A vibrant purple-to-blue gradient gives the brand a modern, digital-first feel that is energetic and trustworthy.'
         },
         
-        brandGuidelinesUrl: '#',
+        brandGuidelinesUrl: 'https://raw.githubusercontent.com/wuebetmistireselassie/documents/main/UniCombo_Brand_Guidelines.pdf',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755554178/UniCombo_mobile_App_cjzwyr.png' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755554178/UniCombo_mobile_App_white_version_pfrhqc.png' }
@@ -232,6 +232,7 @@ const services = [
 ];
 
 const allProjects = [...designs, ...services];
+
 
 
 
