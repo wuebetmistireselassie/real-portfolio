@@ -127,7 +127,7 @@ const designs = [
             solution: 'The logo creatively merges a stylized "A" and "R" with a separate, impactful star icon, directly referencing the firm\'s name. The final brand application is showcased on a large-scale sign in a high-end corporate interior, effectively communicating the firm’s authority and prestige, and giving clients immediate confidence in its professional stature.'
         },
         
-        brandGuidelinesUrl: '#',
+        brandGuidelinesUrl: 'https://raw.githubusercontent.com/wuebetmistireselassie/documents/main/A%20%26%20R%20Stars_Brand_Guidelines.pdf',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755076464/ARStar_d3vtlb.png' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755348560/A_R_Star_Partners_LLP_White_version_lcsmyd.png' }
@@ -232,6 +232,7 @@ const services = [
 ];
 
 const allProjects = [...designs, ...services];
+
 
 
 
