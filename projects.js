@@ -154,7 +154,7 @@ const designs = [
             solution: 'The solution is a bold and minimalist brand identity. A simplified weight plate icon inside a modern hexagonal shield, paired with a powerful, solid font, creates a mark that communicates core strength and professionalism. The final design successfully positions IronCore Fitness as a premium leader in the industry.'
         },
         
-        brandGuidelinesUrl: '#',
+        brandGuidelinesUrl: 'https://raw.githubusercontent.com/wuebetmistireselassie/documents/main/IronCore%20_Brand_Guidelines.pdf',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542139/IronCore_Fitness_Gym_training_black_d1ex3p.png' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755542139/IronCore_Fitness_Gym_training_white_bjtbxb.png' }
@@ -232,6 +232,7 @@ const services = [
 ];
 
 const allProjects = [...designs, ...services];
+
 
 
 
