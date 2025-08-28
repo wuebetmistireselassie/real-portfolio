@@ -74,7 +74,7 @@ const designs = [
             solution: 'The strategic selection of a high-tech mockup that positions the brand as a leader in innovation. The chosen image, a minimalist clay smartphone, serves as a digital touchpoint, conveying a message of quality and trust in the digital age.'
         },
         
-        brandGuidelinesUrl: '#',
+        brandGuidelinesUrl: 'https://raw.githubusercontent.com/wuebetmistireselassie/documents/main/TechWave_Brand_Guidelines.pdf',
         logoVariations: [
             { type: 'full', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346880/TechWave_Electronics_c6lf2v.png' },
             { type: 'white', url: 'https://res.cloudinary.com/dreresany/image/upload/v1755346986/White_version_bxbzte.png' }
@@ -232,6 +232,7 @@ const services = [
 ];
 
 const allProjects = [...designs, ...services];
+
 
 
 
