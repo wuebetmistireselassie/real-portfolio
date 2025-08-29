@@ -6,12 +6,23 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Admin Dashboard | Orders</title>
 <script>
-      // This script redirects any ".html" requests to the clean URL
-      if (window.location.pathname.endsWith('.html')) {
-        let cleanUrl = window.location.pathname.replace(/\.html$/, '');
-        window.location.replace(window.location.origin + cleanUrl + window.location.search + window.location.hash);
-      }
-    </script>
+  // This script correctly redirects any ".html" requests to the clean URL
+  const path = window.location.pathname;
+  if (path.endsWith('.html')) {
+    // First, remove 'index.html' entirely to get the folder path
+    let cleanUrl = path.replace(/index\.html$/, ''); 
+    // Then, for any other .html files, remove the extension
+    cleanUrl = cleanUrl.replace(/\.html$/, '');
+    
+    // If the root index.html was removed, the path is now empty.
+    // The browser needs a "/" to understand it's the homepage.
+    if (cleanUrl === '') {
+      cleanUrl = '/';
+    }
+    
+    window.location.replace(window.location.origin + cleanUrl + window.location.search + window.location.hash);
+  }
+</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -119,4 +130,5 @@
     <script type="module" src="/admin_dashboard.js"></script>
 </body>
 </html>
+
 
