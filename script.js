@@ -1,29 +1,6 @@
-/**
- * NOTE: Add the following CSS to your stylesheet for the download button:
- *
- * .brand-guidelines-download {
- * margin-top: 2rem;
- * padding-top: 1.5rem;
- * border-top: 1px solid #eee;
- * }
- *
- * .download-button {
- * display: inline-block;
- * background-color: #007bff;
- * color: #ffffff;
- * padding: 10px 20px;
- * border-radius: 5px;
- * text-decoration: none;
- * font-weight: bold;
- * margin-top: 0.5rem;
- * transition: background-color 0.3s ease;
- * }
- *
- * .download-button:hover {
- * background-color: #0056b3;
- * }
- *
- */
+// ===================================================================================
+// DYNAMIC CONTENT AND PORTFOLIO FUNCTIONS (FINAL CORRECTED VERSION)
+// ===================================================================================
 
 /**
  * Sets the profile picture in the header from a profileInfo object.
@@ -41,11 +18,10 @@ function setProfilePicture() {
  * Renders the initial homepage with design and service grids.
  */
 function renderHomePage() {
-    const appContainer = document.getElementById('app-container');
     const homePage = document.getElementById('home-page');
     const projectPage = document.getElementById('project-page');
-
-    if (appContainer && homePage && projectPage) {
+    
+    if (homePage && projectPage) {
         homePage.classList.remove('hidden');
         projectPage.classList.add('hidden');
     }
@@ -58,13 +34,22 @@ function renderHomePage() {
             itemElement.className = 'portfolio-item';
             itemElement.dataset.id = item.id;
             itemElement.innerHTML = `
-                <a href="#projects/${item.id}">
+                <a href="#projects/${item.id}" class="portfolio-link">
                     <img src="${item.heroImage}" alt="${item.title}">
                     <div class="portfolio-text-content">
                         <p class="portfolio-title">${item.title}</p>
                     </div>
                 </a>
             `;
+            
+            // --- THIS IS THE CRUCIAL FIX ---
+            // Add a direct click listener to ensure navigation works
+            itemElement.addEventListener('click', (e) => {
+                e.preventDefault(); // Stop the link's default behavior
+                window.location.hash = `projects/${item.id}`; // Manually change the URL hash
+            });
+            // --- END OF FIX ---
+
             designsGrid.appendChild(itemElement);
         });
     }
@@ -75,9 +60,7 @@ function renderHomePage() {
         services.forEach(item => {
             const itemElement = document.createElement('li');
             if (item.url) {
-                itemElement.innerHTML = `
-                    <a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>
-                `;
+                 itemElement.innerHTML = `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>`;
             } else {
                 itemElement.textContent = item.title;
             }
@@ -96,56 +79,33 @@ function renderProjectPage(projectId) {
     const project = designs.find(item => item.id === projectId);
 
     if (!project) {
-        // Handle project not found
-        projectPage.innerHTML = `<section><div class="section-container"><h2>Project Not Found</h2><p>The project you're looking for does not exist.</p></div></section>`;
+        projectPage.innerHTML = `<section><div class="section-container"><h2>Project Not Found</h2><p>The project you're looking for does not exist. <a href="#home">Back to home</a></p></div></section>`;
         homePage.classList.add('hidden');
         projectPage.classList.remove('hidden');
         return;
     }
-
-    // Dynamically build the logo variations
+    
     const logoVariationsHTML = project.logoVariations.map(variation => {
         let classes = 'logo-system-item';
-        if (variation.type === 'white') {
-            classes += ' logo-display-dark-bg';
-        }
-        return `
-            <div class="${classes}">
-                <img src="${variation.url}" alt="${project.title} ${variation.type} Logo">
-                <p>${variation.type} Version</p>
-            </div>
-        `;
+        if (variation.type === 'white') classes += ' logo-display-dark-bg';
+        return `<div class="${classes}"><img src="${variation.url}" alt="${project.title} ${variation.type} Logo"><p>${variation.type} Version</p></div>`;
     }).join('');
 
-    // Dynamically build the design process gallery (if it exists)
     let processGalleryHTML = '';
     if (project.processGallery && project.processGallery.length > 0) {
-        const processImagesHTML = project.processGallery.map(processItem => `
-            <img src="${processItem.url}" alt="${project.title} Design Process">
-        `).join('');
-
-        processGalleryHTML = `
-            <div class="project-section">
-                <h3>The Design Process</h3>
-                <div class="process-gallery">
-                    ${processImagesHTML}
-                </div>
-            </div>
-        `;
+        const processImagesHTML = project.processGallery.map(processItem => `<img src="${processItem.url}" alt="${project.title} Design Process">`).join('');
+        processGalleryHTML = `<div class="project-section"><h3>The Design Process</h3><div class="process-gallery">${processImagesHTML}</div></div>`;
     }
-
-    // --- NEW: Dynamically build the brand guidelines download section ---
+    
     let brandGuidelinesHTML = '';
-    // Check if the project object has a URL for brand guidelines
-    if (project.brandGuidelinesUrl && project.brandGuidelinesUrl !== '#') {
+    if (project.brandGuidelinesUrl) {
         brandGuidelinesHTML = `
-            <div class="brand-guidelines-download">
+            <div class="project-section brand-guidelines-download">
                 <p>Download the official brand guidelines to see the complete visual identity system.</p>
-                <a href="${project.brandGuidelinesUrl}" class="download-button" target="_blank" download>Download Guidelines</a>
+                <a href="${project.brandGuidelinesUrl}" class="download-button" target="_blank">Download Guidelines (PDF)</a>
             </div>
         `;
     }
-    // --- END OF NEW CODE BLOCK ---
 
     const projectContent = `
         <button id="back-to-home" class="back-button">← Back to All Projects</button>
@@ -157,23 +117,18 @@ function renderProjectPage(projectId) {
                     <p><strong>The Challenge:</strong> ${project.brief.challenge}</p>
                     <p><strong>The Solution:</strong> ${project.brief.solution}</p>
                 </div>
-
-                <!-- The new download section will be injected here -->
+                
                 ${brandGuidelinesHTML}
 
                 <div class="project-section">
                     <h3>Logo System</h3>
-                    <div class="logo-system-grid">
-                        ${logoVariationsHTML}
-                    </div>
+                    <div class="logo-system-grid">${logoVariationsHTML}</div>
                 </div>
 
                 <div class="project-section">
                     <h3>Real-World Mockups</h3>
                     <div class="mockup-gallery">
-                        ${project.mockupGallery.map(mockup => `
-                            <img src="${mockup.url}" alt="${project.title} Mockup">
-                        `).join('')}
+                        ${project.mockupGallery.map(mockup => `<img src="${mockup.url}" alt="${project.title} Mockup">`).join('')}
                     </div>
                 </div>
 
@@ -186,9 +141,8 @@ function renderProjectPage(projectId) {
     projectPage.innerHTML = projectContent;
     homePage.classList.add('hidden');
     projectPage.classList.remove('hidden');
-    window.scrollTo(0, 0); // Scroll to top of the page
+    window.scrollTo(0, 0);
 
-    // Add event listener for the back button
     document.getElementById('back-to-home').addEventListener('click', () => {
         window.location.hash = '#home';
     });
@@ -199,13 +153,13 @@ function renderProjectPage(projectId) {
  */
 function handleRouting() {
     const hash = window.location.hash;
-    if (hash === '' || hash === '#home') {
+    if (hash === '' || hash === '#home' || !hash) {
         renderHomePage();
     } else if (hash.startsWith('#projects/')) {
         const projectId = hash.split('/')[1];
         renderProjectPage(projectId);
     } else {
-        renderHomePage(); // Fallback to home page if hash is invalid
+        renderHomePage();
     }
 }
 
@@ -215,12 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
     handleRouting();
     window.addEventListener('hashchange', handleRouting);
 
-    // Make the logo name in header a "home" button
-    const logoEl = document.querySelector('.logo-name');
-    if (logoEl) {
-        logoEl.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.hash = '#home';
-        });
-    }
+    document.querySelector('.logo-name').addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.hash = '#home';
+    });
 });
