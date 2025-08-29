@@ -5,12 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Additional Services - Microsoft office and Admin Support | Mistireselassie W. |</title>
 <script>
-      // This script redirects any ".html" requests to the clean URL
-      if (window.location.pathname.endsWith('.html')) {
-        let cleanUrl = window.location.pathname.replace(/\.html$/, '');
-        window.location.replace(window.location.origin + cleanUrl + window.location.search + window.location.hash);
-      }
-    </script>
+  // This script correctly redirects any ".html" requests to the clean URL
+  const path = window.location.pathname;
+  if (path.endsWith('.html')) {
+    // First, remove 'index.html' entirely to get the folder path
+    let cleanUrl = path.replace(/index\.html$/, ''); 
+    // Then, for any other .html files, remove the extension
+    cleanUrl = cleanUrl.replace(/\.html$/, '');
+    
+    // If the root index.html was removed, the path is now empty.
+    // The browser needs a "/" to understand it's the homepage.
+    if (cleanUrl === '') {
+      cleanUrl = '/';
+    }
+    
+    window.location.replace(window.location.origin + cleanUrl + window.location.search + window.location.hash);
+  }
+</script>
  <meta name="description" content="Explore additional services including PowerPoint presentation design, Word document formatting, Excel tasks, and administrative support from a professional freelancer in Addis Ababa.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,6 +70,7 @@
     <script src="/script.js"></script>
 </body>
 </html>
+
 
 
 
