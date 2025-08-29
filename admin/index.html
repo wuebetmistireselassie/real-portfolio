@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Admin Dashboard | Orders</title>
+<script>
+      // This script redirects any ".html" requests to the clean URL
+      if (window.location.pathname.endsWith('.html')) {
+        let cleanUrl = window.location.pathname.replace(/\.html$/, '');
+        window.location.replace(window.location.origin + cleanUrl + window.location.search + window.location.hash);
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -112,3 +119,4 @@
     <script type="module" src="/admin_dashboard.js"></script>
 </body>
 </html>
+
