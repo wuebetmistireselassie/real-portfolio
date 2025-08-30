@@ -1,0 +1,29 @@
+{
+  "about": "Mistireselassie W. is a freelance designer in Addis Ababa, Ethiopia. He offers professional logo design, branding services, and Microsoft Office support (PowerPoint, Word, Excel, Data Entry).",
+  "services": [
+    "Logo Design (custom, minimalist, restaurant, tech, Amharic logos)",
+    "Brand Identity & Branding Services",
+    "PowerPoint Presentation Design",
+    "Microsoft Word Document Formatting",
+    "Microsoft Excel (Data Entry, Formulas, Dashboards)",
+    "File Conversion (PDF, SVG, PNG, etc.)",
+    "Administrative Support"
+  ],
+  "pricing": {
+    "logo": "Starts from XX birr depending on package.",
+    "powerpoint": "Custom slide design – XX birr per slide.",
+    "word": "Document formatting – starts at XX birr.",
+    "excel": "Excel support – price depends on complexity."
+  },
+  "projects": {
+    "beanbloom": "Creative coffee shop logo design for Bean & Bloom in Addis Ababa. Warm, minimalist branding tailored for cafés and Ethiopian coffee culture.",
+    "skypulse": "High-tech drone company brand identity with geometric logo and corporate applications.",
+    "techwave": "Electronics company branding with a futuristic minimalist logo.",
+    "leafinity": "Eco-goods logo merging leaf with infinity, symbolizing sustainability.",
+    "arstar": "Corporate firm branding with A&R initials combined with a star.",
+    "ironcore": "Premium gym and fitness logo using strong shield-like icon.",
+    "unicombo": "Entertainment app branding with infinity + power-on logo.",
+    "moneyflow": "Financial app logo with looping arrows around a dollar sign."
+  },
+  "contact": "Email: your@email.com | Location: Addis Ababa, Ethiopia"
+}
