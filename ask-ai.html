@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask AI - Mistireselassie W.</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+    #chat { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    .msg { margin: 10px 0; }
+    .user { text-align: right; color: blue; }
+    .bot { text-align: left; color: green; }
+    input { width: 80%; padding: 10px; }
+    button { padding: 10px; }
+  </style>
+</head>
+<body>
+  <div id="chat">
+    <h2>Ask AI about my services</h2>
+    <div id="messages"></div>
+    <input id="question" placeholder="Type your question...">
+    <button onclick="askAI()">Ask</button>
+  </div>
+
+  <script>
+    let knowledge = {};
+
+    // Load knowledge base
+    fetch("knowledge.json")
+      .then(res => res.json())
+      .then(data => knowledge = data);
+
+    function askAI() {
+      const q = document.getElementById("question").value.toLowerCase();
+      const messages = document.getElementById("messages");
+
+      // Add user message
+      messages.innerHTML += `<div class="msg user">${q}</div>`;
+
+      let answer = "I couldn't find an exact match, but I can help with logo design, branding, or Microsoft Office services.";
+
+      // Simple keyword search
+      if (q.includes("logo")) answer = knowledge.services[0];
+      if (q.includes("price") || q.includes("cost")) answer = JSON.stringify(knowledge.pricing);
+      if (q.includes("bean") || q.includes("coffee")) answer = knowledge.projects.beanbloom;
+      if (q.includes("drone") || q.includes("skypulse")) answer = knowledge.projects.skypulse;
+      if (q.includes("contact")) answer = knowledge.contact;
+
+      // Add bot message
+      messages.innerHTML += `<div class="msg bot">${answer}</div>`;
+      document.getElementById("question").value = "";
+    }
+  </script>
+</body>
+</html>
