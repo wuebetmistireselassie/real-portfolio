@@ -1,29 +1,24 @@
 {
-  "about": "Mistireselassie W. is a freelance designer in Addis Ababa, Ethiopia. He offers professional logo design, branding services, and Microsoft Office support (PowerPoint, Word, Excel, Data Entry).",
-  "services": [
-    "Logo Design (custom, minimalist, restaurant, tech, Amharic logos)",
-    "Brand Identity & Branding Services",
-    "PowerPoint Presentation Design",
-    "Microsoft Word Document Formatting",
-    "Microsoft Excel (Data Entry, Formulas, Dashboards)",
-    "File Conversion (PDF, SVG, PNG, etc.)",
-    "Administrative Support"
-  ],
-  "pricing": {
-    "logo": "Starts from XX birr depending on package.",
-    "powerpoint": "Custom slide design – XX birr per slide.",
-    "word": "Document formatting – starts at XX birr.",
-    "excel": "Excel support – price depends on complexity."
-  },
-  "projects": {
-    "beanbloom": "Creative coffee shop logo design for Bean & Bloom in Addis Ababa. Warm, minimalist branding tailored for cafés and Ethiopian coffee culture.",
-    "skypulse": "High-tech drone company brand identity with geometric logo and corporate applications.",
-    "techwave": "Electronics company branding with a futuristic minimalist logo.",
-    "leafinity": "Eco-goods logo merging leaf with infinity, symbolizing sustainability.",
-    "arstar": "Corporate firm branding with A&R initials combined with a star.",
-    "ironcore": "Premium gym and fitness logo using strong shield-like icon.",
-    "unicombo": "Entertainment app branding with infinity + power-on logo.",
-    "moneyflow": "Financial app logo with looping arrows around a dollar sign."
-  },
-  "contact": "Email: your@email.com | Location: Addis Ababa, Ethiopia"
+  "branding": "Branding is more than just a logo — it is the process of creating a unique identity for a business. It includes the logo, typography, colors, tone of communication, and overall customer experience. Strong branding builds trust and recognition.",
+  "logo": "Logo design is the art of creating a simple yet memorable symbol that represents a business. A good logo reflects professionalism, uniqueness, and the brand’s vision.",
+  "logo design": "@logo",
+  "logos": "@logo",
+  "identity": "@branding",
+
+  "services": "I provide professional logo design, branding, and Microsoft Office support. Services include: minimalist, tech, and restaurant logo design, branding identity packages, as well as PowerPoint, Word, and Excel formatting.",
+  "order": "To order services, visit the 'Order Services' page or contact me directly via email (changesat2021@gmail.com) or WhatsApp (+251 919 981 116).",
+  "pricing": "Pricing depends on the project. Logo packages start affordably and scale depending on complexity. Microsoft Office services are charged per document or slide. Contact me with details for an exact quote.",
+  
+  "mission": "My mission is to provide businesses and individuals with clear, compelling, and professional visual identities by merging creative design with technical precision.",
+  "vision": "My vision is to be the go-to resource for clients seeking seamless, high-quality design and document solutions, empowering them to present their best work.",
+  "goal": "My goal is to build lasting partnerships by consistently delivering exceptional results with reliability and clear communication.",
+
+  "contact": "You can contact me by email at changesat2021@gmail.com, WhatsApp at +251 919 981 116, or Telegram @google4to. I am based in Addis Ababa, Ethiopia.",
+  "email": "@contact",
+  "whatsapp": "@contact",
+  "telegram": "@contact",
+
+  "projects": "I have created original logo concepts such as Bean & Bloom Coffee Shop, SkyPulse Drones, TechWave Electronics, Leafinity Eco-Goods, A&R Star Partners, IronCore Fitness, UniCombo App, and Money Flow App. Each project represents creative problem-solving and unique brand identity.",
+  "portfolio": "@projects",
+  "designs": "@projects"
 }
