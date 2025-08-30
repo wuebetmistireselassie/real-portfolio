@@ -34,7 +34,7 @@ async function removeBg(file) {
   const response = await fetch("https://api.remove.bg/v1.0/removebg", {
     method: "POST",
     headers: {
-      "X-Api-Key": "YOUR_API_KEY_HERE", // 👈 replace with your key
+      "X-Api-Key": "oBu57admnPohskcakQVrsP1L", // 👈 replace with your key
     },
     body: formData,
   });
