@@ -1,3 +1,6 @@
+const selfieBtn = document.getElementById("selfieBtn");
+const selfieModal = document.getElementById("selfieModal");
+const closeModal = document.getElementById("closeModal");
 const uploadInput = document.getElementById("upload");
 const projectSelect = document.getElementById("projectSelect");
 const mockupGallery = document.getElementById("mockupGallery");
@@ -5,7 +8,16 @@ const selfieImage = document.getElementById("selfieImage");
 const selfieCanvas = document.getElementById("selfieCanvas");
 const saveBtn = document.getElementById("saveBtn");
 
-// 1. Populate project selector
+// ==== 1. Modal toggle ====
+selfieBtn.addEventListener("click", () => {
+  selfieModal.style.display = "block";
+});
+
+closeModal.addEventListener("click", () => {
+  selfieModal.style.display = "none";
+});
+
+// ==== 2. Populate project selector from projects.js ====
 designs.forEach((proj) => {
   const opt = document.createElement("option");
   opt.value = proj.id;
@@ -13,16 +25,42 @@ designs.forEach((proj) => {
   projectSelect.appendChild(opt);
 });
 
-// 2. Handle selfie upload
-uploadInput.addEventListener("change", (e) => {
+// ==== 3. Remove background function ====
+async function removeBg(file) {
+  const formData = new FormData();
+  formData.append("image_file", file);
+  formData.append("size", "auto");
+
+  const response = await fetch("https://api.remove.bg/v1.0/removebg", {
+    method: "POST",
+    headers: {
+      "X-Api-Key": "YOUR_API_KEY_HERE", // 👈 replace with your key
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    alert("Failed to remove background!");
+    return null;
+  }
+
+  const blob = await response.blob();
+  return URL.createObjectURL(blob);
+}
+
+// ==== 4. Handle selfie upload ====
+uploadInput.addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (file) {
-    selfieImage.src = URL.createObjectURL(file);
-    selfieImage.style.display = "block";
+    const bgRemovedUrl = await removeBg(file);
+    if (bgRemovedUrl) {
+      selfieImage.src = bgRemovedUrl;
+      selfieImage.style.display = "block";
+    }
   }
 });
 
-// 3. Show mockup gallery for selected project
+// ==== 5. Show mockup gallery for selected project ====
 projectSelect.addEventListener("change", (e) => {
   mockupGallery.innerHTML = "";
   const selected = designs.find((d) => d.id === e.target.value);
@@ -31,13 +69,15 @@ projectSelect.addEventListener("change", (e) => {
       const img = document.createElement("img");
       img.src = mock.url;
       img.alt = mock.altText;
+      img.style.width = "120px";
+      img.style.margin = "5px";
       img.addEventListener("click", () => addOverlay(mock.url));
       mockupGallery.appendChild(img);
     });
   }
 });
 
-// 4. Add draggable overlay
+// ==== 6. Add draggable overlay ====
 function addOverlay(url) {
   const img = document.createElement("img");
   img.src = url;
@@ -45,7 +85,6 @@ function addOverlay(url) {
   img.style.left = "50px";
   img.style.top = "50px";
 
-  // drag logic
   let isDragging = false, offsetX = 0, offsetY = 0;
 
   img.addEventListener("mousedown", (e) => {
@@ -67,7 +106,7 @@ function addOverlay(url) {
   selfieCanvas.appendChild(img);
 }
 
-// 5. Export selfie
+// ==== 7. Export selfie with overlays ====
 saveBtn.addEventListener("click", async () => {
   html2canvas(selfieCanvas).then((canvas) => {
     const link = document.createElement("a");
