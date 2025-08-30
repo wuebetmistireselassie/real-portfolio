@@ -53,3 +53,27 @@ body {
   cursor: move;
   max-width: 150px;
 }
+#selfieModal {
+  position: fixed;
+  top: 10%;
+  left: 10%;
+  width: 80%;
+  background: #fff;
+  border: 2px solid #333;
+  padding: 20px;
+  z-index: 1000;
+}
+
+#selfieCanvas {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  border: 2px dashed #ccc;
+  margin-top: 10px;
+}
+
+#selfieCanvas img.overlay {
+  position: absolute;
+  max-width: 150px;
+  cursor: move;
+}
