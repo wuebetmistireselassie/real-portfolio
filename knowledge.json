@@ -5,6 +5,19 @@
   "logos": "@logo",
   "identity": "@branding",
 
+  "hello": "Hello 👋! Welcome to my portfolio. How can I assist you today?",
+  "hi": "Hi there! 👋 Feel free to ask me about logo design, branding, pricing, or services.",
+  "hey": "@hello",
+
+  "what are services": "I offer Logo Design, Branding, and Microsoft Office support. Each service is tailored to your needs.",
+  "services list": "@what are services",
+  "our services": "@what are services",
+
+  "explore": "You can explore my portfolio and services directly here: <a href='/#designs'>Designs</a> | <a href='/orders'>Order Services</a> | <a href='/#about'>About Me</a> | <a href='/#contact'>Contact</a>.",
+  "links": "@explore",
+  "direct links": "@explore",
+  "more info": "@explore",
+
   "services": "I provide professional logo design, branding, and Microsoft Office support. Services include: minimalist, tech, and restaurant logo design, branding identity packages, as well as PowerPoint, Word, and Excel formatting.",
   "order": "To order services, visit the 'Order Services' page or contact me directly via email (changesat2021@gmail.com) or WhatsApp (+251 919 981 116).",
   "pricing": "Pricing depends on the project. Logo packages start affordably and scale depending on complexity. Microsoft Office services are charged per document or slide. Contact me with details for an exact quote.",
